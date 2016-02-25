@@ -1,0 +1,28 @@
+<openerp>
+	<data>
+        <!-- Adding commision field in the product.attribute.value -->
+        <record id="product_attribute_value_custom" model="ir.ui.view">
+            <field name="name">product.attribute.value</field>
+            <field name="model">product.attribute.value</field>
+            <field name="inherit_id" ref="product.variants_tree_view"/>
+            <field name="arch" type="xml">
+				<field name = "name" position ="after">
+					<field name ="commission"/>				
+				</field>
+            </field>
+        </record>	        
+        <!-- Adding Miscellaneous field for Miscellaneous variants in product.product -->
+        <record id="product_product_custom" model="ir.ui.view">
+            <field name="name">product.product</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+				<field name = "active" position ="after">
+					<field name ="misc"/>
+					<field name = "shipping"/>
+					<field name = "market_case"/>				
+				</field>
+            </field>
+        </record>	
+	</data>
+</openerp>

@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="marketing_package">
+		<tr>
+			<td style ="text-align:center;max-width:30px" ><t t-esc="name"></t></td>
+			<td style ="text-align:center;max-width:30px">
+				<input id = "select" type = "checkbox" />
+			</td>
+			<td style ="text-align:center;max-width:30px">
+				<input id = "qty" type="number" t-att-value = 'qty' style = "width:60px" />
+			</td>
+			<td>
+				<button  id = "kl" type="button" class = "oe_highlight">Change Details</button>
+			</td>
+			<td style ="text-align:center;">
+				<input type="number" id = "subtotal_marketing" t-att-value = 'total' style = "width:100px" step="0.01" readonly="1"/>
+			</td>
+		</tr>
+	</t>
+	<t t-name="jjuice.action" id = "custom_graph" style="height:100%">
+    <div  style="width:auto;padding: 40px 40px 40px;" name = "jjuice_action_start">
+    	<div style = "float:right;">
+	    	<button type="button" class = "oe_highlight" id = "confirm_order"  >Confirm Order</button>	
+	    	<button type="button" class = "oe_highlight" id = "check_availability">Check Availability</button>    									    	
+    	</div>
+    	<ul class="tabs" data-persist="true">
+        	<t t-foreach = "page" t-as="tab_head">
+	            <li class = "tab_head" t-att-name = "tab_head.id" ><a  t-att-href="'#'+tab_head.name" ><span t-esc = "tab_head.name"></span></a></li>
+        	</t>
+    		<li class = "tab_head" name = "other_info" >
+    			<a  t-att-href="'#other_info'" >
+    				<span t-esc = "'Other Info'"></span>
+				</a>
+			</li>
+    		<li class = "tab_head" name = "misc" >
+    			<a  t-att-href="'#misc'" >
+    				<span t-esc = "'Miscellaneous'"></span>
+				</a>
+			</li>
+    		<li class = "tab_head" name = "marketing" >
+    			<a  t-att-href="'#marketing'" >
+    				<span t-esc = "'Marketing'"></span>
+				</a>
+			</li>						
+    		<li class = "tab_head" name = "misc" >
+    			<a  t-att-href="'#extra'" >
+    				<span t-esc = "'Free Samples'"></span>
+				</a>
+			</li>	
+        </ul>    	
+        <div align = "center" class="tabcontents" style = "overflow-x:scroll;">
+        	<t t-foreach = "page" t-as = "tab_body">
+		        <div class = "hide_tab tab_body" perm_print="print" t-att-print_name = "tab_body.name" t-att-id="tab_body.name" t-att-name = "tab_body.id">
+					<t t-foreach = "vols" t-as="records">
+							<t t-if="records.vol_id == tab_body.id">
+								<table class ="table" style = "table-layout:fixed;overflow:hidden;page-break-inside:auto;">
+									<thead>
+										<th></th>
+										<t t-foreach = "conc_id_internal" t-as = "conc">
+											<th style ="text-align:center;max-width:30px" t-att-name = "conc.id" class = "conc_head text-center"><span t-esc = "conc.name"></span></th>
+										</t>
+											<th style ="text-align:center;max-width:30px" t-att-name = "price" class = "price_head text-center"><span t-esc = "'Unit Price'"></span></th>
+											<th style ="text-align:center;max-width:50px" t-att-name = "total" class = "total_head text-center"><span t-esc = "'Sub Total'"></span></th>										
+									</thead>
+									<tbody>
+										<t t-foreach = "records.template_list" t-as = "rows">
+											<tr class ="delete">
+												<td><span t-att-name = "rows.id" t-esc = "rows.name"></span></td>
+												<t t-foreach = "conc_id_internal" t-as = "conc">
+													<t t-if = "get_perm(conc.id,rows)"> 
+														<td  style ="text-align:center;max-width:30px" id = "qty" t-att-class = "conc.id+' '+records.vol_id+' '+rows.id"><input type="number" name = "charge" t-att-vol = "records.vol_id" t-att-conc = "conc.id" t-att-id = "rows.id"   class="qty jjuice" style="width:60px"></input></td>	
+													</t>
+													<t t-if = "!get_perm(conc.id,rows)">
+														<td style ="text-align:center;max-width:30px" t-att-class = "conc.id+' '+records.vol_id+' '+rows.id"><input readonly="1" style="width:60px"></input></td>
+													</t>	
+												</t>
+												<td  style ="text-align:center;max-width:30px"><input class="price jjuice" t-att-vol = "records.vol_id" t-att-id = "rows.id" t-att-value = "price[records.vol_id] or 0.00"  type="number" step = "0.001" style="width:60px"></input></td>
+												<td  style ="text-align:center;max-width:30px"><input readonly = "1" t-att-vol = "records.vol_id"  id = "subtotal" t-att-product = "rows.id"  t-att-value = "0.00"  type="number" step = "0.001" style="width:80px"></input></td>												
+											</tr>
+										</t>
+										<tr>
+											<td><b>Per Strength Total</b></td>
+											<t	t-foreach = "conc_id_internal" t-as = "conc">
+												<td  style ="text-align:center;max-width:30px">
+													<input style="width:70px" id = "qty_total" t-att-vol = "records.vol_id" t-att-conc = "conc.id" type = "number" readonly = "1"/>
+												</td>
+											</t>
+											<td></td>
+											<td></td>										
+										</tr>
+									</tbody>
+								</table> 
+							</t>
+						</t>
+		            </div>
+	      		</t>
+	      		<div class = "hide_tab tab_body"  align="left" id="other_info">
+	      			<span>
+	      			Internal Sale : <input value = 'true' class = "internal_sale" type = "checkbox"></input>	
+	      			</span>
+	      			<br/>
+					<h1>Sale Representatives</h1>
+					<br/>	      			
+	      			<form>
+						<t t-foreach = "employ" t-as = "emp">
+							<span t-esc="emp.name[1]"></span> <input t-att-value = "emp.id" class = "select" type = "checkbox" t-att-id = "emp.id"></input>
+						</t>
+					</form>
+	      		</div>
+      		<div class = "hide_tab tab_body" align="left" t-att-print_name = "'Free Samples('+free_attr_name+')'" id="extra" perm_print = "print">
+				<table class ="table" style = "table-layout:fixed;overflow:hidden;page-break-inside:auto;">
+					<thead>
+						<th></th>
+						<t t-foreach = "conc_id_internal" t-as = "conc">
+							<th style ="text-align:center;max-width:30px" t-att-name = "conc" t-att-conc = "conc.id" class = "conc_head text-center"><span t-esc = "conc.name"></span></th>
+						</t>
+					</thead>
+					<tbody>
+						<t t-foreach = "extra" t-as = "sample">
+							<tr class = "delete">
+								<td><span name = "extra" t-att-id = "sample.id" t-esc = "sample.name"></span></td>
+								<t t-foreach = "conc_id_internal" t-as = "conc">
+									<t t-if = "get_perm(conc.id,sample)"> 
+										<td name = "extra" t-att-class = "conc.id+' '+free_attr+' '+sample.id" style ="text-align:center;max-width:30px" id = "qty" ><input type="number"  t-att-conc = "conc.id" t-att-vol = "free_attr" t-att-id = "sample.id" attribute = "extra"   class="qty jjuice" style="width:60px"></input></td>	
+									</t>
+									<t t-if = "!get_perm(conc.id,sample)">
+										<td style ="text-align:center;max-width:30px"><input type="number" readonly="1"  style="width:60px"></input></td>
+									</t>	
+								</t>
+								<td style = "border: 0px"><span></span></td>
+							</tr>						
+						</t>
+						<tr>
+							<td style ="text-align:center;" ><b>Total</b></td>
+							<t t-foreach = "conc_id_internal" t-as = "conc">
+								<td  style ="text-align:center;max-width:30px">
+									<input style="width:70px" t-att-conc = "conc.id" name = "extra" id = "qty_total" value = "0"  type = "number" readonly = "1"/>
+								</td>							
+							</t>							
+						</tr>
+					</tbody>
+				</table>
+			</div>
+      		<div class = "hide_tab tab_body" align="left" print_name = "Miscellaneous" id="misc" perm_print = "print">
+				<table class ="table" style = "table-layout:fixed;overflow:hidden;page-break-inside:auto;">
+					<thead>
+						<th>Product Name</th>
+						<th style ="text-align:center;max-width:30px" name = "qty" class = "conc_head text-center"><span t-esc = "'Qty'"></span></th>
+						<th style ="text-align:center;max-width:30px" name = "price" class = "price_head text-center"><span t-esc = "'Unit Price'"></span></th>
+						<th style ="text-align:center;max-width:50px" name = "sub_total" class = "total_head text-center"><span t-esc = "'Sub Total'"></span></th>										
+					</thead>
+					<tbody>
+						<t t-foreach = "misc" t-as = "record">
+							<tr class = "delete">
+								<td>
+									<span t-esc = "record.name"></span>
+								</td>
+								<td style ="text-align:center;max-width:30px">
+									<input type="number"  t-att-id = "record.id" attribute = 'misc'   class="qty jjuice" style="width:60px"></input>
+								</td>
+								<td style ="text-align:center;max-width:30px">
+									<input type="number"  t-att-id = "record.id" t-att-value = "record.price" attribute = 'misc'   class="price jjuice" style="width:60px"></input>
+								</td>
+								<td style ="text-align:center;max-width:30px">
+									<input type="number" readonly="1"  id = "subtotal" step = "0.001" value = "0" attribute = 'misc_sub_total'   class="jjuice" style="width:60px"></input>
+								</td>									
+							</tr>
+						</t>
+						<tr>
+							<td style ="text-align:center;" ><b>Total</b></td>
+								<td  style ="text-align:center;max-width:30px">
+									<input style="width:70px" id = "qty_total" name = "misc"  type = "number" readonly = "1"/>
+								</td>
+							</tr>										
+						</tbody>
+					</table>
+	      		</div>
+<!-- Marketing -->
+	      		<div class = "hide_tab tab_body" align="left" print_name = "Marketing Products" id="marketing" perm_print = "print">
+					<table class = "table" style = "table-layout:fixed;overflow:hidden;page-break-inside:auto;" id = "marketing_package">
+						<thead>
+							<th>Package Name</th>
+							<th style ="text-align:center;max-width:30px">Select</th>
+							<th style ="text-align:center;max-width:30px">Quantity</th>
+							<th></th>
+							<th style ="text-align:center;max-width:30px">Total</th>
+						</thead>
+						<tbody>
+						
+						</tbody>
+					</table>
+					<table class ="table" style = "table-layout:fixed;overflow:hidden;page-break-inside:auto;">
+						<thead>
+							<th>Product Name</th>
+							<th style ="text-align:center;max-width:30px" name = "qty" class = "conc_head text-center"><span t-esc = "'Qty'"></span></th>
+							<th style ="text-align:center;max-width:30px" name = "price" class = "price_head text-center"><span t-esc = "'Unit Price'"></span></th>
+							<th style ="text-align:center;max-width:30px" name = "discount_marketing" class = "price_head text-center"><span t-esc = "'Discount %'"></span></th>
+							<th style ="text-align:center;max-width:50px" name = "sub_total" class = "total_head text-center"><span t-esc = "'Sub Total'"></span></th>										
+						</thead>
+						<tbody>
+							<t t-foreach = "marketing" t-as = "record">
+								<tr class = "delete">
+									<td>
+										<span t-esc = "record.name"></span>
+									</td>
+									<td style ="text-align:center;max-width:30px">
+										<input type="number"  t-att-id = "record.id" attribute = 'marketing'   class="qty jjuice" style="width:60px"></input>
+									</td>
+									<td style ="text-align:center;max-width:30px">
+										<input type="number"  t-att-id = "record.id" t-att-value = "record.price" attribute = 'marketing'   class="price jjuice" style="width:60px"></input>
+									</td>
+									<td style ="text-align:center;max-width:30px">
+										<input type="number"  t-att-id = "record.id" step = "0.001" value = "0" attribute = 'marketing_discount'   class="jjuice" style="width:60px"></input>
+									</td>																		
+									<td style ="text-align:center;max-width:30px">
+										<input type="number" readonly="1"  id = "subtotal" step = "0.001" value = "0" attribute = 'marketing_sub_total'   class="jjuice" style="width:60px"></input>
+									</td>									
+								</tr>
+							</t>
+							<tr>
+								<td style ="text-align:center;" ><b>Total</b></td>
+									<td  style ="text-align:center;max-width:30px">
+										<input style="width:70px" id = "qty_total" name = "marketing"  type = "number" readonly = "1"/>
+									</td>
+								</tr>										
+							</tbody>
+						</table>
+		      		</div>	      			      			      		
+	        </div>
+	    </div>
+      		
+
+							    
+        <div class="row"  style="padding: 5px 40px 40px;">
+        	<div  perm_print = "print" print_name = "" class="col-xs-5 pull-left">
+        		<div>
+	                <table class="table table-condensed">
+		                    <tr class="border-black">
+		                        <td><strong>Total Units</strong></td>
+		                        <td class="text-right">
+			                        <input type = "number" step = "0.001" readonly = "1" id = "total_strength"></input>
+		                        </td>
+		                    </tr>
+		                    <tr class="border-black" rowspan="6" colspan="2">
+		                    	<td><strong>Order Notes</strong></td>
+		                    	<td>
+		                    		<textarea id = "order_note" class="field_text" rows="6"  placeholder="Put an internal note..." style="overflow: hidden; word-wrap: break-word; resize: vertical;width:260px"></textarea>
+		                    	</td>
+		                    </tr>                	
+	               </table>        		
+        		</div>
+				<div>
+	               <h3>Payment Plan</h3>
+					<table class="create_field add_line_container"><tr><td><a href="javascript:void(0)" class="add_line">Add an item</a></td></tr></table>
+					<div class="action_pane create"> <!-- Working -->
+	
+	           		</div>				
+				</div>
+			   <!--  <button type = "button" id = "trial">Trial Button</button> -->
+
+       	 </div>
+            <div class="col-xs-6 pull-right" id = "final_bill">
+                <table class="table table-condensed">
+                    <tr class="border-black">
+                        <td><strong>Subtotal ($)</strong></td>
+                        <td class="text-right">
+                            <!--  <span t-field="o.amount_untaxed"
+                                t-field-options='{"widget": "monetary", "display_currency": "o.pricelist_id.currency_id"}'/> -->
+                                <input type = "number" step = "0.001" readonly = "1" id = "total_without_tax"></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>S and H ($)</td>
+                        <td class="text-right">
+                            <!--  <span t-field="o.amount_tax"
+                                t-field-options='{"widget": "monetary", "display_currency": "o.pricelist_id.currency_id"}'/> -->
+                                <input id = "shipping" class = "bill" type = "number" step ="0.001" value = "0"/>
+                        </td>
+                    </tr>                                                            
+					<tr>
+                        <td>Discount %</td>
+                        <td class="text-right">
+                            <!--  <span t-field="o.amount_tax"
+                                t-field-options='{"widget": "monetary", "display_currency": "o.pricelist_id.currency_id"}'/> -->
+                                <input id = "discount_rate" class = "bill" type = "number" step ="0.001" value = "0"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Discount ($)</td>
+                        <td class="text-right">
+                            <!--  <span t-field="o.amount_tax"
+                                t-field-options='{"widget": "monetary", "display_currency": "o.pricelist_id.currency_id"}'/> -->
+                                <input type = "number"  step = "0.001" class="bill"  id = "discount"/>
+                        </td>
+                    </tr>                    
+                    <tr>
+                        <td>Tax Rate %</td>
+                        <td class="text-right">
+	                        <t t-foreach = "tax" t-as = "tax_line">
+	                        	<span t-esc = "tax_line.name+':'"></span><input name = "tax" type = "checkbox" t-att-id = "tax_line.id" t-att-value = "tax_line.amount"/>
+	                        </t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Tax ($)</td>
+                        <td class="text-right">
+                            <!--  <span t-field="o.amount_tax"
+                                t-field-options='{"widget": "monetary", "display_currency": "o.pricelist_id.currency_id"}'/> -->
+                                <input id = "tax" type="number" step = "0.001" readonly = "1"/>
+                        </td>
+                    </tr>                    
+                    <tr class="border-black">
+                        <td><strong>Total ($)</strong></td>
+                        <td class="text-right">
+                            <input type = "number" step = "0.001" readonly = "1"  id = "main_total"  />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+	</t>
+	<t t-name = "fields_right_create">
+		<tr>
+			<td><strong><span t-esc = "label"></span></strong></td>
+			<td id = "field">
+			</td>
+		</tr>
+	</t>
+	<t t-name = "payment_line_create">
+		<div class = "payment_line">
+			<div id="orangeBox" style = "float:right;display:inline-block;">
+  				<a href = "#" id="x">X</a>
+			</div>
+			<div class="oe_form create_form" style = "display:inline-block;float:left;">
+				<div style = "width:20%;float:left;padding-right:20px">
+					<span style = "vertical-align: middle"><strong><span>Payment <t t-esc = "length+1"></t></span></strong></span>
+				</div>
+				<div class = "fields_liners" style = "float:right">
+				</div>
+			</div>
+		</div>
+	</t>
+    <t t-name="form_create_field_jjuice_right">
+        <table t-att-class='"create_field create_"+id'>
+	        <tr>
+	            <td class="create_account_container" col="5" t-att-class='"create_"+id+"_container"'></td>
+	        </tr>
+        </table>
+    </t>	
+    <t t-name="form_create_field_jjuice">
+        <table t-att-class='"create_field create_"+id'>
+	        <tr>
+	            <td class="create_account_container" col="5" t-att-class='"create_"+id+"_container"'></td>
+	        </tr>
+        </table>
+    </t>
+</templates>

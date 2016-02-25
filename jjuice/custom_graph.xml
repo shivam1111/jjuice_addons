@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        
+    	<template id="assets_backend" name="jjuice assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <script type="text/javascript" src="/jjuice/static/src/js/jjuice.js"></script>
+                <script type="text/javascript" src="/jjuice/static/src/js/tabcontent.js"></script>
+                <link href="/jjuice/static/src/css/tabcontent.css" rel="stylesheet" type="text/css" />
+            </xpath>
+        </template>
+        
+        <record model="ir.actions.client" id="action_client_graph">
+            <field name="name">JJuice</field>
+            <field name="tag">graph.action</field>
+        </record>
+    </data>
+</openerp>
