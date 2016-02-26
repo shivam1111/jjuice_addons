@@ -10,6 +10,7 @@
 ##Leads/Potential Customers 
 
 > This is our own workflow for leads
+
 - A new Menu item Leads/Potential Customers is created
 - [ ] By default when creating a new lead the lead checkbox should be ticked 	
 
