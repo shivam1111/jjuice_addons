@@ -27,7 +27,7 @@
                     <button class="oe_inline oe_stat_button" type="action" name="%(sale.act_res_partner_2_sale_order)d" 
                         attrs="{'invisible': [('leads', '=', False)]}"
                         icon="fa-strikethrough">
-                        <field string="Quotations" name="sale_order_count" widget="statinfo"/>
+                        <field string="Quotations" name="draft_order_count" widget="statinfo"/>
                     </button>     
                 </xpath>
 				

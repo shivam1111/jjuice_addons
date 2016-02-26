@@ -53,11 +53,29 @@ class res_partner_order(osv.osv):
                 'tag':'graph.action',
                 'context':context,
                 }
+    
+    def _draft_order_count(self, cr, uid, ids, field_name, arg, context=None):
+        res = dict(map(lambda x: (x,0), ids))
+        # The current user may not have access rights for sale orders
+        try:
+            for partner in self.browse(cr, uid, ids, context):
+                count = 0
+                # First make total list of sale orders to look for quotations
+                list_order = partner.sale_order_ids + partner.mapped('child_ids.sale_order_ids')
+                for i in list_order:
+                    if i.state == "draft":
+                        count = count + 1
+                res[partner.id] = count
+        except:
+            pass
+        return res
+    
     _columns={
               "leads":fields.boolean("Lead"),
               "order":fields.one2many("res.partner.order","partners"),
               'volume_prices':fields.one2many('volume.prices.line','customer_id',"Prices"),             
-              'email_multi_to':fields.one2many('multi.email','partner_id',"Addition Email IDs")
+              'email_multi_to':fields.one2many('multi.email','partner_id',"Addition Email IDs"),
+              'draft_order_count': fields.function(_draft_order_count, string='# of Sales Order', type='integer'),
               }
 
 class multi_email(osv.osv):

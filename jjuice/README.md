@@ -21,5 +21,6 @@
 - [x] A new Menu item Leads/Potential Customers is created (res_partner_view.xml)
 - [x] A customer cannot be a partner and lead at the same time (res_partner.py) 
 - [x] By default when creating a new lead the lead checkbox should be ticked (res_partner.py)	
-- [x] Quotation button to view all the quotations created for the lead (res_partner_view.xml) 
+- [x] Quotation button to view all the quotations created for the lead (res_partner_view.xml)
+- [x] Added Smart Button 'Quotation'. It shows the quotations associated with the partner (res_partner.py,field="draft_order_count") 
 
