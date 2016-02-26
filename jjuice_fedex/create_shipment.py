@@ -615,7 +615,7 @@ class create_shipment(models.Model):
                         raise ValidationError("Enter Commodity Details for International Shipment")
     
     
-    name = fields.Char('Name')
+    name = fields.Char('Doc No.')
     date = fields.Date('Shipment Creation Date',default = lambda self:time.strftime("%Y-%m-%d"))
     commerical_invoice = fields.Binary('Commerical Invoice')
     commercial_invoice_name = fields.Char('Commercial Invoice Name')
@@ -671,7 +671,7 @@ class create_shipment(models.Model):
     
     # Fields for Recipient
     recipient_id = fields.Many2one('res.partner','Recipient Partner',help="This field is optional.If not filled you can manually set the address")
-    to_person_name = fields.Char('Name',required=True)
+    to_person_name = fields.Char('Customer Name',required=True)
     to_company_name = fields.Char('Company Name')
     to_phone_number = fields.Char('Phone Number',required=True)
     to_street1 = fields.Char('Street',required=True)
