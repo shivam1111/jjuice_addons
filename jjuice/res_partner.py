@@ -12,9 +12,24 @@ class volume_price(osv.osv):
 class res_partner_order(osv.osv):
     _inherit="res.partner"
     _description="jjuice"
+    
+    
+    def _default_set_lead(self,cr,uid,context):
+        if context.get('search_default_leads',False):
+            return True
+        return False
+    
+    def _default_set_customer(self,cr,uid,context):
+        if not context.get('search_default_leads',False):
+            return True
+        return False
+    
     _defaults = {
-                 'user_id':lambda self,cr,uid,context: uid
+                 'user_id':lambda self,cr,uid,context: uid,
+                 'leads':_default_set_lead,
+                 'customer':_default_set_customer
                  }
+    
     def _check_customer_type(self, cr, uid, ids, context=None):
         for partner in self.browse(cr,uid,ids,context):
             if partner.customer and partner.leads:

@@ -11,7 +11,8 @@
 
 > This is our own workflow for leads
 
-- [x]  A new Menu item Leads/Potential Customers is created (res_partner_view.xml)
-- [ ] By default when creating a new lead the lead checkbox should be ticked 	
+- [x] A new Menu item Leads/Potential Customers is created (res_partner_view.xml)
+- [x] A customer cannot be a partner and lead at the same time (res_partner.py) 
+- [x] By default when creating a new lead the lead checkbox should be ticked (res_partner.py)	
 
 
