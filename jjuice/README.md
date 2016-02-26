@@ -11,7 +11,7 @@
 
 > This is our own workflow for leads
 
-- A new Menu item Leads/Potential Customers is created
+- [x]  A new Menu item Leads/Potential Customers is created (res_partner_view.xml)
 - [ ] By default when creating a new lead the lead checkbox should be ticked 	
 
 

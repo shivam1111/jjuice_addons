@@ -118,6 +118,6 @@
             </field> 
         </record>
         
-		<menuitem id='lead_menuitem' name='Potential Customers' parent='base.menu_sales' action="action_partner_lead" />
+		<menuitem id='lead_menuitem' name='Leads/Potential Customers' parent='base.menu_sales' action="action_partner_lead" />
 	</data>
 </openerp>
