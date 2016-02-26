@@ -15,7 +15,7 @@
 - Added Stock Check Availability Functionality
 	* ISSUE SOLVED: The input fields remained red after repeated click on check availability button
 - Marketing package functionality (Javascript)
-- If it is a new record of parnter the interface will not be generated. (jjuice.js line no.935)
+- If it is a new record of partner the interface will not be generated. (jjuice.js line no.935)
  	 
 
 ##Partner
@@ -24,6 +24,13 @@
 	1. Skype Id
 	2. Type Of Account
 	3. Account Classification(For Finance)
+	4. Resale No.
+- Added Filter Customer Wizard to the tree View (jjuice.js)
+	[x] Filter based on Last Order date
+	[x] Filter based on Type of Account (model:res.partner)
+	[x] Filter all customer/lead who have never ordered a particular product line (For us right now it product line means volume)
+	[x] Filter based on  Account Classification (for Finance) 
+	[x] Filter based on sales person 
 
 ##Leads/Potential Customers 
 

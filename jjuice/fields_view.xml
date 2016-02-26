@@ -11,6 +11,7 @@
 				<xpath expr="//field[@name='website']" position= "after">
 					<field name ="resale_no"/>
 					<field name ="acccount_type"/>
+					<field name = "classify_finance" />
 				</xpath>
 				<xpath expr="//notebook/page[@name='internal_notes']" position="after">
 					<page string="Logs">

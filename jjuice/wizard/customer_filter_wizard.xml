@@ -16,7 +16,9 @@
 									<group>
 										<field name = "last_order_date" attrs = "{'invisible':[('field_type','!=','last_order_date')],'required':[('field_type','=','last_order_date')]}" />
 										<field name = "type_of_account" attrs = "{'invisible':[('field_type','!=','type_account')],'required':[('field_type','=','type_account')]}" />
-										<field name = "volume_attributes" widget="many2many_tags" attrs = "{'invisible':[('field_type','!=','not_product_line')],'required':[('field_type','=','not_product_line')]}" context="{'jjuice':True}"/> 									
+										<field name = "volume_attributes" widget="many2many_tags" attrs = "{'invisible':[('field_type','!=','not_product_line')],'required':[('field_type','=','not_product_line')]}" context="{'jjuice':True}"/>
+										<field name = "classify_finance"  attrs = "{'invisible':[('field_type','!=','classify_finance')],'required':[('field_type','=','classify_finance')]}" />
+										<field name = "user_ids" widget="many2many_tags" attrs = "{'invisible':[('field_type','!=','sales_person')],'required':[('field_type','=','sales_person')]}" /> 									
 										<field name = "operator" />
 									</group>
 								</group>								
@@ -27,7 +29,8 @@
 									<field name = "last_order_date" attrs = "{'invisible':[('field_type','!=','last_order_date')]}" />
 									<field name = "type_of_account" attrs = "{'invisible':[('field_type','!=','type_account')]}" />
 									<field name = "volume_attributes" widget="many2many_tags" attrs = "{'invisible':[('field_type','!=','not_product_line')]}" />
-														
+									<field name = "classify_finance"  attrs = "{'invisible':[('field_type','!=','classify_finance')]}" />					
+									<field name = "user_ids" attrs = "{'invisible':[('field_type','!=','sales_person')]}" />
 								</tree>	
 							</field>
 						</page>

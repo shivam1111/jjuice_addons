@@ -7,10 +7,17 @@ class customer_filter_wizard(models.TransientModel):
     
     def get_customer_type_of_account(self,cr,type_of_account):
         cr.execute('''
-            select id from res_partner where acccount_type = '%s' and customer = true
+            select id from res_partner where acccount_type = '%s'
         '''%(type_of_account))
         customer_list = cr.fetchall()
         return customer_list
+    
+    def get_customer_account_finance(self,cr,type):
+        cr.execute('''
+            select id from res_partner where classify_finance = '%s'
+        '''%(type))
+        customer_list = cr.fetchall()
+        return customer_list    
     
     def get_customer_not_product_line(self,cr,attr):
         # This will return the list of customers who have order the product line with attributes id in attr
@@ -41,6 +48,16 @@ class customer_filter_wizard(models.TransientModel):
         customer_list = cr.fetchall()
         return customer_list
 
+    def get_customer_sales_person(self,cr,user_ids):
+        attr_list = map(lambda x: x.id,user_ids)
+        attr_list.append(0)
+        attr_list = tuple(attr_list)
+        cr.execute('''
+            select id from res_partner where user_id in {0}
+        '''.format(attr_list))
+        customer_list = cr.fetchall()
+        return customer_list
+    
     def dummy_buttons(self,cr,uid,ids,context=None):
         return True
     
@@ -56,6 +73,10 @@ class customer_filter_wizard(models.TransientModel):
                 customer_list = total_customer_list - set(self.get_customer_not_product_line(cr,i.volume_attributes))
             elif i.field_type == "type_account":
                 customer_list = set(self.get_customer_type_of_account(cr,i.type_of_account))
+            elif i.field_type == "classify_finance":
+                customer_list = set(self.get_customer_account_finance(cr,i.classify_finance))
+            elif i.field_type == "sales_person":
+                customer_list = set(self.get_customer_sales_person(cr,i.user_ids))
             if i.operator == 'or' or index == 0:
                 final_customer_list = final_customer_list.union(customer_list)
             elif i.operator == 'and':
@@ -81,13 +102,15 @@ class customer_filter_wizard(models.TransientModel):
 
     line_ids = fields.One2many('customer.filter.wizard.line','wizard_id','Add Constraints')
 
-ACCOUNT_TYPE  = [('chain_store',"Chain Store(5+)"),('retailer','Retailer'),('private_label','Private Labeler'),
-                 ('wholesale','Wholesale/Distribution'),('wholesaler','Wholesale & Retail'),
-                 ('whitelabeling','Intrested in White Labeling'),('merchant','Merchant Processor'),
-                 ('trade show','Trade Show Sales Rep'),('marketing','Marketing Rep'),
-                 ('legal representative','Legal Representative For Eliquid Industry'),('website','Website(vapejjuice.com)'),
-                 ('other','Other/Miscellaneous Account')
-]
+ACCOUNT_TYPE  = [('smoke_shop',"Smoke Shop"),('vape_shop','Vape Shop'),('convenient_gas_store','Convenient Store/ Gas Station'),
+                 ('website','Online Store'),
+                 ]
+FINANCE_CLASSIFY  = [
+                 ('retailer','Retailer'),
+                 ('wholesale','Wholesaler / Distributer'),
+                 ('private_label','Private Label'),
+                 ('website','Vapejjuice.com'),
+                 ]
         
 class customer_fitler_wizard_line(models.TransientModel):
     _name = "customer.filter.wizard.line"
@@ -99,9 +122,13 @@ class customer_fitler_wizard_line(models.TransientModel):
                                  ],string='Operator',default='or',required=True)
     field_type = fields.Selection([
                                    ('last_order_date','Last Order Date'),('type_account','Type of Account'),
-                                   ('not_product_line','Does not have Product line')
+                                   ('not_product_line','Does not have Product line'),
+                                   ('classify_finance','Account Classification (for Finance)'),
+                                   ('sales_person',"Sales Person")
                                    ],string = 'Constraint On',required=True)
     last_order_date = fields.Date('Last Order Date')
     type_of_account = fields.Selection(ACCOUNT_TYPE,'Type of Account')
+    classify_finance = fields.Selection(FINANCE_CLASSIFY,"Account Classification (for Finance)")
+    user_ids = fields.Many2many('res.users','customer_filter_wizard_filer_res_partner','wizard_id','user_id','Sales Person')
     volume_attributes = fields.Many2many('product.attribute.value','customer_filter_line_attributes','line_id','attribute_id',string='Product Line')                              
     
