@@ -13,6 +13,8 @@
 				<xpath expr = "/form/sheet" position = "inside">
 					  <widget type="jjuice" context = "{'id':price}"/> 
 				</xpath>
+				
+				<xpath expr = "/form/sheet/group/group/field[@name='title']" position ="replace"/>
 				<xpath expr = "/form/sheet/group/group/field[@name='email']" position ="after">
 					<field name = "email_multi_to">
 						<tree string = "Emails" editable = "top">

@@ -47,7 +47,6 @@ FEDEX INTEGRATION
              'fedex_account_sequence.xml',
              'create_shipment.xml',
              'wizard/fedex_message.xml',
-             'res_partner.xml',
              'stock_view.xml',
              'views/jjuice_fedex.xml',
              'report/print_label.xml'

@@ -1005,6 +1005,7 @@ openerp.jjuice= function (instance,local) {
 					});
 					self.field_manager_right = self.createFormrightWidgets();
 					$("#check_availability").on('click',function(event){
+						self.$el.find('input.qty').css('background-color','')
 						input_records= []
 						self.extract_records_fields(input_records)
 						packages=[]
