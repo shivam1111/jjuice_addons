@@ -4,7 +4,7 @@ openerp.jjuice= function (instance,local) {
     var QWeb = instance.web.qweb;
     instance.web.jjuice = instance.web.jjuice || {};
     
-// Filter customer wizard button===============================================================
+// Filter customer wizard button *******************************************************************
     instance.web.views.add('open_filter_wizard_customer','instance.web.jjuice.openp_filter_wizard');
     instance.web.jjuice.openp_filter_wizard = instance.web.ListView.include({
     	do_search:function(domain, context, group_by){
@@ -70,8 +70,8 @@ openerp.jjuice= function (instance,local) {
 			}
     	}
     })
+// Filter customer wizard button *******************************************************************
     
-// Filter customer wizard button===============================================================
     instance.web.views.add('tree_group_expand', 'instance.web.jjuice.group_expandView');
     instance.web.jjuice.group_expandView = instance.web.ListView.extend({
         init: function() {
@@ -92,6 +92,7 @@ openerp.jjuice= function (instance,local) {
     });	
 
 //======================================================================================================
+    
 	get_perm = function(conc_id,rows){
 		if ($.inArray(conc_id,rows.conc_id) > -1){
 			return true;
@@ -931,6 +932,9 @@ openerp.jjuice= function (instance,local) {
 						$("div[name = 'jjuice_action_start']").parent().empty();
 					}
 					self.marketing_package = {}
+					if (!self.field_manager.datarecord.id){
+						return
+					}
 					self.$el.append(QWeb.render("jjuice.action",context))
 					_.each(context.marketing_package,function(packages){
 						var marketing_package = new instance.web.jjuice.marketing_package_widget(self,packages)

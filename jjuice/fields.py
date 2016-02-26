@@ -335,7 +335,6 @@ class sale_order_line(osv.osv):
         volume_id = ir_model_data.get_object_reference(cr, uid, 'jjuice', 'attribute_vol')[1]
         for attribute in product_object.attribute_value_ids:
             if attribute.attribute_id.id == volume_id and price_unit > 0:
-                obj=self.pool.get('sale.order').browse(cr,uid,ids).order_line
                 total_commission=((price_unit-attribute.commission)/2)*product_uos_qty
                 res['commission']=total_commission
                 return {'value':res}
