@@ -168,7 +168,7 @@
             <field name="view_mode">form</field>
             <field name = "target">new</field>
       </record>
-      <menuitem id = "child_child_fedex_rate_request" parent = "child_fedex_account_menu" action = "action_fedex_rate_request" />		
+      <menuitem id = "child_child_fedex_rate_request" sequence="102" parent = "child_fedex_account_menu" action = "action_fedex_rate_request" />		
 		
 	</data>
 </openerp>

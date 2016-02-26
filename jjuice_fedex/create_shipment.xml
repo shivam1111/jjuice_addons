@@ -155,7 +155,12 @@
             <field name="model">create.shipment.fedex</field>
             <field name="arch" type="xml">
             	<tree string = "Shipments" colors="green:state=='draft';red:state=='fail';grey:state=='done';">
-					<field name = "name" />  
+					<field name = "name" lablel = "Doc No."/>
+					<field name = "to_person_name" label = "Cutomer Name" />
+					<field name = "to_company_name" label = "Company Name" />
+					<field name = "to_street1" />
+					<field name = "to_city" />
+					<field name = "tracking_number" />  
 					<field name = "state" invisible="1" />
 					<field name = "tracking_number" />
 					<field name = "status" />
@@ -482,7 +487,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
       </record>
-      <menuitem id = "child_child_fedex_create_shipment" parent = "child_fedex_account_menu" action = "action_fedex_create_shipment" />				
+      <menuitem id = "child_child_fedex_create_shipment" sequence="100" parent = "child_fedex_account_menu" action = "action_fedex_create_shipment" />				
 				
 	</data>
 </openerp>
