@@ -24,7 +24,8 @@
 	1. Skype Id
 	2. Type Of Account
 	3. Account Classification(For Finance)
-	4. Resale No.
+	4. Resale No
+	
 - Added Filter Customer Wizard to the tree View (jjuice.js)
 	[x] Filter based on Last Order date
 	[x] Filter based on Type of Account (model:res.partner)
