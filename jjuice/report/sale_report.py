@@ -6,8 +6,10 @@ class sale_report(osv.osv):
     _description = "Sales Orders Statistics"
     _auto = False
     _columns = {
-                    'conc':fields.many2one("product.attribute.value",string = "Concentration",readonly=True),                        
-                    'vol':fields.many2one("product.attribute.value",string = "Volume",readonly=True),
+                'conc':fields.many2one("product.attribute.value",string = "Concentration",readonly=True),                        
+                'vol':fields.many2one("product.attribute.value",string = "Volume",readonly=True),
+                'account_type':fields.char("Type Of Account",readonly=True),
+                'classify_finance':fields.char("Account Classification(For Finance)",readonly=True)
                 }
 
     def _select(self,cr):
@@ -47,6 +49,8 @@ class sale_report(osv.osv):
                         s.date_order as date,
                         s.date_confirm as date_confirm,
                         s.partner_id as partner_id,
+                        COALESCE (partner.acccount_type, 'No Label') as account_type ,
+                        COALESCE (partner.classify_finance, 'No Finance Classification') as classify_finance,
                         s.user_id as user_id,
                         s.company_id as company_id,
                         extract(epoch from avg(date_trunc('day',s.date_confirm)-date_trunc('day',s.create_date)))/(24*60*60)::decimal(16,2) as delay,
@@ -79,6 +83,8 @@ class sale_report(osv.osv):
                         s.date_order as date,
                         s.date_confirm as date_confirm,
                         s.partner_id as partner_id,
+                        COALESCE (partner.acccount_type, 'No Label') as account_type ,
+                        COALESCE (partner.classify_finance, 'No Finance Classification') as classify_finance,
                         s.user_id as user_id,
                         s.company_id as company_id,
                         extract(epoch from avg(date_trunc('day',s.date_confirm)-date_trunc('day',s.create_date)))/(24*60*60)::decimal(16,2) as delay,
@@ -88,7 +94,24 @@ class sale_report(osv.osv):
                         s.project_id as analytic_account_id,
                         s.section_id as section_id
             """        
-        return select_str    
+        return select_str   
+    
+    def _from(self):
+        from_str = """
+                sale_order_line l
+                      join sale_order s on (l.order_id=s.id)
+                        left join product_product p on (l.product_id=p.id)
+                            left join product_template t on (p.product_tmpl_id=t.id)
+                                left join res_partner as partner on (s.partner_id = partner.id)
+                    left join product_uom u on (u.id=l.product_uom)
+                    left join product_uom u2 on (u2.id=t.uom_id)
+                    left join product_pricelist pp on (s.pricelist_id = pp.id)
+                    join currency_rate cr on (cr.currency_id = pp.currency_id and
+                        cr.date_start <= coalesce(s.date_order, now()) and
+                        (cr.date_end is null or cr.date_end > coalesce(s.date_order, now())))
+        """
+        return from_str
+     
 
     def _group_by(self):
         group_by_str = """
@@ -105,7 +128,9 @@ class sale_report(osv.osv):
                     s.pricelist_id,
                     s.project_id,
                     s.section_id,
-                    s.state
+                    s.state,
+                    partner.acccount_type,
+                    partner.classify_finance
         """
         return group_by_str
     

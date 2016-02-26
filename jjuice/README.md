@@ -34,10 +34,18 @@
 - [x] By default when creating a new lead the lead checkbox should be ticked (res_partner.py)	
 - [x] Quotation button to view all the quotations created for the lead (res_partner_view.xml)
 - [x] Added Smart Button 'Quotation'. It shows the quotations associated with the partner (res_partner.py,field:"draft_order_count") 
-- [x] Add the customized filter (jjuice.js search_customer())
+- [x] Add the  filter button in tree view for marketing   (jjuice.js search_customer())
 
 ## Reporting
 
-- [x] Treasury Analysis report can be filtered based on "Type of Account" field in Partners(model:res.partner, report/account_treasury_report.py) 
-- [x] Reports Sale Analysis , Treasury Analysis -> Add Filter options with field "Type of Account" and Account Classification (for Finance) in Partner(model:res.partner) 
-	 
+- Treasury Analysis report (report/account_treasury_report.py)
+	- [x] Can be filtered based on "Type of Account" field of Partner(model:res.partner)
+	- [x] Can be filtered based on "Account Classification(for Finance)" field of Partner(model:res.partner)
+	- [x] Can be filtered based on Invoice Partner(field:partner_id)
+- Sales Analysis Report (report/sale_report.py)
+	- [x] Can be filtered based on following Product Attribute(model:product.attribute.value)
+		- [x] Concentration (field:conc)
+		- [x] Volume (field:vol)
+	- [x] Can be filtered based on the following related partner fields
+		- [x] Type of Account
+		- [x] Account Classification (for Finance)

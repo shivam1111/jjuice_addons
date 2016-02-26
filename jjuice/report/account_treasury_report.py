@@ -8,7 +8,8 @@ class account_treasury_report(osv.osv):
     
     _columns = {
                 'partner_id':fields.many2one('res.partner','Partner',readonly=True),
-                'account_type':fields.char("Account Type",readonly=True),
+                'account_type':fields.char("Type Of Account",readonly=True),
+                'classify_finance':fields.char("Account Classification(For Finance)",readonly=True)
                 }
     
     def init(self, cr):
@@ -20,6 +21,7 @@ class account_treasury_report(osv.osv):
                 p.fiscalyear_id as fiscalyear_id,
                 p.id as period_id,
                 COALESCE (partner.acccount_type, 'No Label') as account_type ,
+                COALESCE (partner.classify_finance, 'No Finance Classification') as classify_finance,
                 l.partner_id as partner_id,
                 sum(l.debit) as debit,
                 sum(l.credit) as credit,
@@ -34,7 +36,7 @@ class account_treasury_report(osv.osv):
                 left join res_partner partner on (l.partner_id = partner.id)
             where l.state != 'draft'
               and a.type = 'liquidity'
-            group by p.id, p.fiscalyear_id, p.date_start, am.company_id,l.partner_id,partner.acccount_type
+            group by p.id, p.fiscalyear_id, p.date_start, am.company_id,l.partner_id,partner.acccount_type,partner.classify_finance
             )
         """)
 
