@@ -8,7 +8,7 @@ openerp.jjuice= function (instance,local) {
     instance.web.views.add('open_filter_wizard_customer','instance.web.jjuice.openp_filter_wizard');
     instance.web.jjuice.openp_filter_wizard = instance.web.ListView.include({
     	do_search:function(domain, context, group_by){
-            var self = this;
+    		var self = this;
             this.last_domain = domain;
             this.last_context = context;
             this.last_group_by = group_by;
@@ -18,10 +18,20 @@ openerp.jjuice= function (instance,local) {
     	search_customer:function(){
             var self = this;
             domain = []
-            if (self.res){
-            	domain = [['id','in',self.res || []]];
+            /* If the last_context has the param:
+             * 'search_default_leads'   -> This means the menu item is a Leads/Potential Customer
+             * 'seach_default_customer' -> This means the menu item is a Customer Menu
+             */
+            if ('search_default_leads' in self.last_context){
+            	domain = [['leads','=',true]]
+            }else if ('search_default_customer' in self.last_context){
+            	domain = [['customer','=',true]]
+            }else{
+            	domain= []
             }
-            
+            if (self.res){
+            	domain.push(['id','in',self.res]);
+            }
         	var compound_domain = new instance.web.CompoundDomain(self.last_domain, domain);
             self.dataset.domain = compound_domain.eval();
             return self.old_search(compound_domain, self.last_context, self.last_group_by);            	            	    	

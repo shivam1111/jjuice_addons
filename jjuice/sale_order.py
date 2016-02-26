@@ -32,6 +32,25 @@ class sale_order(models.Model):
     _inherit  = "sale.order"
     _description = "Sale Order JJuice"
     
+    def set_customer_lead(self,cr,uid,ids,context=None):
+        '''
+            This function converts the lead into customer for sale order ids
+        '''
+        partner = self.pool.get('res.partner')
+        for order in self.pool.get("sale.order").browse(cr,uid,ids,context):
+            partner.write(cr,uid,order.partner_id.id,{'customer':True,'leads':False},context)
+        return True
+     
+        
+    def action_wait(self, cr, uid, ids, context=None):
+        '''
+            IF the related partner is a lead then convert it into  customer
+        '''
+        self.set_customer_lead(cr,uid,ids,context=None)
+        super(sale_order,self).action_wait(cr,uid,ids,context)
+        return True
+    
+    
     def confirm_sales_order(self,cr,uid,sale_id,paid_line,context=None):
         if context == None:context = {}
         sale_order = self.pool.get('sale.order')

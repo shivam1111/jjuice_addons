@@ -4,6 +4,10 @@
 - Change Sales person of Multiple Customers by opening wizard from the More Menu in tree view of customers. 
 - Hide Title in Customer and Partners
 
+## Sale
+
+- [x] When "Confirm Sale" is clicked the related partner turns into lead if it is a lead (sale_order.py function action_wait())
+
 ## Interface
 
 > Interface for creating Sales Order from Customers Form
@@ -22,5 +26,9 @@
 - [x] A customer cannot be a partner and lead at the same time (res_partner.py) 
 - [x] By default when creating a new lead the lead checkbox should be ticked (res_partner.py)	
 - [x] Quotation button to view all the quotations created for the lead (res_partner_view.xml)
-- [x] Added Smart Button 'Quotation'. It shows the quotations associated with the partner (res_partner.py,field="draft_order_count") 
+- [x] Added Smart Button 'Quotation'. It shows the quotations associated with the partner (res_partner.py,field:"draft_order_count") 
+- [x] Add the customized filter (jjuice.js search_customer())
 
+## Reporting
+
+- [x] Treasury Analysis report can be filtered based on "Type of Account" field in Partners(model:res.partner, report/account_treasury_report.py) 

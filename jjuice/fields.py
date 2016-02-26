@@ -13,13 +13,9 @@ crm.AVAILABLE_PRIORITIES = [
     ('5','Very Very High')
 ]
 
-ACCOUNT_TYPE  = [('chain_store',"Chain Store(5+)"),('retailer','Retailer'),('private_label','Private Labeler'),
-                 ('wholesale','Wholesale/Distribution'),('wholesaler','Wholesale & Retail'),
-                 ('whitelabeling','Intrested in White Labeling'),('merchant','Merchant Processor'),
-                 ('trade show','Trade Show Sales Rep'),('marketing','Marketing Rep'),
-                 ('legal representative','Legal Representative For Eliquid Industry'),('website','Website(vapejjuice.com)'),
-                 ('other','Other/Miscellaneous Account')
-]
+ACCOUNT_TYPE  = [('smoke_shop',"Smoke Shop"),('vape_shop','Vape Shop'),('convenient_gas_store','Convenient Store/ Gas Station'),
+                 ('website','Online Store'),
+                 ]
 
 
 class crm_lead(format_address, osv.osv):
