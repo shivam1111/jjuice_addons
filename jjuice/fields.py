@@ -13,6 +13,13 @@ crm.AVAILABLE_PRIORITIES = [
     ('5','Very Very High')
 ]
 
+FINANCE_CLASSIFY  = [
+                 ('retailer','Retailer'),
+                 ('wholesale','Wholesaler / Distributer'),
+                 ('private_label','Private Label'),
+                 ('website','Vapejjuice.com'),
+                 ]
+
 ACCOUNT_TYPE  = [('smoke_shop',"Smoke Shop"),('vape_shop','Vape Shop'),('convenient_gas_store','Convenient Store/ Gas Station'),
                  ('website','Online Store'),
                  ]
@@ -50,11 +57,9 @@ class res_partner(osv.osv):
         'skype_id': fields.char('Skype Id', size=240),
         'resale_no': fields.char('State Issued Resale Number', size=240),
         'acccount_type':fields.selection (ACCOUNT_TYPE,string = "Type Of Account"),
-        #'notes':fields.text("Notes"),
-        #'m2m':fields.many2many('res.partner','relation_res_partenr_lead','lead_res_partner','res_lead_partner',"Lead & Notes"),
+        'classify_finance':fields.selection(FINANCE_CLASSIFY,string="Account Classification(For Finance)"),
         'm2m':fields.one2many("partner.lead",'partner2')
-        
- }
+        }
     
 class res_partner_lead(osv.osv):
     _name='partner.lead'

@@ -18,6 +18,13 @@
 - If it is a new record of parnter the interface will not be generated. (jjuice.js line no.935)
  	 
 
+##Partner
+
+- Added fields (fields.py)
+	1. Skype Id
+	2. Type Of Account
+	3. Account Classification(For Finance)
+
 ##Leads/Potential Customers 
 
 > This is our own workflow for leads
@@ -32,3 +39,5 @@
 ## Reporting
 
 - [x] Treasury Analysis report can be filtered based on "Type of Account" field in Partners(model:res.partner, report/account_treasury_report.py) 
+- [x] Reports Sale Analysis , Treasury Analysis -> Add Filter options with field "Type of Account" and Account Classification (for Finance) in Partner(model:res.partner) 
+	 
