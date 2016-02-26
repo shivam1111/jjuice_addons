@@ -62,7 +62,6 @@
              'report/account_treasury_report_view.xml',
              'wizard/change_sale_person_customers.xml',
              'wizard/change_sale_person_lead.xml',
-              'wizard/convert_opportunity.xml',
               'crm_lead_view.xml',
               'marketing_package.xml',
               'wizard/mail_compose_message.xml'

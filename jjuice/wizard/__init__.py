@@ -2,7 +2,6 @@ import stock_detail_transfer
 import pay_payment_plan
 import change_sale_person_customers
 import change_sale_person_lead
-import convert_opportunity
 import register_payment
 import mail_compose_message
 import customer_filter_wizard

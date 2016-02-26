@@ -274,7 +274,6 @@ class sale_order(models.Model):
         del buffer_dict1
         for key,value in sorted(buffer_dict.items(),key=operator.itemgetter(1),reverse=True):
             conc_dict.update({key:str(value)+"mg"})
-        print "===================================val",vals
         data= {'paid_stamp':paid_stamp,'shipping_stamp':shipping_stamp,'invoice_line':invoice_lines,
                                  'ids':id,'grand_total':grand_total,
                                  'comment':comment,'strength_misc':strength_misc,
