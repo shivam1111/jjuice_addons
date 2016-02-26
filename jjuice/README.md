@@ -49,3 +49,7 @@
 	- [x] Can be filtered based on the following related partner fields
 		- [x] Type of Account
 		- [x] Account Classification (for Finance)
+- Invoice Analysis (report/invoice_report.py)
+	- [x] Can be filtered based on the following related partner fields
+		- [x] Type of Account
+		- [x] Account Classification (for Finance)
