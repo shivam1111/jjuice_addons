@@ -3,6 +3,7 @@
 
 - Change Sales person of Multiple Customers by opening wizard from the More Menu in tree view of customers. 
 - Hide Title in Customer and Partners
+- Stock Picking order by creation date (field:date) (sale_stock.py)
 
 ## Sale
 

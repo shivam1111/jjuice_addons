@@ -9,7 +9,14 @@
 					<button name = "tranfer_fedex" attrs="{'invisible':[('state','!=','assigned')]}"  icon="/jjuice_fedex/static/src/img/icons/gtk-fedex.png" type = "object" string = "FedEx &amp; Transfer"  />
 				</xpath>
 				<xpath expr = "/form/sheet/group/group/field[@name='backorder_id']" position="after">
-					<field name = "fedex_shipment_id" attrs = "{'invisible':[('fedex_shipment_id','=',False)]}"/>
+					<field name = "fedex_shipment_id" attrs = "{'invisible':[('fedex_shipment_id','=',False)]}">
+						<tree string = "Fedex Shipments">
+							<field name = "name" />
+							<field name = "tracking_number" />
+							<field name = "state" />
+							<button string = "Track Shipment" icon="gtk-media-play" name = "track_shipment" type = "object" /> 
+						</tree>
+					</field>
 				</xpath>
             </field>
        </record>

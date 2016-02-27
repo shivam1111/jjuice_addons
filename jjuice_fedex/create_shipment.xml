@@ -160,7 +160,6 @@
 					<field name = "to_company_name" label = "Company Name" />
 					<field name = "to_street1" />
 					<field name = "to_city" />
-					<field name = "tracking_number" />  
 					<field name = "state" invisible="1" />
 					<field name = "tracking_number" />
 					<field name = "status" />
@@ -487,7 +486,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
       </record>
-      <menuitem id = "child_child_fedex_create_shipment" sequence="100" parent = "child_fedex_account_menu" action = "action_fedex_create_shipment" />				
-				
+      <menuitem id = "child_child_fedex_create_shipment" sequence="100" parent = "child_fedex_account_menu" action = "action_fedex_create_shipment" />
+      <menuitem id = "child_child_fedex_create_shipment_warehouse_operations" name = "FedEx Shipment"  parent = "stock.menu_stock_warehouse_mgmt" action = "action_fedex_create_shipment" />				
 	</data>
 </openerp>
