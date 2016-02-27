@@ -39,7 +39,8 @@ class stock_picking(osv.osv):
         assert len(ids) == 1
         if type(ids) is int: ids = [ids]
         sale_id = self.read(cr,uid,ids[0],{'sale_id'},context)
-        if sale_id:
+        print "************************sale_id",sale_id
+        if sale_id.get('sale_id',False):
             context.update({'stock_picking':True})
             return self.pool.get('sale.order').print_attachment_report(cr,uid,[sale_id.get('sale_id',[0])[0]],context)
         else: return True
