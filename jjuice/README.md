@@ -26,11 +26,14 @@
 	3. Account Classification(For Finance)
 	4. Resale No
 - Added Filter Customer Wizard to the tree View (jjuice.js)
+	- Pass {"'filter":True} from action context in order to display the Button in Partner Tree view
 	- [x] Filter based on Last Order date
 	- [x] Filter based on Type of Account (model:res.partner)
 	- [x] Filter all customer/lead who have never ordered a particular product line (For us right now,product line means volume)
 	- [x] Filter based on  Account Classification (for Finance) 
 	- [x] Filter based on sales person 
+	- [x] Filter based on Account Source of Partner (mode:res.partner)
+	- [x] Filter based on Account Source Name of Partner (mode:res.partner)
 
 ##Leads/Potential Customers 
 

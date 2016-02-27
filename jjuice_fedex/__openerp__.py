@@ -23,7 +23,7 @@
 {
     'name': 'FEDEX',
     'version': '1.1',
-    'category': 'jjuice',
+    'category': 'JJuice',
     'sequence': 19,
     'summary': 'FEDEX Integration',
     'description': """

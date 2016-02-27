@@ -58,6 +58,21 @@ class customer_filter_wizard(models.TransientModel):
         customer_list = cr.fetchall()
         return customer_list
     
+    def get_customer_acquisition_source(self,cr,source):
+        cr.execute('''
+            select partner.id from res_partner as partner left join account_acquisition as source on source.id = partner.acquisition_id
+                where source.source = '%s'
+        '''%(source))
+        partner_list = cr.fetchall()
+        return partner_list
+    
+    def get_customer_acquisition_source_name(self,cr,source_id):
+        cr.execute('''
+            select id from res_partner as partner where acquisition_id = %s
+        '''%(source_id))
+        partner_list = cr.fetchall()
+        return partner_list        
+    
     def dummy_buttons(self,cr,uid,ids,context=None):
         return True
     
@@ -77,6 +92,11 @@ class customer_filter_wizard(models.TransientModel):
                 customer_list = set(self.get_customer_account_finance(cr,i.classify_finance))
             elif i.field_type == "sales_person":
                 customer_list = set(self.get_customer_sales_person(cr,i.user_ids))
+            elif i.field_type == "acquisition_source":
+                customer_list = set(self.get_customer_acquisition_source(cr,i.acquisition_source))
+            elif i.field_type == "acquisition_source_name":
+                customer_list = set(self.get_customer_acquisition_source_name(cr,i.acquisition_source_name.id))
+                
             if i.operator == 'or' or index == 0:
                 final_customer_list = final_customer_list.union(customer_list)
             elif i.operator == 'and':
@@ -111,6 +131,13 @@ FINANCE_CLASSIFY  = [
                  ('private_label','Private Label'),
                  ('website','Vapejjuice.com'),
                  ]
+
+_SOURCE = [
+           ('trade_show','Trade Show'),
+           ('sales_trip','Sales Trip'),
+           ('magazine_add','Magazine Add'),
+           ('referral','Referral'),
+           ]
         
 class customer_fitler_wizard_line(models.TransientModel):
     _name = "customer.filter.wizard.line"
@@ -124,11 +151,14 @@ class customer_fitler_wizard_line(models.TransientModel):
                                    ('last_order_date','Last Order Date'),('type_account','Type of Account'),
                                    ('not_product_line','Does not have Product line'),
                                    ('classify_finance','Account Classification (for Finance)'),
-                                   ('sales_person',"Sales Person")
+                                   ('sales_person',"Sales Person"),
+                                   ('acquisition_source','Acquisition Source'),
+                                   ('acquisition_source_name','Acquisition Source Value')
                                    ],string = 'Constraint On',required=True)
     last_order_date = fields.Date('Last Order Date')
     type_of_account = fields.Selection(ACCOUNT_TYPE,'Type of Account')
     classify_finance = fields.Selection(FINANCE_CLASSIFY,"Account Classification (for Finance)")
     user_ids = fields.Many2many('res.users','customer_filter_wizard_filer_res_partner','wizard_id','user_id','Sales Person')
     volume_attributes = fields.Many2many('product.attribute.value','customer_filter_line_attributes','line_id','attribute_id',string='Product Line')                              
-    
+    acquisition_source = fields.Selection(_SOURCE,string='Acquisition Source')
+    acquisition_source_name = fields.Many2one('account.acquisition','Acquisition Source Value')

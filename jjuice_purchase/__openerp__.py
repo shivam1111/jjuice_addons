@@ -23,7 +23,7 @@
 {
     'name': 'JJUICE Purchase Management',
     'version': '1.1',
-    'category': 'Purchase Management',
+    'category': 'JJuice',
     'sequence': 19,
     'summary': 'Purchase Orders, Receipts, Supplier Invoices',
     'description': """

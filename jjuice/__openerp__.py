@@ -22,13 +22,13 @@
     'name' : 'JJUICE',
     'version' : '0.1',
     'author' : 'J & G Infosystems',
-    'category' : 'Jjuice',
+    'category' : 'JJuice',
     'description' : """
     
    """,
     'website': '',
     'images' : [], #'/images/image_name.png'
-    'depends' : ['base','hr','crm','sale','account','stock','sale_stock','sale_crm'],#account_analytic_analysis
+    'depends' : ['base','hr','crm','sale','account','stock','sale_stock','sale_crm','account_acquisition'],#account_analytic_analysis
     'data': ['jjuice_data.xml',
              'fields_view.xml',
              'product_wizard_view.xml',
