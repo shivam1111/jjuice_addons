@@ -75,6 +75,7 @@ class res_partner_order(osv.osv):
               "order":fields.one2many("res.partner.order","partners"),
               'volume_prices':fields.one2many('volume.prices.line','customer_id',"Prices"),             
               'email_multi_to':fields.one2many('multi.email','partner_id',"Addition Email IDs"),
+              'multi_address':fields.one2many('res.partner', 'parent_id', 'Contacts', domain=[('active','=',True),('type','in',['invoice','delivery'])]),
               'draft_order_count': fields.function(_draft_order_count, string='# of Sales Order', type='integer'),
               }
 

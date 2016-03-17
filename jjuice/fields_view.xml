@@ -12,6 +12,49 @@
 					<field name ="resale_no"/>
 					<field name = "classify_finance" />
 					<field name ="acccount_type"/>
+					<field string = "Additional Address" name = "multi_address" context="{'default_type':'delivery','default_parent_id': active_id,'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_supplier': False, 'default_customer': False, 'default_use_parent_address': False}}">
+		                <tree string = "Address">
+		                	<field name = "name" />
+		                	<field name = "type" />
+		                </tree>
+		                <form string="Address">
+		                    <field name="image" widget='image' class="oe_avatar oe_left" options='{"preview_image": "image_medium"}'/>
+		                    <div class="oe_title">
+		                        <div class="oe_edit_only">
+		                            <label for="name"/> 
+		                        </div>
+		                        <h1>
+		                            <field name="name" default_focus="1" placeholder="Name" />
+		                        </h1>
+		                    </div>
+		                    <field name = "type" required = "1" />
+		                    <field name="category_id" widget="many2many_tags" placeholder="Tags..."/>
+		                    <group>
+			                    <group>
+			                    	<div>
+		                                <field name="street" placeholder="Street..."  />
+		                                <field name="street2" />
+		                                <div class="address_format">
+		                                    <field name="city" placeholder="City" style="width: 40%%" />
+		                                    <field name="state_id" class="oe_no_button" placeholder="State" style="width: 37%%" options='{"no_open": True}' on_change="onchange_state(state_id)" />
+		                                    <field name="zip" placeholder="ZIP" style="width: 20%%" />
+		                                </div>
+		                                <field name="country_id" placeholder="Country" class="oe_no_button" options='{"no_open": True, "no_create": True}' />			                    	
+			                    	</div>
+			                    </group>
+			                    <group>
+			                        <field name="user_ids" invisible="1"/>
+			                        <field name="email" widget="email" required="context.get('force_email', False)" attrs="{'required': [('user_ids','!=', [])]}"/>
+			                        <field name="phone"/>
+			                        <field name="mobile"/>
+			                        <div>
+			                        	<label for = "customer"/><field name = "customer" />
+			                        	<label for = "supplier"/><field name = "supplier" />
+			                        </div>		                    		                    
+			                    </group>		                    
+		                    </group>
+		                </form>					
+					</field>
 				</xpath>
 				<xpath expr="//notebook/page[@name='internal_notes']" position="after">
 					<page string="Logs">

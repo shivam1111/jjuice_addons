@@ -33,7 +33,6 @@
 				
 				<xpath expr="//notebook/page[@name='internal_notes']" position="after">
 					<page string = "Prices">
-	            		
 						<field name = "volume_prices" nolabel = "1">
 							<tree string = "Volume Prices" editable = "bottom" >
 								<field name ="product_attribute" context = "{'jjuice':True}"/>

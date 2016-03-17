@@ -929,7 +929,7 @@ openerp.jjuice= function (instance,local) {
 			
     		$(document).ready(function(){
 				self.field_manager.on("change",self,function(){
-					self.start();
+//					self.start();
 				});
     			if (self.field_manager.datarecord && self.field_manager.datarecord.id){
 	    			queryDict = {'action':'graph.action',
@@ -1081,6 +1081,7 @@ openerp.jjuice= function (instance,local) {
 							console.log(self.field_manager_right);
 							if (self.field_manager_right.datarecord.method_of_payment == undefined){
 								self.do_notify("Payment Method","Cannot leave a Payment Method field blank")
+								$(event.currentTarget).prop('disabled',false)
 								return 							
 							}
 						}						
