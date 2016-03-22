@@ -70,6 +70,7 @@ class crm_lead(format_address, osv.osv):
                                     
                                 })
                 company_id = partner.create(cr,uid,company_vals,context)
+                print "*************************company_id",company_id
             if i.contact_name:
                 contact_vals.update({
                                      'name':i.contact_name,
@@ -92,7 +93,7 @@ class crm_lead(format_address, osv.osv):
                                      'parent_id':company_id,
                                      })
                 partner.create(cr,uid,contact_vals,context)
-        return
+        return True
     
     
     _columns = {
