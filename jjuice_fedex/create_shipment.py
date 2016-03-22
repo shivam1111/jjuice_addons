@@ -18,7 +18,7 @@ import os
 class create_shipment(models.Model):
     _name = "create.shipment.fedex"
     _description = "Creates Shipment"
-    
+    _order="date desc"
     @api.multi
     @api.model
     def print_label(self):
