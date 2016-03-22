@@ -52,7 +52,7 @@
             'views/report_saleorder.xml',
             'wizard/display_product_availability.xml',
             'wizard/customer_filter_wizard.xml',
-            'crm_lead_view.xml',
+#             'crm_lead_view.xml',
              'payment_plan_view.xml',
              'wizard/pay_payment_plan.xml',
              'account_voucher.xml',
