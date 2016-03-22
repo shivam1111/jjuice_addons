@@ -27,6 +27,77 @@ ACCOUNT_TYPE  = [('smoke_shop',"Smoke Shop"),('vape_shop','Vape Shop'),('conveni
 
 class crm_lead(format_address, osv.osv):
     _inherit = 'crm.lead'
+    
+    def trasnfer_leads_partners(self,cr,uid,ids,context):
+        partner = self.pool.get('res.partner')
+        leads = self.pool.get('crm.lead')
+        lead_ids = leads.search(cr,uid,['|', ('type','=','lead'), ('type','=',False)],context=context)
+        for i in  leads.browse(cr,uid,lead_ids,context):
+            use_parent_address = False
+            company_vals = {}
+            contact_vals = {}
+            comment = ""
+            company_id = False
+            comment = comment+ "Subject: %s\n"%(i.name)
+            if i.referred:
+                comment = comment + "Referred By: %s\n"%(i.referred)
+            print "*********************comment",comment
+            #Check if there is a company
+            if i.partner_name:
+                use_parent_address = True
+                company_vals.update({
+                                    'name':i.partner_name,
+                                    'is_company':True,
+                                    'user_id': i.user_id and i.user_id.id or False,
+                                    'leads':True,
+                                    'phone':i.phone,
+                                    'mobile':i.mobile,
+                                    'fax':i.fax,
+                                    'email':i.email_from,
+                                    'street':i.street,
+                                    'street2':i.street2,
+                                    'city':i.city,
+                                    'state_id':i.state_id and i.state_id.id or False,
+                                    'zip':i.zip,
+                                    'country_id':i.country_id and i.country_id.id or False,
+                                    'date_field':i.date_field,
+                                    'lead_type':i.lead_type,
+                                    'how_met':i.how_met,
+                                    'acccount_type':i.account_type,
+                                    'function':i.function,
+                                    'priority':i.priority,
+                                    'comment':comment,
+                                    'type':'contact',
+                                    'customer':False,
+                                    
+                                })
+                company_id = partner.create(cr,uid,company_vals,context)
+            if i.contact_name:
+                contact_vals.update({
+                                     'name':i.contact_name,
+                                     'type':'contact',
+                                     'customer':False,
+                                     'comment':comment,
+                                     'is_company':False,
+                                     'user_id': i.user_id and i.user_id.id or False,
+                                     'use_parent_address':use_parent_address,
+                                     'leads':True,
+                                     'phone':i.phone,
+                                     'mobile':i.mobile,
+                                     'fax':i.fax,
+                                     'email':i.email_from,
+                                     'date_field':i.date_field,
+                                     'lead_type':i.lead_type,
+                                     'how_met':i.how_met,
+                                     'acccount_type':i.account_type,
+                                     'function':i.function,
+                                     'priority':i.priority,
+                                     'parent_id':company_id,
+                                     })
+                partner.create(cr,uid,contact_vals,context)
+        return
+    
+    
     _columns = {
                 'priority': fields.selection(crm.AVAILABLE_PRIORITIES, 'Priority', select=True),
                 }
@@ -53,12 +124,21 @@ class hr_employee(osv.osv):
 class res_partner(osv.osv):
     _inherit='res.partner'
     _description='jjuice module'
+    
+    def create(self,cr,uid,vals,context):
+        print "-------------------vals",vals
+        return super(res_partner,self).create(cr,uid,vals,context)
+    
     _columns={
         'skype_id': fields.char('Skype Id', size=240),
         'resale_no': fields.char('State Issued Resale Number', size=240),
         'acccount_type':fields.selection (ACCOUNT_TYPE,string = "Type Of Account"),
         'classify_finance':fields.selection(FINANCE_CLASSIFY,string="Account Classification(For Finance)"),
-        'm2m':fields.one2many("partner.lead",'partner2')
+        'm2m':fields.one2many("partner.lead",'partner2'),
+        'date_field':fields.date('Date we first met'),
+        'lead_type':fields.selection([('Hot Lead','Hot Lead'),('Warm Lead','Warm Lead'),('Still No Contact','Still No Contact'),('60-90 Days','60-90 Days'),('Not Interested','Not Interested')],string="Type of Lead"),
+        'how_met':fields.text('How we met'),
+        'priority':fields.selection(crm.AVAILABLE_PRIORITIES,'Priority')
         }
     
 class res_partner_lead(osv.osv):

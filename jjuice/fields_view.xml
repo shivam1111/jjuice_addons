@@ -5,13 +5,20 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form"/>
             <field name="arch" type="xml">
+            	<xpath expr="//notebook/page[@name='internal_notes']" position = "after">
+            		<page string = "JJuice Internal Info">
+            			<group>
+            				<field name = "date_field" />
+            				<field name = "how_met" />
+            				<field name = "lead_type" attrs = "{'invisible':[('leads','=',False)]}" />
+            			</group>
+            		</page>
+            	</xpath>
 				<xpath expr="//field[@name='email']" position= "after">
 					<field name ="skype_id"/>
+					<field name = "priority" widget="priority"/>
 				</xpath>
-				<xpath expr="//field[@name='website']" position= "after">
-					<field name ="resale_no"/>
-					<field name = "classify_finance" />
-					<field name ="acccount_type"/>
+				<xpath expr="//field[@name='website']" position= "before">
 					<field string = "Additional Address" name = "multi_address" context="{'default_type':'delivery','default_parent_id': active_id,'default_street': street, 'default_street2': street2, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_supplier': False, 'default_customer': False, 'default_use_parent_address': False}}">
 		                <tree string = "Address">
 		                	<field name = "name" />
@@ -54,7 +61,12 @@
 			                    </group>		                    
 		                    </group>
 		                </form>					
-					</field>
+					</field>				
+				</xpath>
+				<xpath expr="//field[@name='website']" position= "after">
+					<field name ="resale_no"/>
+					<field name = "classify_finance" />
+					<field name ="acccount_type"/>
 				</xpath>
 				<xpath expr="//notebook/page[@name='internal_notes']" position="after">
 					<page string="Logs">

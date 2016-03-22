@@ -4,26 +4,14 @@
         <record model="ir.ui.view" id="sale_crm.crm_case_form_view_oppor">
             <field name="name">CRM - Opportunities - Quote Inherit</field>
             <field name="model">crm.lead</field>
-            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
+            <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
             <field name="arch" type="xml">
                 <data>
-                    <xpath expr="//field[@name='stage_id']" position="before">
-                        <button invisible="1" attrs="{'invisible': [('probability', '&lt;', 100)]}" string="Create Quotation" name="%(sale_crm.action_crm_make_sale)d" type="action"/>
-                        <button invisible="1" attrs="{'invisible': [('probability', '=', 100)]}" string="Convert to Quotation" name="%(sale_crm.action_crm_make_sale)d" type="action" class="oe_highlight"/>
-                    </xpath>
-                </data>
-            </field>
-        </record>
-
-		<record id = "add_button_create_quotation" model = "ir.ui.view">
-            <field name="name">CRM Leads</field>
-            <field name="model">crm.lead</field>
-            <field name="inherit_id" ref="crm.crm_case_form_view_oppor"/>
-            <field name="arch" type="xml">
-            	<xpath expr = "/form/header/button[@name='case_mark_won']" position = "after">
-            		<button name = "create_quotation" string = "Create a Quotation" type = "object" class = "oe_highlight"/>
-            	</xpath>
-            </field>
+                	<xpath expr = "/form/header" position = "inside">
+                		<button name = "trasnfer_leads_partners" string = "Transfer" type = "object" />
+                	</xpath>
+				</data>
+			</field>
 		</record>
 	</data>
 </openerp>

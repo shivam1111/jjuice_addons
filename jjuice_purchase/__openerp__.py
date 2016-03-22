@@ -41,7 +41,9 @@
     'data': [ 'purchase_view.xml',
              'jjuice_data.xml',
              'stock_view.xml',
-             'views/jjuice_purchase.xml'
+             'views/jjuice_purchase.xml',
+             'views/report_purchaseorder.xml',
+             'views/report_purchasequotation.xml'
     ],
     'test': [
     ],
