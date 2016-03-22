@@ -41,7 +41,6 @@ class crm_lead(format_address, osv.osv):
             comment = comment+ "Subject: %s\n"%(i.name)
             if i.referred:
                 comment = comment + "Referred By: %s\n"%(i.referred)
-            print "*********************comment",comment
             #Check if there is a company
             if i.partner_name:
                 use_parent_address = True
@@ -125,8 +124,15 @@ class res_partner(osv.osv):
     _inherit='res.partner'
     _description='jjuice module'
     
+    def convert_lead_partner(self,cr,uid,ids,context):
+        for i in ids:
+            child_ids = self.search(cr,uid,[('parent_id','child_of',i)])
+            self.write(cr,uid,child_ids,{
+                                            'customer':True,
+                                            'leads':False
+                                         },context)
+    
     def create(self,cr,uid,vals,context):
-        print "-------------------vals",vals
         return super(res_partner,self).create(cr,uid,vals,context)
     
     _columns={
