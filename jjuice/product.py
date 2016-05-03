@@ -3,28 +3,6 @@ from openerp.tools.translate import _
 import openerp.addons.decimal_precision as dp
 from openerp import SUPERUSER_ID
 
-class product_product(osv.osv):
-    _inherit = "product.product"
-    
-    def _check_shipping(self, cr, uid, ids, context=None):
-        cr.execute('''
-            select count(*) from product_product where shipping = true
-        ''')
-        count = cr.fetchall()[0][0]
-        if (count > 1):
-            return False
-        return True
-
-    _constraints = [
-        (_check_shipping, 'Error: There can be only one shipping product', ['shipping']),
-        ]
-    
-    _columns = {
-                'market_case':fields.boolean("Marketing"),
-                'shipping':fields.boolean("Shipping"),
-                'misc':fields.boolean("Miscellaneous"),
-                }
-    
 class product_attribute_value(osv.osv):
     _inherit = "product.attribute.value"
     
@@ -55,8 +33,19 @@ class sale_order(osv.osv):
         else :
             return self.create(cr,uid,vals,context)
             
+            
 class product_product(osv.osv):
     _inherit = "product.product"
+    
+    def _check_shipping(self, cr, uid, ids, context=None):
+        cr.execute('''
+            select count(*) from product_product where shipping = true
+        ''')
+        count = cr.fetchall()[0][0]
+        if (count > 1):
+            return False
+        return True
+    
     
     def _check_product_type(self, cr, uid, ids, context=None):
         for record in self.browse(cr,uid,ids,context):
@@ -70,6 +59,7 @@ class product_product(osv.osv):
         
     _constraints = [
         (_check_product_type, 'A product cannot be marketing,shipping,miscellaneous product at the same time', ['misc','shipping','market_case']),
+        (_check_shipping, 'Error: There can be only one shipping product', ['shipping']),
     ]
 
 #     [{'id': 10, 'name': '10ml'}, {'id': 11, 'name': '350ml'}]
@@ -367,4 +357,6 @@ class product_product(osv.osv):
         result.update({'extra':list_records,'vol_id':attribute_free[0],'vol_name':attribute_free[2],'taxes':tax_detail})
         return result
 
-
+    _columns = {
+                'shipping':fields.boolean("Shipping"),
+                }

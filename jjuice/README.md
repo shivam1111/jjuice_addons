@@ -64,3 +64,4 @@
 	- [x] Can be filtered based on the following related partner fields
 		- [x] Type of Account
 		- [x] Account Classification (for Finance)
+		

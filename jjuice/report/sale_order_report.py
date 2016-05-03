@@ -25,6 +25,7 @@ from openerp.report import report_sxw
 from openerp.tools.translate import _
 from openerp.osv import osv
 
+# This  prints a new delivery list 
 class order_original_report(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context=None):
         super(order_original_report, self).__init__(cr, uid, name, context=context)
