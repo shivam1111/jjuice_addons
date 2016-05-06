@@ -3,37 +3,18 @@ from openerp.tools.translate import _
 import openerp.addons.decimal_precision as dp
 from openerp import SUPERUSER_ID
 
+
 class product_attribute_value(osv.osv):
     _inherit = "product.attribute.value"
     
     _defaults = {
                  'commission':0,
                  }
-    
-    def name_search(self,cr, uid, name, args=None, operator='ilike', context=None, limit=100):
-        if context.get('jjuice',False):
-            ir_model_data = self.pool.get('ir.model.data') 
-            volume_id = ir_model_data.get_object_reference(cr, uid, 'jjuice', 'attribute_vol')[1]
-            result =  super(product_attribute_value,self).name_search(cr, uid, name, args=[['attribute_id','=',volume_id]] , operator='ilike', context=None, limit=100)            
-        else:
-            result =  super(product_attribute_value,self).name_search(cr, uid, name, args=None, operator='ilike', context=None, limit=100)
-        return result
-    
+
     _columns = {
-                'default_free_samples':fields.boolean('Free Samples'),
                 'commission':fields.float("Commision Value"),
                 }
     
-class sale_order(osv.osv):
-    _inherit = "sale.order.line"
-    
-    def check_create_sale_order(self,cr,uid,vals,context=None):
-        if vals.get('product_uom_qty',0) == 0:
-            return True
-        else :
-            return self.create(cr,uid,vals,context)
-            
-            
 class product_product(osv.osv):
     _inherit = "product.product"
     
@@ -47,18 +28,7 @@ class product_product(osv.osv):
         return True
     
     
-    def _check_product_type(self, cr, uid, ids, context=None):
-        for record in self.browse(cr,uid,ids,context):
-            if record.misc:
-                if record.shipping or record.market_case:
-                    return False
-            elif record.shipping:
-                if record.market_case:
-                    return False
-            return True
-        
     _constraints = [
-        (_check_product_type, 'A product cannot be marketing,shipping,miscellaneous product at the same time', ['misc','shipping','market_case']),
         (_check_shipping, 'Error: There can be only one shipping product', ['shipping']),
     ]
 
@@ -357,6 +327,37 @@ class product_product(osv.osv):
         result.update({'extra':list_records,'vol_id':attribute_free[0],'vol_name':attribute_free[2],'taxes':tax_detail})
         return result
 
+    def _get_domain_volume(self,context=None):
+        # We have access to self.env in this context.
+        ids = self.env.ref('jjuice.attribute_vol').id
+        return [('attribute_id','=', ids)]
+    
+    def _get_domain_concentration(self,context=None):
+        # We have access to self.env in this context.
+        ids = self.env.ref('jjuice.attribute_conc').id
+        return [('attribute_id','=', ids)]    
+    
+    def name_get(self, cr, uid, ids, context=None):
+        result = super(product_product,self).name_get(cr, uid, ids, context=None)
+        final_result = []
+        for product in result:
+            product_brw = self.browse(cr,uid,product[0],context)
+            if product_brw.tab_id and product_brw.tab_id.tab_style in [1,5]: # Change names only if the product has tab_id and tab style is matrix
+                name = ' / '.join([(product_brw.vol_id.name or "No vol"),(product_brw.conc_id.name or "No Conc")])
+                name = ' / '.join([product[1],name])
+                final_result.append((product_brw.id,name))
+            else:
+                final_result.append(product)
+        return final_result
+        
+    _sql_constraints = [
+                        ('properties_uniq', 'unique(tab_id,vol_id,conc_id,flavor_id)', ("The Concentration,Volume,Flavor and Tab of a  product should be unique!"))
+                ]
+    
     _columns = {
                 'shipping':fields.boolean("Shipping"),
+                'tab_id':fields.many2one('product.tab','Tab',ondelete='cascade', select=True),
+                'vol_id':fields.many2one('product.attribute.value',string="Volume",domain=_get_domain_volume),
+                'conc_id':fields.many2one('product.attribute.value',string="Concentration",domain=_get_domain_concentration),
+                'flavor_id':fields.many2one('product.flavors',"Flavor")
                 }

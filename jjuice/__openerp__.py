@@ -35,14 +35,12 @@
              'commission_view.xml',
              'customers_view_change.xml',
              'res_partner_view.xml',
-             'product_template_custom.xml',
              'custom_graph.xml',
              'report/report_sale_order.xml',
              'sale_report.xml',
              'account_invoice.xml',
              'account_report.xml',
              'product_view.xml',
-             'res_config.xml',
              'sale_stock_view.xml',
              'wizard/stock_transfer_details.xml',
              'sale_order.xml',
@@ -63,8 +61,9 @@
              'wizard/change_sale_person_lead.xml',
               'crm_lead_view.xml',
               'marketing_package.xml',
-              'wizard/mail_compose_message.xml'
-             
+              'wizard/mail_compose_message.xml',
+              'product_tab_view.xml',
+              'product_flavours_view.xml'
              ],
 
     'qweb' : [

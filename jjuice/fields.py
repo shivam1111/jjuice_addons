@@ -120,7 +120,7 @@ class hr_employee(osv.osv):
     
 class res_partner(osv.osv):
     _inherit='res.partner'
-    _description='jjuice module'
+    _description='JJUICE'
     
     def convert_lead_partner(self,cr,uid,ids,context):
         for i in ids:

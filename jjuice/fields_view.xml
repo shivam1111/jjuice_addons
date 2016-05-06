@@ -120,23 +120,8 @@
 				</xpath>
 			</field>
 		</record>
-	<!-- 	<record id="view_inheritance_sale_order_sale_rep" model="ir.ui.view">
-            <field name="name">first.view.inheritances.sale_rep</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale_stock.view_order_form_inherit"/>
-            <field name="arch" type="xml">
-				<xpath expr="//field[@name='order_policy']" position= "after">
-					<field name="sale_rep" widget="many2many_tags"/>
-					 <field name='commission'/>
-						<tree>
-							<field name ="name"/>
-						</tree>
-					</field>
-				</xpath> 
-			</field>
-		</record> -->
-		
-		  <record id="view_inheritance_sale_order1" model="ir.ui.view">
+    	
+    	<record id="view_inheritance_sale_order1" model="ir.ui.view">
             <field name="name">first.view.inheritancess</field>
             <field name="model">crm.lead</field>
             <field name="inherit_id" ref="crm.crm_case_form_view_leads"/>
@@ -176,8 +161,7 @@
 			</field>
 		</record>
 		
-					<!-- commission field in sale order -->
-		
+		   <!-- commission field in sale order -->
 		   <record id="view_inheritance_commission_view" model="ir.ui.view">
             <field name="name">first.view.commission</field>
             <field name="model">sale.order</field>
