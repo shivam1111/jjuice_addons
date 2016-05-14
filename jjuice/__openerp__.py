@@ -35,7 +35,7 @@
              'commission_view.xml',
              'customers_view_change.xml',
              'res_partner_view.xml',
-             'custom_graph.xml',
+             'jjuice.xml',
              'report/report_sale_order.xml',
              'sale_report.xml',
              'account_invoice.xml',

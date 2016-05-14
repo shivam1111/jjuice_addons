@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+	
+	<!-- Nav Tabs -->
+	<t t-name = "nav_tabs">
+		<t t-if="class_state == true">
+			<li role="presentation" class="active"><a t-att-href="'#'+tech_tab_name" t-att-aria-controls="tech_tab_name" role="tab" data-toggle="tab"><t t-esc="tab_name"></t></a></li>
+		</t>
+		<t t-if="class_state == false">
+			<li role="presentation" ><a t-att-href="'#'+tech_tab_name" t-att-aria-controls="tech_tab_name" role="tab" data-toggle="tab"><t t-esc="tab_name"></t></a></li>
+		</t>		
+	</t>
+	
+	<!-- Tab panes -->
+	<t t-name = "tab_panes">
+		<t t-if = "class_state == true" >
+			<div role="tabpanel" class="tab-pane active" t-att-id="tech_tab_name">
+			</div>
+		</t>
+		<t t-if = "class_state == false" >
+			<div role="tabpanel" class="tab-pane" t-att-id="tech_tab_name">
+				<div>
+				</div>	
+			</div>
+		</t>		
+	</t>
+	<t t-name="products_list">
+		<div class = "table-responsive">
+			<table class="table table-hover table-bordered">
+				<caption></caption>
+				<thead>
+					<th>Product Name</th>
+					<th>Qty</th>
+					<th>Unit Price</th>
+					<th>Subtotal</th>
+				</thead>
+				<tbody id="main_body">
+				
+				</tbody>
+			</table>
+		</div>	
+	</t>
+	
+	<t t-name="flavor_conc_matrix_table" >
+		<div class = "table-responsive">
+			<table class="table table-hover table-bordered">
+				<caption></caption>
+				<thead>
+					<tr>
+						<th></th>
+						<th t-foreach="concentration" t-as="conc">
+							<span><t t-esc="conc[1]"/></span>
+						</th>
+						<t t-if = "tab_style == 1">
+							<th>
+								<span>Unit Price</span>
+							</th>
+							<th>
+								<span>Subtotal</span>
+							</th>
+						</t>
+					</tr>
+				</thead>
+				<tbody id="main_body">
+					
+				</tbody>
+			</table>
+		</div>
+	</t>
+	
+	<!-- Main -->
+	<t t-name = "interface">
+		<div>
+			<ul class="nav nav-tabs" role="tablist">
+			
+			</ul>
+			<div class = "oe_button_box oe_right">
+				<button type="button" id="confirm" class = "oe_highlight"  >Confirm Order</button>
+				<button type="button" id = "check_availability" class = "oe_highlight">Check Availability</button>
+				<button type="button" id = "rate_request" class = "oe_highlight">Rate Request</button>
+			</div>
+			<div class="tab-content">
+					
+			</div>
+		</div>
+		
+	</t>
+
+</templates>

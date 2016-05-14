@@ -1,12 +1,12 @@
 openerp.jjuice= function (instance,local) {
-	openerp.pls.pos(instance);
+	openerp.jjuice.pos(instance,local);
     var _t = instance.web._t,
     _lt = instance.web._lt;
     var QWeb = instance.web.qweb;
     instance.web.jjuice = instance.web.jjuice || {};
     
 
-    // Filter customer wizard button *******************************************************************
+    //********************************* Filter customer wizard button ****************************
     instance.web.views.add('open_filter_wizard_customer','instance.web.jjuice.openp_filter_wizard');
     instance.web.jjuice.openp_filter_wizard = instance.web.ListView.include({
     	do_search:function(domain, context, group_by){
@@ -87,7 +87,7 @@ openerp.jjuice= function (instance,local) {
     })
 
     
-    // Filter customer wizard button *******************************************************************
+    // *******************************Filter customer wizard button ********************
     instance.web.views.add('tree_group_expand', 'instance.web.jjuice.group_expandView');
     instance.web.jjuice.group_expandView = instance.web.ListView.extend({
         init: function() {

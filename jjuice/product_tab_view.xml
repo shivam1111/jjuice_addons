@@ -1,15 +1,29 @@
 <openerp>
 	<data>
+		<record id = "product_tab_tree" model = "ir.ui.view">
+			<field name = "name">Product Tab Tree View</field>
+			<field name = "model">product.tab</field>
+			<field name = "arch" type="xml">
+				<tree string = "Product Tabs">
+					<field name="sequence" widget="handle"/>
+					<field name = "name" />
+					<field name = "active" />
+					<field name = "visible_all_customers" />
+					<field name = "specific_customer_ids" />
+				</tree>
+			</field> 
+		</record>
 		<record id = "product_tab_form" model="ir.ui.view">
-            <field name="name">Product Tab</field>
+            <field name="name">Product Tab Form View</field>
             <field name="model">product.tab</field>
             <field name="arch" type="xml">
                 <form string="Product Tab">
                 	<sheet>
  						<div class="oe_title oe_left">
 	                        <div class="oe_edit_only">
-	                            <label for="name"/> (
-	                            <field name="visible_all_customers"  class="oe_inline"/> <label for="visible_all_customers" string="Visible to all Customers"/>)
+	                            <label for="name"/> 
+	                            <field name="visible_all_customers"  class="oe_inline"/> <label for="visible_all_customers" string="Visible to all"/>
+	                        	<field name="active"  class="oe_inline"/> <label for="active" string="Active"/>
 	                        </div>
 	                        <h1>
 	                            <field name="name" default_focus="1" placeholder="Name"/>
@@ -22,6 +36,7 @@
 		                        <field name="specific_customer_ids" widget="many2many_tags"  domain="[('customer', '=', True)]" attrs="{'invisible': [('visible_all_customers','=', True)]}"  />
 								<field name = "vol_id" widget="selection" attrs = "{'invisible':[('tab_style','not in',[1,5])],'required':[('tab_style','in',[1,5])]}" />
 								<field name = "consumable_stockable" />
+								<field name = "input_width" />
 								<field name = "sequence" />
 							</group>
 							<group>

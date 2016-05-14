@@ -5,7 +5,7 @@ class volume_price(osv.osv):
     _name = "volume.prices.line"
     _columns = {
                 'customer_id':fields.many2one('res.partner','Customer',invisible=True),
-                'product_attribute':fields.many2one('product.attribute.value',"Volume"),
+                'product_attribute':fields.many2one('product.attribute.value',"Volume",required=True),
                 'price':fields.float("Price"),
                 }
     

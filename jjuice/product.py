@@ -356,8 +356,8 @@ class product_product(osv.osv):
     
     _columns = {
                 'shipping':fields.boolean("Shipping"),
-                'tab_id':fields.many2one('product.tab','Tab',ondelete='cascade', select=True),
-                'vol_id':fields.many2one('product.attribute.value',string="Volume",domain=_get_domain_volume),
-                'conc_id':fields.many2one('product.attribute.value',string="Concentration",domain=_get_domain_concentration),
+                'tab_id':fields.many2one('product.tab','Tab',ondelete='cascade', select=True,readonly=True),
+                'vol_id':fields.many2one('product.attribute.value',string="Volume",domain=_get_domain_volume,readonly=True),
+                'conc_id':fields.many2one('product.attribute.value',string="Concentration",domain=_get_domain_concentration,readonly=True),
                 'flavor_id':fields.many2one('product.flavors',"Flavor")
                 }
