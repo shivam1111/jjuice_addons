@@ -22,27 +22,9 @@ openerp.jjuice.pos = function (instance,local) {
 	main_def = $.Deferred();
 	$(document).ready(function(){
     	var mod = new instance.web.Model("product.tab", {}, []); // MODEL,CONTEXT,DOMAIN
-    	mod.call("search_read",{'order':'sequence',}).done(function(tabs){ //search_read method will automatically not load active = False records
-    		product = new openerp.Model('product.product',{},[])
-    		// tabs is an array
-    		$.each(tabs,function(index,tab){
-    			if (tab.product_ids.length > 0){
-    				product.call("read",{
-    					"ids":tab.product_ids,
-    					"fields":['name','vol_id','conc_id','flavor_id','lst_price']
-    				}).done(function(data){
-    					tab.product_ids = data
-    					if (index == tabs.last()){
-    						main_def.resolve(tabs)
-    					}
-    				})
-    			}else{
-    				if (index == tabs.last()){
-						main_def.resolve(tabs)
-					}
-    			}
-    		})
-    	})
+    	mod.call("fetch_static_data",[]).done(function(res){ //search_read method will automatically not load active = False records
+    		main_def.resolve(res)
+    	})//end call
 	})
 	
 	function sortProperties(obj)
@@ -70,6 +52,10 @@ openerp.jjuice.pos = function (instance,local) {
 			this.tab_parent = tab_parent;
 			this.data = tab_data;
 			this.dfm = new instance.web.form.DefaultFieldManager(self);
+			// List of objects with key as product id
+			this.qty = {};
+			this.price = {};
+			this.subtotal = {};
 		},
 		
 		get_width:function(){
@@ -79,14 +65,107 @@ openerp.jjuice.pos = function (instance,local) {
 		get_price:function(product){
 			return product.lst_price;
 		},
-		
+		calculate_subtotal_money:function(product_id,qty){
+			var self = this;
+			price = parseFloat(self.price[product_id].get_value() || 0);
+			total = price * qty;
+			self.subtotal[product_id].set_value(total);
+		},
+		calculate_subtotal_qty:function(){
+			var self = this;
+			total = 0;
+			_.each(self.qty,function(cell){
+				total = total + parseFloat(cell.get_value() || 0);
+			})
+			self.subtotal_qty.set_value(total);
+		},
 		renderElement:function(){
 			console.log("renderElement")
 			var self=this;
 			width = self.get_width();
 			//Fetch Volume Prices first
 			self.$el = $(QWeb.render('products_list',{'tab_style':self.data.tab_style}))
-			console.log(self.data)
+			console.log("-",self.data.product_ids)
+			_.each(self.data.product_ids,function(product){
+				$row = $("<tr><td><strong>%NAME%</strong></td></tr>".replace("%NAME%",product.name))
+				// Qty Column
+				$col= $("<td></td>")
+				widget = new instance.web.form.FieldFloat(self.dfm,{
+	                attrs: {
+	                    name: "qty_input_"+remove_spaces(product.name),
+	                    type: "float",
+	                    context: {
+	                    },
+	                    modifiers: '{"required": false}',
+	                },
+	            });
+				self.qty[product.id] = widget;
+				widget.appendTo($col);
+				widget.set_dimensions("auto",width)
+				$row.append($col);
+				widget.on("changed_value",widget,function(event){
+					if (self.data.tab_style == 2){
+						self.calculate_subtotal_money(product.id,this.get_value())
+					}
+					self.calculate_subtotal_qty();
+				})
+				if (self.data.tab_style != 2){
+					self.$el.find("#main_body").append($row);
+					return
+				}
+				// Unit price column
+				$col = $("<td></td>")
+				widget = new instance.web.form.FieldFloat(self.dfm,{
+	                attrs: {
+	                    name: "unit_price_input_"+remove_spaces(product.name),
+	                    type: "float",
+	                    context: {
+	                    },
+	                    modifiers: '{"required": false}',
+	                },
+	            });
+				self.price[product.id] = widget;
+				widget.appendTo($col);
+				widget.set_value(self.get_price(product));
+				widget.on("changed_value",widget,function(event){
+					self.calculate_subtotal_money(product.id,this.get_value())
+				});
+				widget.set_dimensions("auto",width)
+				$row.append($col);
+				
+				// Subtotal column
+				$col = $("<td></td>")
+				widget = new instance.web.form.FieldFloat(self.dfm,{
+	                attrs: {
+	                    name: "subtotal_input_"+remove_spaces(product.name),
+	                    type: "float",
+	                    context: {
+	                    },
+	                    modifiers: '{"required": false,"readonly":true}',
+	                },
+	            });
+				self.subtotal[product.id] = widget;
+				widget.appendTo($col);
+				widget.set_dimensions("auto",width)
+				$row.append($col);
+				self.$el.find("#main_body").append($row);
+			});//end each
+			$row = $("<tr class='success'><td><strong>Total Quantity</strong></td></tr>");
+			$col = $("<td></td>")
+			widget = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "subtotal_qty_input",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false,"readonly":true}',
+                },
+            });
+			self.subtotal_qty = widget;
+			widget.appendTo($col);
+			widget.set_dimensions("auto",width)
+			$row.append($col);
+			self.$el.find("#main_body").append($row);
 		},
 	})
 	
@@ -112,7 +191,7 @@ openerp.jjuice.pos = function (instance,local) {
 				self.available_conc[conc] = product.conc_id[1];
 				widget = new instance.web.form.FieldFloat(self.dfm,{
 	                attrs: {
-	                    name: "qty_input"+remove_spaces(product.name),
+	                    name: "qty_input_"+remove_spaces(product.name),
 	                    type: "float",
 	                    context: {
 	                    },
@@ -143,7 +222,6 @@ openerp.jjuice.pos = function (instance,local) {
 			var self = this;
 			qty_total = 0;
 			_.each(self.product_data[flavor_id],function(cell){
-				console.log(cell.get_value());
 				qty_total = qty_total  + parseFloat((cell.get_value() || 0))
 			})
 			price = self.prices[flavor_id].get_value();
@@ -170,7 +248,7 @@ openerp.jjuice.pos = function (instance,local) {
 			$.each(self.available_flavors,function(index_flavor,flavor){
 				$row = $("<tr></tr>");
 				// * First render the product cells
-				$row.append(("<td>%NAME%</td>").replace("%NAME%",flavor[1]))
+				$row.append(("<td><strong>%NAME%<strong></td>").replace("%NAME%",flavor[1]))
 				$.each(self.available_conc,function(index_conc,conc){
 					$col= $("<td></td>")
 					if (self.product_data[flavor[0]][conc[0]]){
@@ -224,7 +302,7 @@ openerp.jjuice.pos = function (instance,local) {
 				self.$el.find("#main_body").append($row);
 			})//end each				
 			// * Now rendering the subtotal_qty widget
-			$row = $("<tr class='success'><td>Total Per Strength</td></tr>");
+			$row = $("<tr class='success'><td><strong>Total Per Strength</strong></td></tr>");
 			$.each(self.available_conc,function(index_conc,conc){
 				$col = $("<td></td>");
 				widget_subtotal_qty = new instance.web.form.FieldFloat(self.dfm,{
@@ -307,10 +385,122 @@ openerp.jjuice.pos = function (instance,local) {
     		this.field_manager = field_manager;
     		this.prices = {};
     		this.$prices = $.Deferred();
+    		this.dfm = new instance.web.form.DefaultFieldManager(self);
+    		this.taxes = [];
+		},
+		renderElement:function(){
+			var self = this;
+			self._super();
+			$body = self.$el.find("tbody#main_body")
+			self.total_units = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "total_unit_input",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false,"readonly":true}',
+                },
+            });
+			self.total_units.appendTo($body.find('td#total_units'))
+			self.subtotal = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "subtotal_input",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false,"readonly":true}',
+                },
+            });
+			self.subtotal.appendTo($body.find('td#subtotal'))
+			
+			self.shipping_handling = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "s_h_input",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false}',
+                },
+            });
+			self.shipping_handling.appendTo($body.find("#s_h"))
+			self.order_notes = new instance.web.form.FieldText(self.dfm,{
+                attrs: {
+                    name: "order_notes_input",
+                    type: "text",
+                    context: {
+                    },
+                    modifiers: '{"required": false}',
+                },
+            });
+			self.order_notes.appendTo($body.find("#order_notes"))
+			
+			self.discount_percentage = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "discount_percentage_input",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false}',
+                },
+            });
+			self.discount_percentage.appendTo($body.find("#discount_percentage"))
+			
+			self.discount = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "discount_input",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false}',
+                },
+            });
+			self.discount.appendTo($body.find("#discount"))
+			
+			self.tax_value = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "tax_input",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false,"readonly":true}',
+                }
+            });
+			self.tax_value.appendTo($body.find("td#tax_value"))
+			self.total = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "total",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false,"readonly":true}',
+                }
+            });
+			self.total.appendTo($body.find("td#total"))			
+			self.paid = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "paid",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false}',
+                }
+            });
+			self.paid.appendTo($body.find("td#paid"))						
+			
+			self.balance = new instance.web.form.FieldFloat(self.dfm,{
+                attrs: {
+                    name: "balance",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": false,"readonly":true}',
+                }
+            });
+			self.balance.appendTo($body.find("td#balance"))					
 		},
 		start:function(){
-			var self = this;
 			this.tabs_object = []
+			var self = this;
 			this.field_manager.on("change",self,function(){
 				/*
 				 * The view is not refreshed when we change the partner record. For that if we detect a change in field manager,
@@ -340,10 +530,32 @@ openerp.jjuice.pos = function (instance,local) {
 			}else{
 				self.$prices.resolve()
 			}					
-			$.when(main_def,self.$prices).done(function(tabs){
-				console.log(self.prices);
-				self.tabs_data = tabs; // Saving Tab data in Main widget
-				$.each(tabs,function(index,tab){
+			$.when(main_def,self.$prices).done(function(res){
+				self.tabs_data = res.tabs; // Saving Tab data in Main widget
+				_.each(res.taxes,function(tax){
+					$row = $("<tr><td><span><strong>%NAME%</strong></span></td></tr>".replace("%NAME%",tax.name))
+					$col = $("<td></td>")
+					var tax_widget = new instance.web.form.FieldBoolean(self.dfm,{
+		                attrs: {
+		                    name: "tax_input",
+		                    type: "boolean",
+		                    context: {
+		                    },
+		                    modifiers: '{"required": false}',
+		                },
+					});
+					tax_widget.appendTo($col);
+					tax_widget.set({
+						'id':tax.id,
+						'amount':tax.amount,
+						'price_include':tax.price_include
+					});
+					$row.append($col);
+					self.$el.find("tbody#taxes").append($row);
+					self.taxes.push(tax_widget)
+				});
+				
+				$.each(self.tabs_data ,function(index,tab){
 					// Check first if the tab is to be displayed for this customer
 					if (!tab.visible_all_customers){
 						if (!_.contains(tab.specific_customer_ids,self.field_manager.datarecord.id)){

@@ -29,10 +29,13 @@
 			<table class="table table-hover table-bordered">
 				<caption></caption>
 				<thead>
-					<th>Product Name</th>
-					<th>Qty</th>
-					<th>Unit Price</th>
-					<th>Subtotal</th>
+					<th><span><strong>Product Name</strong></span></th>
+					<th><span><strong>Qty</strong></span></th>
+					
+					<t t-if="tab_style == 2">
+						<th><span>Unit Price<strong></strong></span></th>
+						<th><span><strong>Subtotal</strong></span></th>
+					</t>
 				</thead>
 				<tbody id="main_body">
 				
@@ -49,14 +52,14 @@
 					<tr>
 						<th></th>
 						<th t-foreach="concentration" t-as="conc">
-							<span><t t-esc="conc[1]"/></span>
+							<span><strong><t t-esc="conc[1]"/></strong></span>
 						</th>
 						<t t-if = "tab_style == 1">
 							<th>
-								<span>Unit Price</span>
+								<span><strong>Unit Price</strong></span>
 							</th>
 							<th>
-								<span>Subtotal</span>
+								<span><strong>Subtotal</strong></span>
 							</th>
 						</t>
 					</tr>
@@ -81,6 +84,89 @@
 			</div>
 			<div class="tab-content">
 					
+			</div>
+			<div class="non-tab-content">
+				<div class = "table-responsive">
+					<table class="table table-hover table-bordered">
+						<caption></caption>
+						<tbody id = "main_body">
+							<tr>
+								<td class="active"><strong>Total Units</strong></td>	
+								<td id="total_units" class="danger">
+								
+								</td>
+								<td class="active"><strong>Subtotal</strong></td>
+								<td id = "subtotal" class="danger">
+								
+								</td>
+							</tr> <!--  -->
+							<tr>
+								<td class="active"><strong>Order Notes</strong></td>
+								<td id = "order_notes" classs = "info">
+								
+								</td>
+								<td colspan="2">
+									<table class = "table table-hover table-bordered">
+										<tbody>
+											<tr>
+												<td class="active"><strong>S &amp; H ($)</strong></td>
+												<td class="info" id = "s_h">
+												</td>
+											</tr>
+											<tr>
+												<td class="active"><strong>Discount Percentage</strong></td>
+												<td class="info" id = "discount_percentage">
+													
+												</td>
+											</tr>
+											<tr>
+												<td class="active"><strong>Discount</strong></td>
+												<td class="info" id = "discount">
+													
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr> <!--  -->
+							<tr>
+								<td>
+									<strong>Taxes</strong>
+								</td>
+								<td>
+									<table class = "table table-hover table-bordered">
+										<tbody id = "taxes">
+											<tr>
+												<td class="active"><strong>Taxes</strong></td>
+												<td class="danger" id = "tax_value">
+													
+												</td>
+											</tr>
+										</tbody>
+									</table>								
+								</td>
+								<td colspan="2">
+									<table class = "table table-hover table-bordered">
+										<tbody>
+											<tr>
+												<td class="active"><span><strong>Total</strong></span></td>
+												<td id="total" class="danger"></td>
+											</tr>
+											<tr>
+												<td class="active"><span><strong>Paid</strong></span></td>
+												<td id="paid" class="danger"></td>
+											</tr>
+											<tr>
+												<td class="active"><span><strong>Balance</strong></span></td>
+												<td id="balance" class="danger"></td>
+											</tr>											
+										</tbody>
+									</table>								
+								</td>								
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 		

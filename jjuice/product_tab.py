@@ -19,6 +19,22 @@ class product_tab(models.Model):
     _description = "Product Tab"
     _order = "sequence asc"
     
+    def fetch_static_data(self,cr,uid,context=None):
+        res = {}
+        products = self.pool.get('product.product')
+        taxes = self.pool.get('account.tax')
+        tabs = self.search_read(cr,uid,order="sequence")
+        for i in tabs:
+            if len(i.get('product_ids',False)) > 0:
+                product_info = products.read(cr,uid,i.get('product_ids'),fields=['name','vol_id','conc_id','flavor_id','lst_price'])
+                i["product_ids"] = product_info
+        res.update({'tabs':tabs})
+        tax_info = taxes.search_read(cr,uid,domain=[['type','=','percent'],['type_tax_use','=','sale']],fields=['id','name','price_include','amount'])
+        res.update({
+                    'taxes':tax_info
+                    })
+        return res
+    
     @api.model
     def _get_attribute_domain(self):
         # We have access to self.env in this context.
