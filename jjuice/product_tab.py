@@ -29,7 +29,7 @@ class product_tab(models.Model):
                 product_info = products.read(cr,uid,i.get('product_ids'),fields=['name','vol_id','conc_id','flavor_id','lst_price'])
                 i["product_ids"] = product_info
         res.update({'tabs':tabs})
-        tax_info = taxes.search_read(cr,uid,domain=[['type','=','percent'],['type_tax_use','=','sale']],fields=['id','name','price_include','amount'])
+        tax_info = taxes.search_read(cr,uid,domain=[['type','=','percent'],['type_tax_use','=','sale'],['price_include','=',False]],fields=['id','name','amount'])
         res.update({
                     'taxes':tax_info
                     })

@@ -67,17 +67,21 @@ openerp.jjuice.pos = function (instance,local) {
 		},
 		calculate_subtotal_money:function(product_id,qty){
 			var self = this;
+			old = self.subtotal[product_id].get_value() || 0 
 			price = parseFloat(self.price[product_id].get_value() || 0);
 			total = price * qty;
 			self.subtotal[product_id].set_value(total);
+			self.tab_parent.parent.trigger("subtotal_money_changed",{"old":old,"new_value":total})
 		},
 		calculate_subtotal_qty:function(){
 			var self = this;
 			total = 0;
+			old_qty = self.subtotal_qty.get_value();
 			_.each(self.qty,function(cell){
 				total = total + parseFloat(cell.get_value() || 0);
 			})
 			self.subtotal_qty.set_value(total);
+			self.tab_parent.parent.trigger("subtotal_change",{'old':old_qty,'new_value':total});
 		},
 		renderElement:function(){
 			console.log("renderElement")
@@ -85,7 +89,6 @@ openerp.jjuice.pos = function (instance,local) {
 			width = self.get_width();
 			//Fetch Volume Prices first
 			self.$el = $(QWeb.render('products_list',{'tab_style':self.data.tab_style}))
-			console.log("-",self.data.product_ids)
 			_.each(self.data.product_ids,function(product){
 				$row = $("<tr><td><strong>%NAME%</strong></td></tr>".replace("%NAME%",product.name))
 				// Qty Column
@@ -221,22 +224,29 @@ openerp.jjuice.pos = function (instance,local) {
 		calculate_subtotal_money:function(flavor_id){
 			var self = this;
 			qty_total = 0;
+			old = self.subtotal_money[flavor_id].get_value() || 0 ;
 			_.each(self.product_data[flavor_id],function(cell){
 				qty_total = qty_total  + parseFloat((cell.get_value() || 0))
 			})
 			price = self.prices[flavor_id].get_value();
 			total_value = price*qty_total;
 			self.subtotal_money[flavor_id].set_value(total_value);
+			self.tab_parent.parent.trigger("subtotal_money_changed",{"old":old,"new_value":total_value})
 		},
 		calculate_subtotal_qty:function(conc_id){
 			var self=this;
 			total_qty = 0;
+			old_qty = self.subtotal_qty[conc_id].get_value() || 0;
 			_.each(self.product_data,function(flavor){
 				if (flavor[conc_id]){
 					total_qty = total_qty + parseFloat(flavor[conc_id].get_value())
 				}
 			})
-			self.subtotal_qty[conc_id].set_value(total_qty);
+			self.subtotal_qty[conc_id].set_value(total_qty || 0);
+			self.tab_parent.parent.trigger("subtotal_change",{'old':old_qty,'new_value':total_qty});
+		},
+		start:function(){
+			var self=this;
 		},
 		renderElement:function(){
 			console.log("renderElement")
@@ -320,7 +330,6 @@ openerp.jjuice.pos = function (instance,local) {
 				self.subtotal_qty[conc[0]] = widget_subtotal_qty
 			});//end each
 			self.$el.find("#main_body").append($row);
-			console.log(self);
 		},
 	})
 	
@@ -374,13 +383,114 @@ openerp.jjuice.pos = function (instance,local) {
 			self.$tab.appendTo(self.parent.tabs)
 			self.$body.appendTo(self.parent.panes)
 		}
-	})
+	});
+	
+	local.payment_plan_line = instance.Widget.extend({
+		template:"payment_plan_line",
+		init:function(parent){
+			this._super(parent);
+			this.parent = parent
+			this.dfm = new instance.web.form.DefaultFieldManager(this);
+            this.dfm.extend_field_desc({
+            	payment_method: {
+                    relation: "account.journal",
+                },
+            });			
+			this.payment_method = new instance.web.form.FieldMany2One(this.dfm,{
+                attrs: {
+                    name: "payment_method",
+                    type: "many2one",
+                    context: {
+                    },
+                    modifiers: '{"required": true}',
+                }
+            });			
+			this.amount = new instance.web.form.FieldFloat(this.dfm,{
+                attrs: {
+                    name: "amount",
+                    type: "float",
+                    context: {
+                    },
+                    modifiers: '{"required": true}',
+                }
+            });
+			this.date = new instance.web.form.FieldDate(this.dfm,{
+                attrs: {
+                    name: "date",
+                    type: "date",
+                    context: {
+                    },
+                    modifiers: '{"required": true}',
+                }
+            });	
+			this.$delete = $("<span class='glyphicon glyphicon-remove-circle'></span>")
+		},
+		start:function(){
+			var self = this;
+			self.$delete.on("click",self,function(event){
+				self.destroy();
+			})
+			self.amount.on("change",self,function(event){
+				self.parent.trigger("recalculate_total",true);
+			});
+		},
+		
+		renderElement:function(){
+			var self = this;
+			this._super();
+			self.payment_method.appendTo(self.$el.find("td#payment_method"))
+			self.amount.appendTo(self.$el.find("td#amount"))
+			self.date.appendTo(self.$el.find("td#date"))
+			console.log(self.$el.find("td#delete"));
+			self.$el.find("td#delete").append(self.$delete)
+		},
+		destroy:function(){
+			this._super();
+			this.parent.trigger("recalculate_total",true);
+		},
+		
+	});
+	
+	local.payment_plan = instance.Widget.extend({
+		template:"payment_plan",
+		init:function(parent){
+			this._super(parent);
+			this.line = []
+			this.total = 0.00;
+			this.parent = parent;
+		},
+		renderElement:function(){
+			var self = this;
+			self._super();
+			self.$add_an_item = $("<tr><td><a href='#'><u>Add an item</u></a></td></tr>") 
+			self.$el.append(self.$add_an_item);
+		},
+		recalculate_total:function(){
+			var self = this;
+			_.each(self.line,function(line){
+				self.total = self.total + parseFloat(line.amount.get_value() || 0)
+			});
+			self.parent.trigger("recalc_balance",true)
+		},
+		start:function(){
+			var self = this;
+			self.$add_an_item.on("click",self,function(event){
+				line = new local.payment_plan_line(self)
+				self.line.push(line);
+				line.appendTo(self.$el)
+			});
+			self.on("recalculate_total",self,self.recalculate_total)
+		},
+	});
 	
 	// Main 
 	instance.web.form.custom_widgets.add('jjuice', 'instance.jjuice.jjuice_interface_main');
 	local.jjuice_interface_main = instance.web.form.FormWidget.extend({
     	template:'interface',
-		init: function(field_manager,node) {
+    	events:{
+    		"click button#rate_request":"execute_rate_request"
+    	},
+    	init: function(field_manager,node) {
 			this._super(field_manager, node);
     		this.field_manager = field_manager;
     		this.prices = {};
@@ -388,9 +498,90 @@ openerp.jjuice.pos = function (instance,local) {
     		this.dfm = new instance.web.form.DefaultFieldManager(self);
     		this.taxes = [];
 		},
+		execute_rate_request:function(){
+			var self = this;
+			self.do_action({
+                type: 'ir.actions.act_window',
+                res_model: "rate.fedex.request",
+                views: [[false, 'form']],
+                context:{
+                	"default_recipient_id":self.field_manager.datarecord.id
+                },
+                target: 'new'
+			})
+		},
+		renderTabs:function(){
+			var self = this;
+			self.tabs = self.$el.find("ul[role='tablist']")
+			self.panes = self.$el.find("div.tab-content")
+			//Fetch Prices of current customer
+			volume_prices_ids = self.field_manager.datarecord.volume_prices
+			if (volume_prices_ids.length > 0){
+				vol_price = new openerp.Model('volume.prices.line'); 
+				vol_price.call('read',{
+					'ids':volume_prices_ids,
+					'fields':['product_attribute','price']
+				}).done(function(prices){
+					_.each(prices,function(elem){
+						if (elem.product_attribute){
+							self.prices[elem.product_attribute[0]]=elem.price; 
+						}						
+					})
+					self.$prices.resolve()
+				})
+			}else{
+				self.$prices.resolve()
+			}//end if else
+			
+			$.when(main_def,self.$prices).done(function(res){
+				self.tabs_object = []
+				self.tabs_data = res.tabs; // Saving Tab data in Main widget
+				_.each(res.taxes,function(tax){
+					$row = $("<tr><td><span><strong>%NAME%</strong></span></td></tr>".replace("%NAME%",tax.name))
+					$col = $("<td></td>")
+					var tax_widget = new instance.web.form.FieldBoolean(self.dfm,{
+		                attrs: {
+		                    name: "tax_input",
+		                    type: "boolean",
+		                    context: {
+		                    },
+		                    modifiers: '{"required": false}',
+		                },
+					});
+					tax_widget.appendTo($col);
+					tax_widget.set({
+						'id':tax.id,
+						'amount':tax.amount,
+					});
+					tax_widget.on("change",self,self.tax_changed)
+					$row.append($col);
+					self.$el.find("tbody#taxes").append($row);
+					self.taxes.push(tax_widget)
+				});
+				$.each(self.tabs_data ,function(index,tab){
+					// Check first if the tab is to be displayed for this customer
+					if (!tab.visible_all_customers){
+						if (!_.contains(tab.specific_customer_ids,self.field_manager.datarecord.id)){
+							return
+						}
+					}
+					// state is a variable that decides whether the tab is by default active or not. In our case by default active is the first tab
+					state = false
+					if (self.tabs_object.length == 0){
+						state=true;
+					}
+					var tab_widget = new local.tab(self,state,tab)
+					state = true // First tab index = 0
+					tab_widget.appendTo(self.$el)
+					self.tabs_object.push(tab_widget)
+				})
+			}) // end when			
+		},
+
 		renderElement:function(){
 			var self = this;
 			self._super();
+			self.renderTabs();
 			$body = self.$el.find("tbody#main_body")
 			self.total_units = new instance.web.form.FieldFloat(self.dfm,{
                 attrs: {
@@ -423,6 +614,7 @@ openerp.jjuice.pos = function (instance,local) {
                 },
             });
 			self.shipping_handling.appendTo($body.find("#s_h"))
+				 
 			self.order_notes = new instance.web.form.FieldText(self.dfm,{
                 attrs: {
                     name: "order_notes_input",
@@ -444,6 +636,7 @@ openerp.jjuice.pos = function (instance,local) {
                 },
             });
 			self.discount_percentage.appendTo($body.find("#discount_percentage"))
+			self.discount_percentage.on("change",self,self.changed_discount);
 			
 			self.discount = new instance.web.form.FieldFloat(self.dfm,{
                 attrs: {
@@ -455,6 +648,7 @@ openerp.jjuice.pos = function (instance,local) {
                 },
             });
 			self.discount.appendTo($body.find("#discount"))
+			self.discount.on("change",self,self.changed_discount);
 			
 			self.tax_value = new instance.web.form.FieldFloat(self.dfm,{
                 attrs: {
@@ -486,7 +680,7 @@ openerp.jjuice.pos = function (instance,local) {
                 }
             });
 			self.paid.appendTo($body.find("td#paid"))						
-			
+			self.paid.on("change",self,function(){self.trigger("recalc_balance",true)});
 			self.balance = new instance.web.form.FieldFloat(self.dfm,{
                 attrs: {
                     name: "balance",
@@ -496,82 +690,115 @@ openerp.jjuice.pos = function (instance,local) {
                     modifiers: '{"required": false,"readonly":true}',
                 }
             });
-			self.balance.appendTo($body.find("td#balance"))					
+			self.balance.appendTo($body.find("td#balance"))		
+			self.payment_plan = new local.payment_plan(self);
+			self.payment_plan.appendTo($body.find("td#payment_plans"))
+		},
+		trigger_recalculate:function(){
+			var self = this;
+			self.trigger("recalc_discount",self.discount_percentage)
+			self.trigger("recalc_tax",true)
+			self.trigger("recalc_total",true);
+		},
+		subtotal_changed:function(event_data){
+			var self = this;
+			old = self.total_units.get_value() || 0;
+			new_total = old +  event_data.new_value - event_data.old;
+			self.total_units.set_value(new_total)
+		},		
+		subtotal_money_changed:function(event_data){
+			var self = this;
+			old = self.subtotal.get_value() || 0;
+			new_total = old - event_data.old + event_data.new_value
+			self.subtotal.set_value(new_total)
+			self.trigger_recalculate();
+		},
+		tax_changed:function(tax){
+			var self=this;
+			amount = 0
+			subtotal = self.subtotal.get_value() || 0;
+			s_h = parseFloat(self.shipping_handling.get_value()) || 0;
+			subtotal = subtotal + s_h;
+			discount = self.discount.get_value() || 0;
+			taxable_amount = subtotal - discount
+			_.each(self.taxes,function(tax){
+				tax_amount = tax.get("amount");
+				if (tax.get_value()){
+					amount = amount +  taxable_amount * tax_amount
+				}//end if
+				console.log(amount);
+			}); //end each
+			self.tax_value.set_value(amount);
+			self.trigger("recalc_total",true);
+		},
+		changed_discount:function(field){
+			var self = this;
+			console.log("discount")
+			if (field.field_manager.eval_context.stop){
+				return
+			}
+			field.field_manager.eval_context.stop = true;
+			if (field.name == "discount_percentage_input"){
+				discount_percentage = parseFloat(field.get_value()) || 0
+				subtotal = self.subtotal.get_value() || 0;
+				s_h = parseFloat(self.shipping_handling.get_value()) || 0;
+				subtotal = subtotal + s_h;
+				discount = (discount_percentage * subtotal)/100;
+				self.discount.set_value(discount);
+				
+			}else if (field.name == "discount_input"){
+				console.log(field,self)
+				discount = parseFloat(field.get_value()) || 0;
+				subtotal = self.subtotal.get_value() || 0;
+				s_h = parseFloat(self.shipping_handling.get_value()) || 0;
+				subtotal = subtotal + s_h;
+				if (subtotal != 0){
+					discount_percentage = (discount/subtotal)*100;
+					self.discount_percentage.set_value(discount_percentage);												
+				}
+			}
+			field.field_manager.eval_context.stop = false;
+			self.trigger("recalc_tax",true)
+			self.trigger("recalc_total",true);
+		},		
+		recalculate(event_data){
+			var self = this;
+			subtotal = parseFloat(self.subtotal.get_value()) || 0;
+			shipping_handling = parseFloat(self.shipping_handling.get_value()) || 0;
+			console.log( "*",shipping_handling );
+			discount = parseFloat(self.discount.get_value()) || 0;
+			tax_value = parseFloat(self.tax_value.get_value()) || 0;
+			total = subtotal + shipping_handling - discount + tax_value
+			self.total.set_value(total);
+			self.trigger("recalc_balance",true)
+		},
+		recalculate_balance:function(event){
+			var self = this;
+			paid = parseFloat(self.paid.get_value()) || 0;
+			total = parseFloat(self.total.get_value()) || 0;
+			plan_total = self.payment_plan.total || 0;
+			balance = total - paid - plan_total;
+			self.balance.set_value(balance);
 		},
 		start:function(){
-			this.tabs_object = []
 			var self = this;
-			this.field_manager.on("change",self,function(){
+			self.on("subtotal_change",self,self.subtotal_changed)
+			self.on("subtotal_money_changed",self,self.subtotal_money_changed)
+			self.on("recalc_total",self,self.recalculate);
+			self.on("recalc_tax",self,self.tax_changed);
+			self.on("recalc_discount",self,self.changed_discount);
+			self.shipping_handling.on("change",self,self.trigger_recalculate);
+			self.on("recalc_balance",self,self.recalculate_balance);
+			this.field_manager.on("change",self,function(event){
 				/*
 				 * The view is not refreshed when we change the partner record. For that if we detect a change in field manager,
 				 * we empty the $el of the parent and render according the new customer record
 				 */  
+				console.log("form changed2",event)
+				console.log("field manager:",self.field_manager)
 				self.$el.empty();
 				self.renderElement();
-				self.start();
 			});			
-			self.tabs = self.$el.find("ul[role='tablist']")
-			self.panes = self.$el.find("div.tab-content")
-			//Fetch Prices of current customer
-			volume_prices_ids = self.field_manager.datarecord.volume_prices
-			if (volume_prices_ids.length > 0){
-				vol_price = new openerp.Model('volume.prices.line'); 
-				vol_price.call('read',{
-					'ids':volume_prices_ids,
-					'fields':['product_attribute','price']
-				}).done(function(prices){
-					_.each(prices,function(elem){
-						if (elem.product_attribute){
-							self.prices[elem.product_attribute[0]]=elem.price; 
-						}						
-					})
-					self.$prices.resolve()
-				})
-			}else{
-				self.$prices.resolve()
-			}					
-			$.when(main_def,self.$prices).done(function(res){
-				self.tabs_data = res.tabs; // Saving Tab data in Main widget
-				_.each(res.taxes,function(tax){
-					$row = $("<tr><td><span><strong>%NAME%</strong></span></td></tr>".replace("%NAME%",tax.name))
-					$col = $("<td></td>")
-					var tax_widget = new instance.web.form.FieldBoolean(self.dfm,{
-		                attrs: {
-		                    name: "tax_input",
-		                    type: "boolean",
-		                    context: {
-		                    },
-		                    modifiers: '{"required": false}',
-		                },
-					});
-					tax_widget.appendTo($col);
-					tax_widget.set({
-						'id':tax.id,
-						'amount':tax.amount,
-						'price_include':tax.price_include
-					});
-					$row.append($col);
-					self.$el.find("tbody#taxes").append($row);
-					self.taxes.push(tax_widget)
-				});
-				
-				$.each(self.tabs_data ,function(index,tab){
-					// Check first if the tab is to be displayed for this customer
-					if (!tab.visible_all_customers){
-						if (!_.contains(tab.specific_customer_ids,self.field_manager.datarecord.id)){
-							return
-						}
-					}
-					// state is a variable that decides whether the tab is by default active or not. In our case by default active is the first tab
-					state = false
-					if (self.tabs_object.length == 0){
-						state = true // First tab index = 0
-					}
-					var tab_widget = new local.tab(self,state,tab)
-					tab_widget.appendTo(self.$el)
-					self.tabs_object.push(tab_widget)
-				})
-			})
 		}
 	});
 }

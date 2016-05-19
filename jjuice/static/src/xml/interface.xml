@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 	
+	<t t-name = "payment_plan_line">
+		<tr>
+			<td class="payment_plan_rows col-md-2">
+			</td>
+			<td id="payment_method" class="col-md-4">
+				
+			</td>
+			<td id="amount" class="col-md-2">
+				
+			</td>
+			<td id = "date" class="col-md-3">
+			
+			</td>
+			<td id = "delete" class = "col-md-1">
+				
+			</td>
+		</tr>		
+	</t>
+	
+	<!-- Payment Plan -->
+	<t t-name="payment_plan">
+		<table class = "table table-hover table-condensed css-serial">
+			<caption><h3>Payment Plans</h3></caption>
+			<thead>
+				<th>#</th>
+				<th>Payment Method</th>
+				<th>Amount</th>
+				<th>Date</th>
+				<th></th>
+			</thead>
+			<tbody>
+			</tbody>
+		</table>
+	</t>
+	
 	<!-- Nav Tabs -->
 	<t t-name = "nav_tabs">
 		<t t-if="class_state == true">
@@ -130,14 +165,14 @@
 								</td>
 							</tr> <!--  -->
 							<tr>
-								<td>
+								<td class="active">
 									<strong>Taxes</strong>
 								</td>
 								<td>
 									<table class = "table table-hover table-bordered">
 										<tbody id = "taxes">
 											<tr>
-												<td class="active"><strong>Taxes</strong></td>
+												<td class="active" ><span><strong>Taxes</strong></span></td>
 												<td class="danger" id = "tax_value">
 													
 												</td>
@@ -159,10 +194,17 @@
 											<tr>
 												<td class="active"><span><strong>Balance</strong></span></td>
 												<td id="balance" class="danger"></td>
-											</tr>											
+											</tr>
 										</tbody>
 									</table>								
 								</td>								
+							</tr> <!--  -->
+							<tr>
+								<tr >
+									<td colspan="4" id = "payment_plans">
+												
+									</td>
+								</tr>											
 							</tr>
 						</tbody>
 					</table>
