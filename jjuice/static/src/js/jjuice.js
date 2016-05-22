@@ -1,5 +1,6 @@
 openerp.jjuice= function (instance,local) {
 	openerp.jjuice.pos(instance,local);
+	openerp.jjuice.marketing_package(instance,local)
     var _t = instance.web._t,
     _lt = instance.web._lt;
     var QWeb = instance.web.qweb;

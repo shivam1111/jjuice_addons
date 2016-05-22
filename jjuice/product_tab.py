@@ -24,10 +24,19 @@ class product_tab(models.Model):
         products = self.pool.get('product.product')
         taxes = self.pool.get('account.tax')
         tabs = self.search_read(cr,uid,order="sequence")
+        marketing_package = self.pool.get('marketing.package')
         for i in tabs:
+            if i.get("tab_style",False) == 3:
+                package_ids = i.get('marketing_packages_ids',False)
+                if package_ids:
+                    i.update({
+                              "marketing_packages_ids":marketing_package.get_marketing_package(cr,uid,package_ids)
+                              })
+                    
             if len(i.get('product_ids',False)) > 0:
-                product_info = products.read(cr,uid,i.get('product_ids'),fields=['name','vol_id','conc_id','flavor_id','lst_price'])
-                i["product_ids"] = product_info
+                product_info = products.read(cr,uid,i.get('product_ids'),fields=['name','vol_id','conc_id','flavor_id','lst_price','virtual_available','incoming_qty'])
+                i["product_ids"] = {}
+                i["product_ids"] = {product['id']:product for product in product_info}
         res.update({'tabs':tabs})
         tax_info = taxes.search_read(cr,uid,domain=[['type','=','percent'],['type_tax_use','=','sale'],['price_include','=',False]],fields=['id','name','amount'])
         res.update({
@@ -70,7 +79,6 @@ class product_tab(models.Model):
         for pair in pairs:
             product_ids = product_obj.search([('tab_id','=',pair[0]),('flavor_id','=',pair[1].id),
                                 ('vol_id','=',pair[2]),('conc_id','=',pair[3])])
-            print "***********************product_ids",product_ids
             if product_ids:
                 product_ids.unlink()
         return True
@@ -147,6 +155,7 @@ class product_tab(models.Model):
     consumable_stockable = fields.Selection(_type_of_product,"Type of Product",required=True)
     sequence = fields.Integer('Sequence')
     active = fields.Boolean("Active",default=True)
+    marketing_packages_ids = fields.Many2many("marketing.package",'tab_id','package_id',string = "Marketing Packages",help = "Useful if the tab style is Marketing")
     flavor_conc_line = fields.One2many(
                                         'flavor.conc.details','tab_id',"Flavors & Concentration Details"
                                         )

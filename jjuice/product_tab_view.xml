@@ -59,6 +59,15 @@
 	                    			</tree>
 	                    		</field>
 	                    	</page>
+	                    	<page string = "Marketing Packages" attrs = "{'invisible':[('tab_style','!=',3)]}">
+	                    		<field name = "marketing_packages_ids" nolabel = "1">
+	                    			<tree string = "Marketing Packages">
+	                    				<field name = "name" />
+	                    				<field name = "active" />
+	                    				<field name = "line_ids" />
+	                    			</tree>
+	                    		</field>
+	                    	</page>	                    	
 	                    </notebook>
                 	</sheet>
                 </form>

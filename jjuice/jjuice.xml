@@ -5,6 +5,8 @@
             <xpath expr="." position="inside">
                 <script type="text/javascript" src="/jjuice/static/src/js/jjuice.js"></script>
                 <script type="text/javascript" src="/jjuice/static/src/js/interface.js"></script>
+                <script type="text/javascript" src="/jjuice/static/src/js/marketing_package.js"></script>
+                <script type="text/javascript" src="/jjuice/static/src/lib/bootbox.min.js"></script>
                  <link rel="stylesheet" href="/jjuice/static/src/css/tabcontent.css"/>
             </xpath>
         </template>

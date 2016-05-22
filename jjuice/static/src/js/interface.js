@@ -3,13 +3,7 @@ openerp.jjuice.pos = function (instance,local) {
 	var _t = instance.web._t,
     _lt = instance.web._lt;
 	var QWeb = instance.web.qweb;
-	instance.web.jjuice = instance.web.jjuice || {}	
-	
-	/*
-	 * Data to be loaded once
-	 * ----------------------
-	 * The tabs info
-	 */
+	instance.web.jjuice = instance.web.jjuice || {};
 
 	Array.prototype.last = function(){
 		if (this.length > 0){
@@ -46,18 +40,105 @@ openerp.jjuice.pos = function (instance,local) {
 	remove_spaces = function(string){
 		return string.replace(/\s/g, "");
 	}
+
+	local.AbstractWidget = {
+		prepare_order_line :function(items,product_id,qty,price,discount){
+			items.push({
+				'product_id':product_id,
+				'qty':qty,
+				'price':price,
+				'discount':discount,
+			})
+		},
+		get_product_information:function(product_ids,fields){
+			if (product_ids.length > 0) {
+				product = new openerp.Model('product.product');
+				return product.call("read",[product_ids,fields])
+			}else{
+				return false
+			}
+		},
+		calculate_availability:function(product){
+			virtual = product.virtual_available;
+			incoming = product.incoming_qty;
+			available = virtual - incoming;
+			return available ;
+		},
+		set_availability:function (product,self){
+			available = self.calculate_availability(product)
+			tab = product['tab_id']
+			product = self.product_ids[product.id]
+			qty = parseFloat(product.get_value()) || 0
+			if (available >= qty){
+				product.set({'availability':true});
+			}else{
+				product.set({'availability':false});
+			}
+			return product
+		},
+		on_check_availability:function(product,self){ //self is tab object
+			product.$("input").keydown(function(event){
+				if (event.which == 13){
+					$.when(self.get_product_information([product.data.id],['virtual_available','incoming_qty','tab_id'])).done(function(data){
+						// empty tabs
+						if (data){
+							_.each(data,function(product){
+								product = self.set_availability(product,self.tab_parent.parent);
+								if (product.get("availability")){
+									self.tab_parent.do_notify("Availability Status:","Available")
+								}else{
+									self.tab_parent.do_warn("Availability Status:","Not Available")
+								}
+							})
+						}
+					});
+				}
+			});
+		},
+		should_set_float_value:function(val){
+			if (isNaN(val) || val == undefined || typeof(val) == 'string'){
+				return false
+			}else{
+				return true
+			}
+		},
+		set_value:function(widget,val,parent){
+			var self = this;
+			if (self.should_set_float_value(val)){
+				val = val.toFixed(2)
+				widget.set_value(val)
+			}else{
+				parent.do_warn("Invalid Value","")
+			}
+		},
+		calculate_final_money_total:function(){
+			var self = this;
+			total = 0;
+			_.each(self.subtotal_money,function(subtotal){
+				val = parseFloat(subtotal.get_value()) || 0;
+				total = total + val
+			});
+			self.final_total_money = total
+			self.tab_parent.parent.trigger("subtotal_money_changed",true)
+		},
+		order_report:function(){
+			return
+		},
+	}
 	
-	local.product_lists = instance.Widget.extend({
+local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		init:function(tab_parent,tab_data){
+			this._super(tab_parent);
 			this.tab_parent = tab_parent;
 			this.data = tab_data;
 			this.dfm = new instance.web.form.DefaultFieldManager(self);
-			// List of objects with key as product id
-			this.qty = {};
 			this.price = {};
-			this.subtotal = {};
+			this.subtotal_money = {} // this is just a holder of subtotal widget
+			this.subtotal_qty = {}; // this is just a holder of subtotal widget
+			this.final_total_money = 0.00;
+			this.final_total_qty = 0
 		},
-		
+
 		get_width:function(){
 			return this.data.input_width
 		},
@@ -65,32 +146,37 @@ openerp.jjuice.pos = function (instance,local) {
 		get_price:function(product){
 			return product.lst_price;
 		},
-		calculate_subtotal_money:function(product_id,qty){
+		calculate_subtotal_money:function(product_id){
 			var self = this;
-			old = self.subtotal[product_id].get_value() || 0 
-			price = parseFloat(self.price[product_id].get_value() || 0);
+			price = parseFloat(self.price[product_id].get_value()) || 0;
+			qty = parseFloat(self.subtotal_qty[product_id].get_value()) || 0;
 			total = price * qty;
-			self.subtotal[product_id].set_value(total);
-			self.tab_parent.parent.trigger("subtotal_money_changed",{"old":old,"new_value":total})
+			self.set_value(self.subtotal_money[product_id],total,self.tab_parent);
+			self.trigger("subtotal_money_widget_changed")
 		},
-		calculate_subtotal_qty:function(){
+		calculate_subtotal_qty:function(){ //calculate_subtotal_money
 			var self = this;
 			total = 0;
-			old_qty = self.subtotal_qty.get_value();
-			_.each(self.qty,function(cell){
+			_.each(self.subtotal_qty,function(cell){
 				total = total + parseFloat(cell.get_value() || 0);
 			})
-			self.subtotal_qty.set_value(total);
-			self.tab_parent.parent.trigger("subtotal_change",{'old':old_qty,'new_value':total});
+			self.set_value(self.final_subtotal_qty,total,self.tab_parent);
+			self.trigger("subtotal_qty_widget_changed",true)
 		},
+		calculate_final_qty_total:function(data){
+			var self = this;
+			total = parseFloat(self.final_subtotal_qty.get_value()) || 0
+			self.final_total_qty = total;
+			self.tab_parent.parent.trigger("subtotal_change",true);
+		},				
+		
 		renderElement:function(){
-			console.log("renderElement")
 			var self=this;
 			width = self.get_width();
 			//Fetch Volume Prices first
 			self.$el = $(QWeb.render('products_list',{'tab_style':self.data.tab_style}))
 			_.each(self.data.product_ids,function(product){
-				$row = $("<tr><td><strong>%NAME%</strong></td></tr>".replace("%NAME%",product.name))
+				$row = $("<tr><td class = 'col-md-3'><strong>%NAME%</strong></td></tr>".replace("%NAME%",product.name))
 				// Qty Column
 				$col= $("<td></td>")
 				widget = new instance.web.form.FieldFloat(self.dfm,{
@@ -102,15 +188,28 @@ openerp.jjuice.pos = function (instance,local) {
 	                    modifiers: '{"required": false}',
 	                },
 	            });
-				self.qty[product.id] = widget;
+				widget.set({
+					"availability":true,
+				});
+				self.subtotal_qty[product.id] = widget;
 				widget.appendTo($col);
-				widget.set_dimensions("auto",width)
+				widget.set_dimensions("auto",width);
 				$row.append($col);
 				widget.on("changed_value",widget,function(event){
 					if (self.data.tab_style == 2){
-						self.calculate_subtotal_money(product.id,this.get_value())
+						self.calculate_subtotal_money(product.id)
 					}
 					self.calculate_subtotal_qty();
+				});
+				widget.data = product;
+				self.on_check_availability(widget,self);
+				self.tab_parent.parent.product_ids[product.id] = widget
+				widget.on("change:availability",widget,function(widget){
+					if (widget.get("availability") == false){
+						widget.$el.find("input").css('background-color','red')
+					}else{
+						widget.$el.find("input").css('background-color','')
+					}
 				})
 				if (self.data.tab_style != 2){
 					self.$el.find("#main_body").append($row);
@@ -129,9 +228,9 @@ openerp.jjuice.pos = function (instance,local) {
 	            });
 				self.price[product.id] = widget;
 				widget.appendTo($col);
-				widget.set_value(self.get_price(product));
+				self.set_value(widget,self.get_price(product),self.tab_parent);
 				widget.on("changed_value",widget,function(event){
-					self.calculate_subtotal_money(product.id,this.get_value())
+					self.calculate_subtotal_money(product.id)
 				});
 				widget.set_dimensions("auto",width)
 				$row.append($col);
@@ -140,14 +239,14 @@ openerp.jjuice.pos = function (instance,local) {
 				$col = $("<td></td>")
 				widget = new instance.web.form.FieldFloat(self.dfm,{
 	                attrs: {
-	                    name: "subtotal_input_"+remove_spaces(product.name),
+	                    name: "subtotal_money_input_"+remove_spaces(product.name),
 	                    type: "float",
 	                    context: {
 	                    },
 	                    modifiers: '{"required": false,"readonly":true}',
 	                },
 	            });
-				self.subtotal[product.id] = widget;
+				self.subtotal_money[product.id] = widget;
 				widget.appendTo($col);
 				widget.set_dimensions("auto",width)
 				$row.append($col);
@@ -164,16 +263,40 @@ openerp.jjuice.pos = function (instance,local) {
                     modifiers: '{"required": false,"readonly":true}',
                 },
             });
-			self.subtotal_qty = widget;
+			self.final_subtotal_qty = widget;
 			widget.appendTo($col);
 			widget.set_dimensions("auto",width)
 			$row.append($col);
 			self.$el.find("#main_body").append($row);
 		},
+		order_report:function(){
+			var self = this;
+			var items = [];
+			_.each(self.subtotal_qty,function(product){
+				product_id = product.data.id
+				qty = parseFloat(product.get_value()) || 0;
+				if (qty == 0){
+					return
+				}
+				price = 0;
+				if (self.tab_parent.dataset.tab_style == 2){
+					price = parseFloat(self.price[product_id].get_value()) || 0;
+				}
+				discount = 0;
+				self.prepare_order_line(items,product_id,qty,price,discount)
+			})
+			return items
+		},
+		start:function(){
+			var self = this;
+			self.on("subtotal_money_widget_changed",self,self.calculate_final_money_total)
+			self.on("subtotal_qty_widget_changed",self,self.calculate_final_qty_total)
+		},
 	})
 	
-	local.flavor_conc_matrix = instance.Widget.extend({
+	local.flavor_conc_matrix = instance.Widget.extend(local.AbstractWidget,{
 		init:function(tab_parent,tab_data){
+			this._super(tab_parent);
 			this.tab_parent = tab_parent;
 			this.data = tab_data;
 			this.product_data = {};
@@ -184,6 +307,8 @@ openerp.jjuice.pos = function (instance,local) {
 			this.subtotal_money = {}; // It will contain flavor key and widget of subtotals
 			this.subtotal_qty = {};// It will contain concentration key and widget of qty total
 			this.initialize();
+			this.final_total_qty = 0;
+			this.final_total_money = 0.00;
 		},
 		initialize:function(){
 			var self = this;
@@ -202,7 +327,16 @@ openerp.jjuice.pos = function (instance,local) {
 	                },
 	            });
 				widget.set({
-					'data': product
+					'availability':true,
+				});
+				widget.data = product;
+				self.tab_parent.parent.product_ids[product.id] = widget
+				widget.on("change:availability",widget,function(widget){
+					if (widget.get("availability") == false){
+						widget.$el.find("input").css('background-color','red')
+					}else{
+						widget.$el.find("input").css('background-color','')
+					}
 				})
 				if ( _.contains(_.keys(self.product_data),String(flavor))){ // if flavor key is present in dictionary
 					self.product_data[flavor][conc]=widget
@@ -221,35 +355,66 @@ openerp.jjuice.pos = function (instance,local) {
 		get_width:function(){
 			return this.data.input_width
 		},
+		order_report:function(){
+			var self = this;
+			var items = [];
+			$.each(self.product_data,function(flavor_id,conc_ids){
+				price = 0;
+				if (self.tab_parent.dataset.tab_style == 1){
+					price =parseFloat(self.prices[flavor_id].get_value()) || 0
+				}
+				_.each(conc_ids,function(conc){
+					qty = parseFloat(conc.get_value()) || 0
+					if (qty == 0){
+						return
+					}
+					self.prepare_order_line(items,conc.data.id,qty,price,0)
+				})//end each
+			})
+			return items
+		},
+		
 		calculate_subtotal_money:function(flavor_id){
 			var self = this;
 			qty_total = 0;
-			old = self.subtotal_money[flavor_id].get_value() || 0 ;
 			_.each(self.product_data[flavor_id],function(cell){
 				qty_total = qty_total  + parseFloat((cell.get_value() || 0))
 			})
 			price = self.prices[flavor_id].get_value();
 			total_value = price*qty_total;
-			self.subtotal_money[flavor_id].set_value(total_value);
-			self.tab_parent.parent.trigger("subtotal_money_changed",{"old":old,"new_value":total_value})
+			self.set_value(self.subtotal_money[flavor_id],total_value,self.tab_parent)
+			self.trigger("subtotal_money_widget_changed",true)
 		},
+
 		calculate_subtotal_qty:function(conc_id){
 			var self=this;
 			total_qty = 0;
-			old_qty = self.subtotal_qty[conc_id].get_value() || 0;
 			_.each(self.product_data,function(flavor){
 				if (flavor[conc_id]){
 					total_qty = total_qty + parseFloat(flavor[conc_id].get_value())
 				}
 			})
 			self.subtotal_qty[conc_id].set_value(total_qty || 0);
-			self.tab_parent.parent.trigger("subtotal_change",{'old':old_qty,'new_value':total_qty});
+			self.trigger("subtotal_qty_widget_changed",true)
 		},
+		
+		calculate_final_qty_total:function(data){
+			var self = this;
+			total = 0;
+			_.each(self.subtotal_qty,function(qty){
+				qty = parseFloat(qty.get_value()) || 0;
+				total = total + qty;
+			});
+			self.final_total_qty = total;
+			self.tab_parent.parent.trigger("subtotal_change",true);
+		},		
+
 		start:function(){
-			var self=this;
+			this.on("subtotal_money_widget_changed",this,this.calculate_final_money_total);
+			this.on("subtotal_qty_widget_changed",this,this.calculate_final_qty_total);
+			return this._super();
 		},
 		renderElement:function(){
-			console.log("renderElement")
 			var self=this;
 			price = self.get_prices();
 			width = self.get_width();
@@ -264,12 +429,13 @@ openerp.jjuice.pos = function (instance,local) {
 					if (self.product_data[flavor[0]][conc[0]]){
 						self.product_data[flavor[0]][conc[0]].appendTo($col)
 						self.product_data[flavor[0]][conc[0]].set_dimensions("auto",width);
-						self.product_data[flavor[0]][conc[0]].on("changed_value",self.product_data[flavor[0]][conc[0]],function(event){
+						self.product_data[flavor[0]][conc[0]].on("change:value",self.product_data[flavor[0]][conc[0]],function(event){
 							if (self.data.tab_style == 1){
 								self.calculate_subtotal_money(flavor[0]);
 							}
 							self.calculate_subtotal_qty(conc[0]);
 						});
+						self.on_check_availability(self.product_data[flavor[0]][conc[0]],self);
 					}//end if
 					$row.append($col)
 				}) //end each
@@ -296,7 +462,7 @@ openerp.jjuice.pos = function (instance,local) {
 		                },
 		            });
 					
-					widget_price.set_value(price)
+					self.set_value(widget_price,price,self.tab_parent) 
 					widget_price.appendTo($col_price)
 					widget_price.set_dimensions("auto",width);
 					widget_price.on("changed_value",widget_price,function(event){
@@ -348,28 +514,26 @@ openerp.jjuice.pos = function (instance,local) {
 			var tmp = self._super()
 			switch(self.dataset.tab_style){
 				case 1://Flavor Concentration Matrix
-					console.log("Flavour Concentration Matrix");
 					var tab_widget = new local.flavor_conc_matrix(self,self.dataset);
 					tab_widget.appendTo(self.$body);
 					self.tab_widget = tab_widget;
 					break;
 				case 2://Products List
-					console.log("Products List");
 					var tab_widget = new local.product_lists(self,self.dataset);
 					tab_widget.appendTo(self.$body);
 					self.tab_widget = tab_widget;
 					break;
 				case 3: //Marketing
-					console.log("Marketing");
+					var tab_widget = new local.marketing_package(self,self.dataset)
+					tab_widget.appendTo(self.$body);
+					self.tab_widget = tab_widget;
 					break;
 				case 4: //Free Samples List
-					console.log("Free Samples List");
 					var tab_widget = new local.product_lists(self,self.dataset);
 					tab_widget.appendTo(self.$body);
 					self.tab_widget = tab_widget;
 					break;
 				case 5: //Free Samples Matrix
-					console.log("Free Samples Matrix");
 					var tab_widget = new local.flavor_conc_matrix(self,self.dataset);
 					tab_widget.appendTo(self.$body);
 					self.tab_widget = tab_widget;
@@ -441,7 +605,6 @@ openerp.jjuice.pos = function (instance,local) {
 			self.payment_method.appendTo(self.$el.find("td#payment_method"))
 			self.amount.appendTo(self.$el.find("td#amount"))
 			self.date.appendTo(self.$el.find("td#date"))
-			console.log(self.$el.find("td#delete"));
 			self.$el.find("td#delete").append(self.$delete)
 		},
 		destroy:function(){
@@ -458,6 +621,21 @@ openerp.jjuice.pos = function (instance,local) {
 			this.line = []
 			this.total = 0.00;
 			this.parent = parent;
+		},
+		order_report:function(){
+			var self = this;
+			items = []
+			_.each(this.line,function(line){
+				payment_method = line.payment_method.get_value();
+				amount = parseFloat(line.amount.get_value()) || 0;
+				date = line.date.get_value();
+				items.push({
+					'journal_id':payment_method,
+					'amount':amount,
+					'date':date,
+				})
+			})
+			return items;
 		},
 		renderElement:function(){
 			var self = this;
@@ -485,10 +663,12 @@ openerp.jjuice.pos = function (instance,local) {
 	
 	// Main 
 	instance.web.form.custom_widgets.add('jjuice', 'instance.jjuice.jjuice_interface_main');
-	local.jjuice_interface_main = instance.web.form.FormWidget.extend({
+	local.jjuice_interface_main = instance.web.form.FormWidget.extend(local.AbstractWidget,{
     	template:'interface',
     	events:{
-    		"click button#rate_request":"execute_rate_request"
+    		"click button#rate_request":"execute_rate_request",
+    		"click button#check_availability":"execute_check_availability",
+    		"click button#confirm":"execute_confirm_order",
     	},
     	init: function(field_manager,node) {
 			this._super(field_manager, node);
@@ -497,6 +677,53 @@ openerp.jjuice.pos = function (instance,local) {
     		this.$prices = $.Deferred();
     		this.dfm = new instance.web.form.DefaultFieldManager(self);
     		this.taxes = [];
+    		this.product_ids = {};
+		},
+		execute_confirm_order:function(){ //working
+			var self = this;
+			lines = []
+			taxes = []
+			_.each(self.tabs_object,function(tab){
+				lines = $.merge(tab.tab_widget.order_report(),lines)
+			});
+			_.each(self.taxes,function(tax){
+				taxes.push(tax.get("id"));
+			})
+			var s_h = parseFloat(self.shipping_handling.get_value()) || 0
+			var discount_percentage = parseFloat(self.discount_percentage.get_value) || 0
+			var order_notes = self.order_notes.get_value();
+			var paid = parseFloat(self.paid.get_value()) || 0
+			var payment_plan = self.payment_plan.order_report();
+			console.log(lines)
+			console.log(payment_plan)
+		},
+		execute_check_availability:function(){ 
+			var self = this;
+			product_ids = []
+			$.each(self.product_ids,function(key,product){
+				product_ids.push(product.data.id)
+			});
+			product_not_available = []
+			$.when(self.get_product_information(product_ids,['virtual_available','incoming_qty','tab_id'])).done(function(data){
+				// empty tabs
+				if (data){
+					_.each(data,function(product){
+						product = self.set_availability(product,self);
+						if (! product.get("availability")){
+							product_not_available.push({
+								'name':product.data.name,
+								'tab_name': tab[1],
+								'available':available,
+								'required':qty
+							})
+						}
+					})
+				}
+				$pop = QWeb.render("product_not_available_list",{"products":product_not_available})
+				bootbox.alert($pop,function(){
+					return
+				})				
+			})
 		},
 		execute_rate_request:function(){
 			var self = this;
@@ -534,7 +761,7 @@ openerp.jjuice.pos = function (instance,local) {
 			}//end if else
 			
 			$.when(main_def,self.$prices).done(function(res){
-				self.tabs_object = []
+				self.tabs_object = {}
 				self.tabs_data = res.tabs; // Saving Tab data in Main widget
 				_.each(res.taxes,function(tax){
 					$row = $("<tr><td><span><strong>%NAME%</strong></span></td></tr>".replace("%NAME%",tax.name))
@@ -567,13 +794,12 @@ openerp.jjuice.pos = function (instance,local) {
 					}
 					// state is a variable that decides whether the tab is by default active or not. In our case by default active is the first tab
 					state = false
-					if (self.tabs_object.length == 0){
+					if (jQuery.isEmptyObject(self.tabs_object) == true){
 						state=true;
 					}
 					var tab_widget = new local.tab(self,state,tab)
-					state = true // First tab index = 0
 					tab_widget.appendTo(self.$el)
-					self.tabs_object.push(tab_widget)
+					self.tabs_object[tab.id] = tab_widget;
 				})
 			}) // end when			
 		},
@@ -702,59 +928,60 @@ openerp.jjuice.pos = function (instance,local) {
 		},
 		subtotal_changed:function(event_data){
 			var self = this;
-			old = self.total_units.get_value() || 0;
-			new_total = old +  event_data.new_value - event_data.old;
-			self.total_units.set_value(new_total)
+			total = 0;
+			_.each(self.tabs_object,function(tab){
+				total = total + tab.tab_widget.final_total_qty;
+			});
+			self.set_value(self.total_units,total,self)
 		},		
-		subtotal_money_changed:function(event_data){
+		subtotal_money_changed:function(){
 			var self = this;
-			old = self.subtotal.get_value() || 0;
-			new_total = old - event_data.old + event_data.new_value
-			self.subtotal.set_value(new_total)
+			total = 0;
+			_.each(self.tabs_object,function(tab){
+				total = total + tab.tab_widget.final_total_money;
+			});
+			self.set_value(self.subtotal,total,self)
 			self.trigger_recalculate();
 		},
 		tax_changed:function(tax){
 			var self=this;
 			amount = 0
-			subtotal = self.subtotal.get_value() || 0;
+			subtotal = parseFloat(self.subtotal.get_value()) || 0;
 			s_h = parseFloat(self.shipping_handling.get_value()) || 0;
 			subtotal = subtotal + s_h;
-			discount = self.discount.get_value() || 0;
+			discount = parseFloat(self.discount.get_value()) || 0;
 			taxable_amount = subtotal - discount
 			_.each(self.taxes,function(tax){
 				tax_amount = tax.get("amount");
 				if (tax.get_value()){
 					amount = amount +  taxable_amount * tax_amount
 				}//end if
-				console.log(amount);
 			}); //end each
-			self.tax_value.set_value(amount);
+			self.set_value(self.tax_value,amount,self)
 			self.trigger("recalc_total",true);
 		},
 		changed_discount:function(field){
 			var self = this;
-			console.log("discount")
 			if (field.field_manager.eval_context.stop){
 				return
 			}
 			field.field_manager.eval_context.stop = true;
 			if (field.name == "discount_percentage_input"){
 				discount_percentage = parseFloat(field.get_value()) || 0
-				subtotal = self.subtotal.get_value() || 0;
+				subtotal = parseFloat(self.subtotal.get_value()) || 0;
 				s_h = parseFloat(self.shipping_handling.get_value()) || 0;
 				subtotal = subtotal + s_h;
 				discount = (discount_percentage * subtotal)/100;
-				self.discount.set_value(discount);
+				self.set_value(self.discount,discount,self)
 				
 			}else if (field.name == "discount_input"){
-				console.log(field,self)
 				discount = parseFloat(field.get_value()) || 0;
 				subtotal = self.subtotal.get_value() || 0;
 				s_h = parseFloat(self.shipping_handling.get_value()) || 0;
 				subtotal = subtotal + s_h;
 				if (subtotal != 0){
 					discount_percentage = (discount/subtotal)*100;
-					self.discount_percentage.set_value(discount_percentage);												
+					self.set_value(self.discount_percentage,discount_percentage,self)
 				}
 			}
 			field.field_manager.eval_context.stop = false;
@@ -765,11 +992,10 @@ openerp.jjuice.pos = function (instance,local) {
 			var self = this;
 			subtotal = parseFloat(self.subtotal.get_value()) || 0;
 			shipping_handling = parseFloat(self.shipping_handling.get_value()) || 0;
-			console.log( "*",shipping_handling );
 			discount = parseFloat(self.discount.get_value()) || 0;
 			tax_value = parseFloat(self.tax_value.get_value()) || 0;
 			total = subtotal + shipping_handling - discount + tax_value
-			self.total.set_value(total);
+			self.set_value(self.total,total,self)
 			self.trigger("recalc_balance",true)
 		},
 		recalculate_balance:function(event){
@@ -778,7 +1004,7 @@ openerp.jjuice.pos = function (instance,local) {
 			total = parseFloat(self.total.get_value()) || 0;
 			plan_total = self.payment_plan.total || 0;
 			balance = total - paid - plan_total;
-			self.balance.set_value(balance);
+			self.set_value(self.balance,balance,self)
 		},
 		start:function(){
 			var self = this;
@@ -794,8 +1020,6 @@ openerp.jjuice.pos = function (instance,local) {
 				 * The view is not refreshed when we change the partner record. For that if we detect a change in field manager,
 				 * we empty the $el of the parent and render according the new customer record
 				 */  
-				console.log("form changed2",event)
-				console.log("field manager:",self.field_manager)
 				self.$el.empty();
 				self.renderElement();
 			});			

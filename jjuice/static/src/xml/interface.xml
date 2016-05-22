@@ -1,6 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 	
+	<t t-name="marketing_package">
+		<table class = "table table-hover table-bordered css-serial">
+			<caption><h3>Marketing Packages</h3></caption>
+			<thead>
+				<th>#</th>
+				<th>Name</th>
+				<th>Select</th>
+				<th>Quantity</th>
+				<th></th>
+				<th>Total</th>
+			</thead>
+			<tbody id = "package_body">
+			
+			</tbody>
+		</table>
+	</t>
+	
+    <t t-name="marketing_package_line">
+		<tr>
+			<td class="payment_plan_rows col-md-1">
+								
+			</td>
+			<td style ="text-align:center;" ><t t-esc="name"></t></td>
+			<td style ="text-align:center;" class ="col-md-1">
+				<input id = "select" type = "checkbox" />
+			</td>
+			<td style ="text-align:center;">
+				<input id = "qty" type="number" t-att-value = 'qty' style = "width:60px" />
+			</td>
+			<td>
+				<button  id = "kl" type="button" class = "oe_highlight">Change Details</button>
+			</td>
+			<td style ="text-align:center;">
+				<input type="number" id = "subtotal_marketing" t-att-value = 'total' style = "width:100px" step="0.01" readonly="1"/>
+			</td>
+		</tr>
+	</t>
+	
+	
+	<t t-name = "product_not_available_list">
+		<div class = "table-responsive">
+			<table class="table table-hover table-bordered css-serial">
+				<caption><h2>List of products not available</h2></caption>
+				<thead>
+					<th>#</th>
+					<th>Name</th>
+					<th>Tab Name</th>
+					<th>Required Qty</th>
+					<th>Available Qty</th>
+				</thead>
+				<tbody>
+					<t t-foreach="products" t-as="product">
+						<tr>
+							<td class="payment_plan_rows col-md-2">
+								
+							</td>
+							<td>
+								<span><t t-esc="product.name"/></span>
+							</td>
+							<td>
+								<span><t t-esc="product.tab_name"/></span>
+							</td>
+							<td class = "info">
+								<span><t t-esc="product.required"/></span>
+							</td>							
+							<td class = "danger">
+								<span><t t-esc="product.available"/></span>
+							</td>
+						</tr>
+					</t>
+				</tbody>
+			</table>
+		</div>
+	</t>
+	
 	<t t-name = "payment_plan_line">
 		<tr>
 			<td class="payment_plan_rows col-md-2">
@@ -66,11 +141,16 @@
 				<thead>
 					<th><span><strong>Product Name</strong></span></th>
 					<th><span><strong>Qty</strong></span></th>
-					
-					<t t-if="tab_style == 2">
+					<!--  widget comes from marketing package wizard widget -->					
+					<t t-if="tab_style == 2 or tab_style == 3 or (widget and widget.tab_style == 3)" >
 						<th><span>Unit Price<strong></strong></span></th>
-						<th><span><strong>Subtotal</strong></span></th>
 					</t>
+					<t t-if="tab_style == 3 or (widget and widget.tab_style == 3)">
+						<th><span>Discount%<strong></strong></span></th>
+					</t>
+					<t t-if="tab_style == 2 or tab_style == 3 or (widget and widget.tab_style == 3)">
+						<th><span><strong>Subtotal</strong></span></th>
+					</t>					
 				</thead>
 				<tbody id="main_body">
 				
@@ -138,7 +218,6 @@
 							<tr>
 								<td class="active"><strong>Order Notes</strong></td>
 								<td id = "order_notes" classs = "info">
-								
 								</td>
 								<td colspan="2">
 									<table class = "table table-hover table-bordered">
@@ -211,6 +290,9 @@
 				</div>
 			</div>
 		</div>
+		<blockquote class="bg-info">
+			<strong>Total</strong> = <strong>(Subtotal + Shipment - Discount)</strong> + <strong>Taxes (Taxable amount is subtotal + Shipping and handling - discount value)</strong>
+		</blockquote>
 		
 	</t>
 
