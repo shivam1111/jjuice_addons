@@ -8,7 +8,6 @@ class payment_plan(models.Model):
 
     def create(self,cr,uid,vals,context):
         vals['name'] = self.pool.get('ir.sequence').get(cr, uid, 'payment.plan') or '/'
-        vals['amount_orignal'] = vals.get('amount',0)
         return super(payment_plan,self).create(cr,uid,vals,context)
         
     def _check_ids_empty(self,cr,uid,ids,context=None):
@@ -77,18 +76,11 @@ class payment_plan(models.Model):
             if record.order_id:
                 record.invoice_ids=record.order_id.invoice_ids
                 
-    @api.one
-    @api.depends('order_id','invoice_id')
-    def _get_partner(self):
-        if self.order_id:
-            self.partner_id  = self.order_id.partner_id
-        if self.invoice_id:
-            self.partner_id = self.invoice_id.partner_id
     
     name=fields.Char("Name",default = "/")
     date=fields.Date("Date",required = True,default = date.today().strftime('%Y-%m-%d'))
     method_of_payment=fields.Many2one("account.journal","Method Of Payment",required =True)
-    partner_id=fields.Many2one(comodel_name = 'res.partner',compute = "_get_partner",string = "Partner",store=True)
+    partner_id=fields.Many2one(comodel_name = 'res.partner',string = "Partner")
     invoice_id = fields.Many2one('account.invoice',"Invoice")
     order_id=fields.Many2one("sale.order","Sale Order")
     amount_original = fields.Float("Original Plan Amount",readonly = True)

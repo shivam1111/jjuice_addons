@@ -98,13 +98,6 @@
 				<xpath expr="//field[@name='date_order']" position= "after">
 					<field name ="shipment"/>
 				</xpath>
-				<xpath expr = "/form/sheet/notebook/page[@string = 'Order Lines']" position ="after">
-					<page string = "Original Order">
-						<button class = "oe_right oe_highlight" type = "object" name = "print_attachment_report" string = "Print Dispatch Order"/>
-						<field name = "field_order_html" nolabel = "1"/>
-					</page>
-				</xpath>
-				
 				<xpath expr="//field[@name='partner_id']" position= "after">
 					<field name ="internal_sale"/>
 					<field name="sale_rep" widget="many2many_tags"/>

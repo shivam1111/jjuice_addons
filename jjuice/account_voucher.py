@@ -30,21 +30,20 @@ class account_voucher(osv.osv):
             return {'type': 'ir.actions.act_window_close'}
         
         if context.get('invoice_open',False):
-            if context.get('plan_id',False):
-                view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'account', 'invoice_form')[1]
-                plan = self.pool.get('payment.plan').write(cr,uid,context.get('plan_id',False),{'amount':0,'state':'paid'},context)
-                self.signal_workflow(cr, uid, ids, 'proforma_voucher')
-                return {
-                'view_mode': 'form',
-                'res_id':context.get('invoice_id',False),
-                'view_type': 'form',
-                'view_id':view_id,
-                'res_model': 'account.invoice',
-                'type': 'ir.actions.act_window',
-                'nodestroy': True,
-                'target': 'current',
-                'domain': '[]',
-                        }
+            view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'account', 'invoice_form')[1]
+            plan = self.pool.get('payment.plan').write(cr,uid,context.get('plan_id',False),{'amount':0,'state':'paid'},context)
+            self.signal_workflow(cr, uid, ids, 'proforma_voucher')
+            return {
+            'view_mode': 'form',
+            'res_id':context.get('invoice_id',False),
+            'view_type': 'form',
+            'view_id':view_id,
+            'res_model': 'account.invoice',
+            'type': 'ir.actions.act_window',
+            'nodestroy': True,
+            'target': 'current',
+            'domain': '[]',
+                    }
         plan = self.pool.get('payment.plan')
         view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'jjuice', 'pay_payment_plan_form')[1]
         self.signal_workflow(cr, uid, ids, 'proforma_voucher')

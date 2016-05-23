@@ -274,6 +274,10 @@
 												<td class="active"><span><strong>Balance</strong></span></td>
 												<td id="balance" class="danger"></td>
 											</tr>
+											<tr>
+												<td class="active"><span><strong>Payment Method</strong></span></td>
+												<td id="payment_method" class="danger"></td>
+											</tr>
 										</tbody>
 									</table>								
 								</td>								

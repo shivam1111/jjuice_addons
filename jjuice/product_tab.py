@@ -1,5 +1,6 @@
 from openerp import models, fields, api,_
 import openerp.addons.decimal_precision as dp
+from openerp.exceptions import except_orm, Warning, RedirectWarning
 
 _list_tab_style = [
                    (1,"Flavor Concentration Matrix"),
@@ -98,13 +99,9 @@ class product_tab(models.Model):
         n_minus_e = set(new_pairs) - set(existing_pairs)
         created_product_ids = []
         if e_minus_n:
-            print "=============================we need to delete products",e_minus_n
             self._delete_product(e_minus_n)
         if n_minus_e:
-            print "=============================we need to create products",n_minus_e
             created_product_ids.append(self._create_product(n_minus_e))
-        print "////////////////////////////////////////////////e_minus_n",e_minus_n
-        print "////////////////////////////////////////////////n_minus_e",n_minus_e
         return True
         
     @api.model
@@ -145,6 +142,85 @@ class product_tab(models.Model):
             'Tab,Volume,Concentration,Flavor. This combination should be unique!'),                        
                         
     ]    
+    
+    def calculate_discount(self,internal=0,external=0):
+        discount_factor = ((100.00-internal) * (100.00-external))/100
+        discount = 100 - discount_factor
+        return discount
+    
+    def create_order(self,cr,uid,result,context=None):
+        partner_id = result.get('partner_id',[False])
+        action = {}
+        # ACTIVE PARTNER
+        if not result.get('partner_id',False):
+            raise Warning(_('Due to technical problems we are not able to fetch the customer ID. Please contact your developer'))
+
+        # DISCOUNT PERCENTAGE
+        discount_percentage = result.get("discount_percentage",0)
+        
+        #TAXES
+        taxes = result.get('taxes',False)
+        
+        #SHIPPING AND HANDLING
+        if result.get("s_h",False) and result.get("s_h",0) > 0: 
+            cr.execute('''
+                select id from product_product where shipping = true and active = true
+            ''')
+            s_h_id = cr.fetchone()
+            if not s_h_id:
+                raise Warning(_('No shipping product created.Please start a new tab and first create a shipping product by tickng the shipping option on a product variant'))
+            else:
+                result['lines'].append([0,0,{
+                                      'product_id':s_h_id[0],
+                                      'product_uom_qty':1,
+                                      'price_unit':result.get("s_h",0),
+                                      'discount':0,
+                                      }])
+                
+        # CHECK PAYMENT PLANS
+        for plan in  result.get("payment_plan",[]):
+            if (not plan[2].get('amount_original')) or plan[2].get('amount_original') == 0:
+                raise Warning(_('Payment Plan amount cannot be zero'))
+            if (not plan[2].get('method_of_payment')):
+                raise Warning(_('Method of payment is required for payment plan'))
+            plan[2].update({
+                         'partner_id':partner_id
+                         })
+            
+        # Sale Order Lines Discount Setting and taxes addition
+        for line in result.get("lines",False):
+            discount = self.calculate_discount(line[2].get('discount',0),discount_percentage) #line discount and external discount
+            line[2].update({
+                            "discount":discount,
+                            "tax_id":result.get("taxes",[]),
+                            })
+        order_id = self.pool.get('sale.order').create(cr,uid,{
+                                                                'partner_id':partner_id,
+                                                                'note':result.get("order_notes",""),
+                                                                'order_line':result.get("lines",[]),
+                                                                'payment_plan_ids':result.get("payment_plan",[])
+                                                                },context)
+                        
+        if result.get("paid",False) and result.get('paid',False) > 0:
+            paid = result.get("paid",False)
+            payment_method = result.get('payment_method',False)
+            if not payment_method:
+                raise Warning(_("Please enter the payment method!!"))
+            res = self.pool.get("sale.order").confirm_sales_order(cr,uid,[order_id],paid,payment_method,context)
+            return res
+        else:
+            dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'sale','view_order_form')
+            action = {
+                         'type': 'ir.actions.act_window',
+                         'view_type': 'form',
+                         'res_id':order_id,
+                         'view_mode': 'form',
+                         'res_model': 'sale.order',
+                         'views': [[view_id, 'form']],
+                         'view_id': view_id,
+                         'target': 'current',
+                       };
+            return action
     
     name = fields.Char('Tab Name',size=30,required=True)
     visible_all_customers = fields.Boolean("Visible to all Customers")

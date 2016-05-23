@@ -43,12 +43,12 @@ openerp.jjuice.pos = function (instance,local) {
 
 	local.AbstractWidget = {
 		prepare_order_line :function(items,product_id,qty,price,discount){
-			items.push({
+			items.push([0,0,{
 				'product_id':product_id,
-				'qty':qty,
-				'price':price,
+				'product_uom_qty':qty,
+				'price_unit':price,
 				'discount':discount,
-			})
+			}])
 		},
 		get_product_information:function(product_ids,fields){
 			if (product_ids.length > 0) {
@@ -609,7 +609,9 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		},
 		destroy:function(){
 			this._super();
-			this.parent.trigger("recalculate_total",true);
+			index = this.parent.line.indexOf(this);
+			delete this.parent.line[index]
+			this.parent.trigger("recalculate_total");
 		},
 		
 	});
@@ -625,15 +627,15 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		order_report:function(){
 			var self = this;
 			items = []
-			_.each(this.line,function(line){
+			_.each(self.line,function(line){
 				payment_method = line.payment_method.get_value();
 				amount = parseFloat(line.amount.get_value()) || 0;
 				date = line.date.get_value();
-				items.push({
-					'journal_id':payment_method,
-					'amount':amount,
+				items.push([0,0,{
+					'method_of_payment':payment_method,
+					'amount_original':amount,
 					'date':date,
-				})
+				}])
 			})
 			return items;
 		},
@@ -645,6 +647,8 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		},
 		recalculate_total:function(){
 			var self = this;
+			console.log(self.line)
+			self.total = 0.00;
 			_.each(self.line,function(line){
 				self.total = self.total + parseFloat(line.amount.get_value() || 0)
 			});
@@ -683,19 +687,71 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			var self = this;
 			lines = []
 			taxes = []
+			partner_id = self.field_manager.datarecord.id;
 			_.each(self.tabs_object,function(tab){
 				lines = $.merge(tab.tab_widget.order_report(),lines)
 			});
 			_.each(self.taxes,function(tax){
-				taxes.push(tax.get("id"));
+				if (tax.get_value() == true){
+					taxes.push(tax.get("id"));
+				}
 			})
 			var s_h = parseFloat(self.shipping_handling.get_value()) || 0
-			var discount_percentage = parseFloat(self.discount_percentage.get_value) || 0
+			var discount_percentage = parseFloat(self.discount_percentage.get_value()) || 0
 			var order_notes = self.order_notes.get_value();
 			var paid = parseFloat(self.paid.get_value()) || 0
 			var payment_plan = self.payment_plan.order_report();
-			console.log(lines)
-			console.log(payment_plan)
+			if (lines.length == 0){
+				self.do_warn("Invalid Order","No product Added");
+				return
+			}
+			payment_method = self.payment_method.get_value();
+			result = {
+				"partner_id":partner_id,
+				"lines":lines,
+				"taxes":[[6,0,taxes]],
+				"s_h":s_h,
+				"discount_percentage":discount_percentage,
+				"order_notes":order_notes,
+				"paid":paid,
+				"payment_plan":payment_plan,
+				"payment_method":payment_method,
+			}
+			tab = new openerp.Model("product.tab");
+			tab.call("create_order",{
+				"result":result
+			}).done(function(action_data){
+				if (paid > 0){
+					data = action_data.res;
+					var action = {}
+					action = {
+    		             'type': 'ir.actions.act_window',
+    		             'view_type': 'form',
+    		             'res_id':data.res_id,
+    		             'view_mode': 'form',
+    		             'res_model': 'account.invoice',
+    		             'views': [[data.invoice_view_id, 'form']],
+    		             'view_id': data.invoice_view_id,
+    		             'target': 'current',		    								
+					  }
+					self.do_action(action).done(function(){
+					action = {
+							'name':_lt("Pay Invoice"),
+							'type': 'ir.actions.act_window',
+	    		             'view_type': 'form',
+	    		             'view_mode': 'form',
+	    		             'res_model': 'account.voucher',
+	    		             'views': [[action_data.invoice_info.view_id, 'form']],
+	    		             'view_id': action_data.invoice_info.view_id,
+	    		             'target': 'new',	
+	    		             'context':action_data.invoice_info.context,
+						  }
+					self.do_action(action)
+					}); //
+				}else{
+					self.do_action(action)
+				}
+			});
 		},
 		execute_check_availability:function(){ 
 			var self = this;
@@ -916,7 +972,24 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
                     modifiers: '{"required": false,"readonly":true}',
                 }
             });
-			self.balance.appendTo($body.find("td#balance"))		
+			self.balance.appendTo($body.find("td#balance"))
+            
+			self.dfm.extend_field_desc({
+            	payment_method: {
+                    relation: "account.journal",
+                },
+            });			
+			self.payment_method = new instance.web.form.FieldMany2One(this.dfm,{
+                attrs: {
+                    name: "payment_method",
+                    type: "many2one",
+                    context: {
+                    },
+                    modifiers: '{"required": true}',
+                }
+            });	
+			self.payment_method.appendTo($body.find("td#payment_method"))
+			
 			self.payment_plan = new local.payment_plan(self);
 			self.payment_plan.appendTo($body.find("td#payment_plans"))
 		},
@@ -976,7 +1049,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 				
 			}else if (field.name == "discount_input"){
 				discount = parseFloat(field.get_value()) || 0;
-				subtotal = self.subtotal.get_value() || 0;
+				subtotal = parseFloat(self.subtotal.get_value()) || 0;
 				s_h = parseFloat(self.shipping_handling.get_value()) || 0;
 				subtotal = subtotal + s_h;
 				if (subtotal != 0){

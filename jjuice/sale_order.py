@@ -51,20 +51,13 @@ class sale_order(models.Model):
         return True
     
     
-    def confirm_sales_order(self,cr,uid,sale_id,paid_line,context=None):
+    def confirm_sales_order(self,cr,uid,sale_id,paid,method,context=None):
         if context == None:context = {}
-        sale_order = self.pool.get('sale.order')
-        plan_id = self.pool.get('payment.plan').create(cr,uid,{'amount':paid_line.get('paid',False),
-                                                               'order_id':sale_id,
-                                                               'method_of_payment':paid_line.get('method_of_payment',False),
-                                                               'amount_original':paid_line.get('paid',False)
-                                                               },
-                                                                 context)
         account_invoice = self.pool.get('account.invoice')
-        sale_order.action_button_confirm(cr,uid,[sale_id],context)
+        self.action_button_confirm(cr,uid,sale_id,context)
         invoice_wizard = self.pool.get('sale.advance.payment.inv')
         wizard_id = invoice_wizard.create(cr,uid,{'advance_payment_method':'all'},context)
-        context.update({'active_ids':[sale_id],'open_invoices':True})
+        context.update({'active_ids':sale_id,'open_invoices':True})
         res = invoice_wizard.create_invoices(cr,uid,[wizard_id],context)
         account_invoice.signal_workflow(cr, uid, [res.get('res_id',False)], 'invoice_open')
         inv = account_invoice.browse(cr,uid,res.get('res_id',False),context)
@@ -82,21 +75,20 @@ class sale_order(models.Model):
             'target': 'new',
             'domain': '[]',
             'context': {
-                'plan_id':plan_id,
                 'invoice_open':True,
                 'payment_expected_currency': inv.currency_id.id,
                 'default_partner_id': self.pool.get('res.partner')._find_accounting_partner(inv.partner_id).id,
-                'default_amount': paid_line.get('paid',False),
+                'default_amount': paid,
                 'default_reference': inv.name,
                 'close_after_process': True,
                 'invoice_type': inv.type,
-                'default_journal_id':paid_line.get('method_of_payment',False),
+                'default_journal_id':method,
                 'invoice_id': inv.id,
                 'default_type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment',
                 'type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment'
             }
         }
-        return {'res':res,'plan_id':plan_id,'invoice_info':invoice_info}
+        return {'res':res,'invoice_info':invoice_info}
         
     def _get_product_conc_vol(self,cr,uid,attribute,product_id,context):
         ''' 
@@ -318,5 +310,4 @@ class sale_order(models.Model):
                         'datas':{'model':'sale.order','data':data}
                     }
     
-    field_order_html = fields.Html("Order")
-    payment_plan_ids=fields.Many2many("payment.plan","payment_id","payment_sale_relation","sale_id","Payment Plan Id",compute='_compute_payments')
+    payment_plan_ids=fields.Many2many("payment.plan","payment_plan_sale_relation","order_id","payment_id","Payment Plans",)
