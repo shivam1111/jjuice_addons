@@ -135,9 +135,9 @@ class sale_order(models.Model):
         if type(id) is int: id = [id]
         invoice_lines = {'total':0.00,'paid':0.00,'residual':0.00,'invoice':{}}
         cr.execute('''
-            select id from product_product where shipping =true limit 1
+            select id from product_product where shipping =true and active = true limit 1
         ''')
-        shipping_product_id = cr.fetchone()[0]
+        shipping__id = cr.fetchone()[0]
         brw = self.browse(cr,uid,id[0],context)
         dummy, vol_id_attribute = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'jjuice', 'attribute_vol')
         dummy, conc_id_attribute = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'jjuice', 'attribute_conc')

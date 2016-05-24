@@ -1,6 +1,7 @@
 from openerp import models, fields, api,_
 import openerp.addons.decimal_precision as dp
 from openerp.exceptions import except_orm, Warning, RedirectWarning
+from datetime import date
 
 _list_tab_style = [
                    (1,"Flavor Concentration Matrix"),
@@ -183,6 +184,10 @@ class product_tab(models.Model):
                 raise Warning(_('Payment Plan amount cannot be zero'))
             if (not plan[2].get('method_of_payment')):
                 raise Warning(_('Method of payment is required for payment plan'))
+            if not plan[2].get('date',False):
+                plan[2].update({
+                             'date':date.today().strftime('%Y-%m-%d'),
+                             })
             plan[2].update({
                          'partner_id':partner_id
                          })
