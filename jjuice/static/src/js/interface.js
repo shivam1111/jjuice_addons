@@ -749,7 +749,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 					self.do_action(action)
 					}); //
 				}else{
-					self.do_action(action)
+					self.do_action(action_data)
 				}
 			});
 		},

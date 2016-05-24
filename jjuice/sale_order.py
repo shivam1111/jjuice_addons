@@ -27,6 +27,7 @@ import operator
 from openerp.exceptions import except_orm
 from collections import OrderedDict
 from _symtable import FREE
+from openerp.exceptions import Warning
 
 class sale_order(models.Model):
     _inherit  = "sale.order"
@@ -119,32 +120,31 @@ class sale_order(models.Model):
     def print_attachment_report(self,cr,uid,id,context=None):
         uid = SUPERUSER_ID
         assert len(id) == 1
-        vals = [] #contains the products that have concentration and volume
-        misc = {} #contains the miscelaneous products
-        free = [] # contains the free products
-        vol,conc = [],[]
-        strength = {}
-        strength_misc = 0
-        strength_free = {}
-        strength_marketing = 0
-        marketing = {}
-        conc_dict = OrderedDict()
-        vol_dict = {}
+
         paid_stamp,shipping_stamp = True,True
         
         if type(id) is int: id = [id]
+        
         invoice_lines = {'total':0.00,'paid':0.00,'residual':0.00,'invoice':{}}
+        
         cr.execute('''
             select id from product_product where shipping =true and active = true limit 1
         ''')
-        shipping__id = cr.fetchone()[0]
+        shipping_id = cr.fetchone()[0]
         brw = self.browse(cr,uid,id[0],context)
-        dummy, vol_id_attribute = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'jjuice', 'attribute_vol')
-        dummy, conc_id_attribute = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'jjuice', 'attribute_conc')
-        attribute = [vol_id_attribute,conc_id_attribute]
+        
         comment = brw.note
-        grand_total = 0
-
+        
+        available_conc = {}
+        available_flavor = {}
+        
+        matrix_data = {}
+        list_data = {}
+        marketing_data = {}
+        extra_data = {}
+        totals = {}
+        tabs_data = set([])
+        
         #Collecting related invoice information
         for invoice  in brw.invoice_ids:
             #Checking for the paid_stamp
@@ -157,142 +157,174 @@ class sale_order(models.Model):
                 invoice_lines['total'] =  invoice_lines['total'] +  invoice.amount_total
                 invoice_lines['residual'] = invoice_lines['residual'] +  invoice.residual
                 invoice_lines['paid'] = invoice_lines['paid'] + (invoice.amount_total - invoice.residual)
-                 
-        name_list = []
-        for line in brw.order_line:
-            #Checking for marketing products
-            if line.product_id.market_case:
-                if line.product_id.name in marketing.keys():
-                    marketing[line.product_id.name] = marketing[line.product_id.name] +  line.product_uom_qty
-                else: marketing.update({line.product_id.name:line.product_uom_qty})
-                strength_marketing = strength_marketing + line.product_uom_qty
-                continue            
 
+        
+        grand_total = len(brw.order_line);
+        for line in brw.order_line:
+            product_id = line.product_id
+            tab_id = product_id.tab_id
+            
             #Checking for the shipping stamp
-            if line.product_id.id == shipping_product_id:
+            if product_id.id == shipping_id:
+                grand_total= grand_total - 1
                 if line.product_uom_qty > 0:
                     shipping_stamp = False
-                    
-            if line.product_id.misc:
-                if line.product_id.name in misc.keys():
-                    misc[line.product_id.name] = misc[line.product_id.name] +  line.product_uom_qty
-                else:misc.update({line.product_id.name:line.product_uom_qty})
-                strength_misc = strength_misc + line.product_uom_qty
                 continue
             
-            elif line.product_id.shipping or line.product_id.market_case:  
-                continue
-            else:
-                product_info = self._get_product_conc_vol(cr,uid,attribute,line.product_id.id,context)
-#             Output [(att_id,product_attribute_value.name,product_attribute.id)] ---> product_info
-                for i in product_info:
-                    if i[2] == vol_id_attribute:
-                        vol = i
-                        if not i[0] in vol_dict:
-                            vol_dict.update({i[0]:i[1]})
-                    elif i[2] == conc_id_attribute:
-                        conc = i
-                        if not i[0] in conc_dict:
-                            conc_dict.update({
-                                              i[0]:i[1]
-                                              })
+            if tab_id:
+                tabs_data.add((tab_id.id,tab_id.name))
+                if tab_id.tab_style == 1 or tab_id.tab_style == 5:
+                    # this means it is a matrix configuration
+                    flavor_id = product_id.flavor_id
+                    conc_id = product_id.conc_id
                     
-                if line.price_unit == 0 and vol[3]:
-                    if not conc[0] in strength_free:
-                        strength_free.update({
-                                              conc[0]:line.product_uom_qty
-                                              })
+                    if flavor_id and conc_id:
+                        # available concentration and available flavors
+                        print "**************************tab_id,available_conc",tab_id.id,available_conc
+                        if tab_id.id in available_conc.keys():
+                            available_conc[tab_id.id].add((conc_id.id,conc_id.name))
+                            print "**************************tab_id,available_conc if",tab_id.id,available_conc
+                        else:
+                            available_conc.update({
+                                                   tab_id.id:set([(conc_id.id,conc_id.name)])
+                                                   })
+                            print "**************************tab_id,available_conc else",tab_id.id,available_conc
+                        if tab_id.id in available_flavor.keys():
+                            available_flavor[tab_id.id].add((flavor_id.id,flavor_id.name))
+                        else:
+                            available_flavor.update({
+                                                   tab_id.id:set([(flavor_id.id,flavor_id.name)])
+                                                   })                    
+                    
+                        # Adding qty data to be printed on report
+                        if tab_id.id in matrix_data.keys():
+                            tab_data = matrix_data[tab_id.id]
+                            if flavor_id.id in tab_data.keys():
+                                flavor_data = tab_data[flavor_id.id]
+                                if conc_id.id in flavor_data.keys():
+                                    conc_data = flavor_data[conc_id.id] or 0
+                                    flavor_data[conc_id.id] = conc_data + line.product_uom_qty
+                                else:
+                                    flavor_data[conc_id.id] = line.product_uom_qty
+                            else:
+                                tab_data.update({
+                                                 flavor_id.id:{
+                                                               conc_id.id:line.product_uom_qty
+                                                               }
+                                                 })
+                        else:
+                            matrix_data.update({
+                                                tab_id.id:{
+                                                           flavor_id.id:{
+                                                                         conc_id.id:line.product_uom_qty
+                                                                         }
+                                                           }
+                                                })
+                        # Totals
+                        if tab_id.id in totals.keys():
+                            tab_data = totals[tab_id.id]
+                            if conc_id.id in tab_data:
+                                before_qty = tab_data[conc_id.id]
+                                tab_data[conc_id.id] = before_qty + line.product_uom_qty
+                            else:
+                                tab_data[conc_id.id] = line.product_uom_qty
+                                
+                        else:
+                            totals.update({
+                                           tab_id.id:{
+                                                      conc_id.id:line.product_uom_qty
+                                                      }
+                                           })
+                            
                     else:
-                        strength_free[conc[0]] = strength_free[conc[0]] + line.product_uom_qty
+                        raise Warning(_("Please configure product with ID %s properly"%(product_id.id)))
+                    
+                    
+                        
+                if tab_id.tab_style == 2 or tab_id.tab_style == 4:
+                    if tab_id.id in list_data.keys():
+                        tab_data = list_data[tab_id.id]
+                        if product_id.id in tab_data.keys():
+                            before_qty = tab_data[product_id.id] or 0
+                            tab_data[product_id.id] = before_qty + line.product_uom_qty
+                        else:
+                            tab_data.update({
+                                             product_id.id:line.product_uom_qty,
+                                             })
+                            
+                    else:
+                        list_data.update({
+                                          tab_id.id:{
+                                                     product_id.id:line.product_uom_qty,
+                                                     }
+                                          })
+                    #Totals
+                    if tab_id.id in totals.keys():
+                        before_total = totals[tab_id.id]
+                        totals[tab_id.id] = before_total + line.product_uom_qty
+                    else:
+                        totals[tab_id.id] = line.product_uom_qty
                         
                          
-                    if not line.product_id.product_tmpl_id.product_tmpl_id.id in free:
-                        free.append({
-                                     'id':line.product_id.product_tmpl_id.product_tmpl_id.id,
-                                     'name':line.product_id.product_tmpl_id.product_tmpl_id.name,
-                                     'conc':{conc[0]:line.product_uom_qty}
-                                     })
+                if tab_id.tab_style == 3:
+                    if tab_id.id in marketing_data.keys():
+                        tab_data = marketing_data[tab_id.id]
+                        if product_id.id in tab_data.keys():
+                            before_qty = tab_data[product_id.id]
+                            tab_data[product_id.id] = before_qty + line.product_uom_qty
+                        else:
+                            tab_data.update({
+                                             product_id.id:line.product_uom_qty,
+                                             })
                     else:
-                        #find the index
-                        for i in free:
-                            if i['id'] == line.product_id.product_tmpl_id.product_tmpl_id.id:
-                                index = i
-                                index.get('conc').update({
-                                                             conc[0]:line.product_uom_qty
-                                                             })
-                    continue
-                if not vol[0] in strength:
-                    strength.update({
-                                    vol[0]:{
-                                            conc[0]:line.product_uom_qty,
-                                            }
-                                    })
+                        marketing_data.update({
+                                               tab_id.id:{
+                                                          product_id.id:line.product_uom_qty,
+                                                          }
+                                               })
+                    #Totals
+                    if tab_id.id in totals.keys():
+                        before_total = totals[tab_id.id]
+                        totals[tab_id.id] = before_total + line.product_uom_qty
+                    else:
+                        totals[tab_id.id] = line.product_uom_qty
+
+                            
+            else:
+                # EXTRA product with out tabs
+                if product_id.id in extra_data:
+                    before_qty = extra_data[product_id.id]
+                    extra_data[product_id.id] = before_qty + line.product_uom_qty
                 else:
-                    
-                    if strength.get(vol[0],False).get(conc[0],False):
-                        strength.get(vol[0],False)[conc[0]] = strength.get(vol[0],False).get(conc[0],False) + line.product_uom_qty
-                    else:
-                         strength.get(vol[0],False).update({
-                                                            conc[0]:line.product_uom_qty
-                                                            }) 
-                         
-                grand_total = grand_total + line.product_uom_qty
-                if not line.product_id.product_tmpl_id.product_tmpl_id.id in name_list:
-                    name_list.append(line.product_id.product_tmpl_id.product_tmpl_id.id)
-                    if not line.product_id.product_tmpl_id.product_tmpl_id.id:
-                        raise except_orm(_('Error!'),_('Check Product Configuration with id-: %s and name-:%s')%(line.product_id.id,line.product_id.name))
-                    vals.append({
-                                     'id':line.product_id.product_tmpl_id.product_tmpl_id.id,
-                                     'name':line.product_id.product_tmpl_id.product_tmpl_id.name,
-                                      vol[0]:{
-                                             'vol_name':vol[1],
-                                             'conc':{
-                                                     conc[0]:line.product_uom_qty
-                                                 }
-                                             }
-                                         })
+                    extra_data[product_id.id] = line.product_uom_qty
+                
+                if "extra" in totals.keys():
+                    before_total = totals["extra"]
+                    totals[tab_id.id] = before_total + line.product_uom_qty
                 else:
-                    #find the index of flavour in the list
-                    index = {}
-                    for i in vals:
-                        if i['id'] == line.product_id.product_tmpl_id.product_tmpl_id.id:
-                            index = i
-                    if index.get(vol[0],False):
-                        if index[vol[0]].get('conc',False) and index[vol[0]].get('conc',False).get(conc[0],False):
-                            index[vol[0]].get('conc',False)[conc[0]] = index[vol[0]].get('conc',False)[conc[0]] + line.product_uom_qty
-                        else:index[vol[0]].get('conc',{}).update({
-                                                      conc[0]:line.product_uom_qty
-                                                      })
-                    else:
-                        index.update({
-                                     vol[0]:{
-                                             'vol_name':vol[1],
-                                             'conc':{
-                                                    conc[0]:line.product_uom_qty 
-                                                 }
-                                         }
-                                     })
-        free = sorted(free,key=itemgetter('name'))
-        vals = sorted(vals,key=itemgetter('name'))
-        buffer_dict = {}
-        buffer_dict1  = conc_dict.copy()
-        for i  in buffer_dict1:
-            try:
-                buffer_dict.update({i:int(conc_dict[i].split('mg')[0])})
-                del conc_dict[i]
-            except ValueError:
-                print "The element does not have nany numerical concentration"
-        del buffer_dict1
-        for key,value in sorted(buffer_dict.items(),key=operator.itemgetter(1),reverse=True):
-            conc_dict.update({key:str(value)+"mg"})
-        data= {'paid_stamp':paid_stamp,'shipping_stamp':shipping_stamp,'invoice_line':invoice_lines,
-                                 'ids':id,'grand_total':grand_total,
-                                 'comment':comment,'strength_misc':strength_misc,
-                                 'strength':strength,'conc_dict':conc_dict.items(),'vol_dict':vol_dict,'vals':vals,'misc':misc,'free':free,
-                                 'strength_free':strength_free,
-                                 'strength_marketing':strength_marketing,
-                                 'marketing':marketing,
-                                 }
+                    totals[tab_id.id] = line.product_uom_qty
+            
+        for tab in available_conc:
+            available_conc[tab] = list(sorted(available_conc[tab],key=itemgetter(1)))
+        
+        for tab in available_flavor:
+            available_flavor[tab] = list(sorted(available_flavor[tab],key=itemgetter(1)))
+    
+        data= {'paid_stamp':paid_stamp,
+               'shipping_stamp':shipping_stamp,
+               'grand_total':grand_total,
+               'invoice_line':invoice_lines,
+               'comment':comment,
+               'ids':id,
+               'tabs_data':list(tabs_data),
+               'available_conc':available_conc,
+               'available_flavor':available_flavor,
+               'extra_data':extra_data,
+               'list_data':list_data,
+               'matrix_data':matrix_data,
+               'marketing_data':marketing_data,
+               'totals':totals,                  
+             }
 
         if context.get('stock_picking',False):
             data.update({'model':'stock.picking'})

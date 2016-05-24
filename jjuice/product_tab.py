@@ -224,6 +224,7 @@ class product_tab(models.Model):
                          'views': [[view_id, 'form']],
                          'view_id': view_id,
                          'target': 'current',
+                         'context':{},
                        };
             return action
     

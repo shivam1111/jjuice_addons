@@ -36,157 +36,20 @@
 				            </div>
 				            <br/>
 				            <br/>
-				            <t t-set = "info" t-value = "data['vals']"/>
-							<t t-foreach = "data['vol_dict']" t-as = "volume">
-								<span><strong t-esc="data['vol_dict'][volume]"></strong></span>
-								<table class = "table">
+						  <t t-foreach="data['tabs_data']" t-as = "tab">
+						  	<t t-if="tab[0] == 1 or tab[0] == 5">
+								<table>
 									<thead>
-										<th>Flavor</th>
-										<t t-foreach = "data['conc_dict']" t-as="conc">
-											<th t-esc = "conc[1]"></th>
-										</t>
+										<th></th>
 									</thead>
-									<tbody>
-										<t t-foreach="data['vals']" t-as = "flavour">
-											<t t-if = "volume in flavour">
-												<tr>
-													<td>
-														<span t-esc="flavour['name']"></span>
-													</td>
-													<t t-foreach = "data['conc_dict']" t-as = "conc">
-														<td>
-															<t t-if="str(conc[0]) in flavour[volume]['conc']">
-																<span t-esc="flavour[volume]['conc'][str(conc[0])]" ></span>
-															</t>														
-														</td>
-													</t>												
-												</tr>											
-											</t>
-										</t>
-										<tr>
-											<td>Total</td>
-											<t t-foreach = "data['conc_dict']" t-as = "conc">
-												<td>
-													<t t-if = "data['strength']">
-														<t t-if="data['strength'].get(volume,False)">
-															<t t-if="data['strength'].get(volume,False).get(str(conc[0]),False)">
-																<span t-esc="data['strength'][volume][str(conc[0])]"></span>
-															</t>
-														</t>
-													</t>
-												</td>
-											</t>
-										</tr>
-									</tbody> 
-								</table>
-							</t>
-							<t t-if = "len(data['misc']) > 0">
-								<table class = "table">
-									<span><strong>Miscellaneous</strong></span>
-									<thead>
-										<th>Flavor</th>
-										<th>Qty</th>
-									</thead>
-									<tbody>
-										<t t-foreach="data['misc']" t-as = "misc">
-											<tr>
-												<td>
-													<span t-esc="misc"></span>
-												</td>
-												<td>
-													<span t-esc="data['misc'].get(misc,False)"></span>
-												</td>
-											</tr>
-										</t>
-										<tr>
-											<td><span>Total</span></td>
-											<td>
-												<span t-esc="data['strength_misc']"></span>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</t>
-							<t t-if = "len(data['marketing']) > 0">
-								<table class = "table">
-									<span><strong>Marketing</strong></span>
-									<thead>
-										<th>Flavor</th>
-										<th>Qty</th>
-									</thead>
-									<tbody>
-										<t t-foreach="data['marketing']" t-as = "market">
-											<tr>
-												<td>
-													<span t-esc="market"></span>
-												</td>
-												<td>
-													<span t-esc="data['marketing'].get(market,False)"></span>
-												</td>
-											</tr>
-										</t>
-										<tr>
-											<td><span>Total</span></td>
-											<td>
-												<span t-esc="data['strength_marketing']"></span>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</t>							
-							<t t-if = "len(data['free']) > 0">
-								<table class = "table">
-									<span><strong>Free Samples</strong></span>
-									<thead>
-										<th>Flavor</th>
-										<t t-foreach = "data['conc_dict']" t-as="conc">
-											<th t-esc = "conc[1]"></th>
-										</t>
-									</thead>
-									<tbody>
-										<t t-foreach="data['free']" t-as="free">
-											<tr>
-												<td><span t-esc="free['name']"></span></td>
-												<t t-foreach = "data['conc_dict']" t-as="conc">
-													<td>
-														<t t-if = "str(conc[0]) in free['conc']">
-															<span t-esc="free['conc'][str(conc[0])]"></span>
-														</t>
-													</td>
-												</t>											
-											</tr>
-										</t>
-										<tr>
-											<td><span>Total</span></td>
-											<t t-foreach = "data['conc_dict']" t-as="conc">
-												<td>
-													<t t-if = "str(conc[0]) in data['strength_free']">
-														<span t-esc="data['strength_free'][str(conc[0])]"></span>
-													</t>
-												</td>
-											</t>																						
-										</tr>
-									</tbody>
-								</table>
-							</t>
-			                <table class="table table-condensed">
-			                    <tbody>
-			                    	<t t-if = "data['grand_total'] != 0">
-					                    <tr class="border-black">
-					                        <td><strong>Total Units</strong></td>
-					                        <td class="text-right">
-						                        <span t-esc = "data['grand_total']"></span>
-					                        </td>
-					                    </tr>			                    	
-			                    	</t>
-				                    <tr class="border-black" colspan="2" rowspan="6">
-				                    	<td><strong>Order Notes</strong></td>
-				                    	<td>
-				                    		<span t-esc="data['comment']"></span>
-				                    	</td>
-				                    </tr>                	
-	              			   </tbody>
-	                       </table> 
+								</table>						  	
+								<t t-foreach="data['available_flavor']" t-as="flavor">
+									<t t-foreach="data['available_conc']" t-as="conc">
+										
+									</t>						  									
+								</t>
+						  	</t>
+						  </t>
 			               <t t-if = "data['invoice_line']['invoice']">
 								<t t-if = "data['paid_stamp']">
 							        <div class="pull-right watermark" style="position:absolute;opacity:0.4;font-size:3em;width:100%;text-align:center;z-index:1000;">
