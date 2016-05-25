@@ -137,14 +137,14 @@ class sale_order(models.Model):
         
         available_conc = {}
         available_flavor = {}
-        
+        product_list = {}
         matrix_data = {}
         list_data = {}
         marketing_data = {}
         extra_data = {}
         totals = {}
         tabs_data = set([])
-        
+        grand_total = 0
         #Collecting related invoice information
         for invoice  in brw.invoice_ids:
             #Checking for the paid_stamp
@@ -159,20 +159,19 @@ class sale_order(models.Model):
                 invoice_lines['paid'] = invoice_lines['paid'] + (invoice.amount_total - invoice.residual)
 
         
-        grand_total = len(brw.order_line);
         for line in brw.order_line:
             product_id = line.product_id
             tab_id = product_id.tab_id
             
             #Checking for the shipping stamp
             if product_id.id == shipping_id:
-                grand_total= grand_total - 1
                 if line.product_uom_qty > 0:
                     shipping_stamp = False
                 continue
+            grand_total = grand_total + line.product_uom_qty
             
             if tab_id:
-                tabs_data.add((tab_id.id,tab_id.name))
+                tabs_data.add((tab_id.id,tab_id.tab_style,tab_id.name))
                 if tab_id.tab_style == 1 or tab_id.tab_style == 5:
                     # this means it is a matrix configuration
                     flavor_id = product_id.flavor_id
@@ -240,8 +239,10 @@ class sale_order(models.Model):
                         raise Warning(_("Please configure product with ID %s properly"%(product_id.id)))
                     
                     
-                        
-                if tab_id.tab_style == 2 or tab_id.tab_style == 4:
+                elif tab_id.tab_style == 2 or tab_id.tab_style == 4:
+                    product_list.update({
+                                         product_id.id:product_id.name
+                                         })
                     if tab_id.id in list_data.keys():
                         tab_data = list_data[tab_id.id]
                         if product_id.id in tab_data.keys():
@@ -266,7 +267,10 @@ class sale_order(models.Model):
                         totals[tab_id.id] = line.product_uom_qty
                         
                          
-                if tab_id.tab_style == 3:
+                elif tab_id.tab_style == 3:
+                    product_list.update({
+                                     product_id.id:product_id.name
+                             })
                     if tab_id.id in marketing_data.keys():
                         tab_data = marketing_data[tab_id.id]
                         if product_id.id in tab_data.keys():
@@ -291,6 +295,9 @@ class sale_order(models.Model):
 
                             
             else:
+                product_list.update({
+                     product_id.id:product_id.name
+                 })
                 # EXTRA product with out tabs
                 if product_id.id in extra_data:
                     before_qty = extra_data[product_id.id]
@@ -300,9 +307,9 @@ class sale_order(models.Model):
                 
                 if "extra" in totals.keys():
                     before_total = totals["extra"]
-                    totals[tab_id.id] = before_total + line.product_uom_qty
+                    totals['extra'] = before_total + line.product_uom_qty
                 else:
-                    totals[tab_id.id] = line.product_uom_qty
+                    totals['extra'] = line.product_uom_qty
             
         for tab in available_conc:
             available_conc[tab] = list(sorted(available_conc[tab],key=itemgetter(1)))
@@ -323,9 +330,12 @@ class sale_order(models.Model):
                'list_data':list_data,
                'matrix_data':matrix_data,
                'marketing_data':marketing_data,
-               'totals':totals,                  
+               'totals':totals,     
+               'product_list':product_list             
              }
 
+        print "***************************data",data
+        
         if context.get('stock_picking',False):
             data.update({'model':'stock.picking'})
             return {
