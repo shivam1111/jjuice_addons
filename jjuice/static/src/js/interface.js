@@ -21,6 +21,46 @@ openerp.jjuice.pos = function (instance,local) {
     	})//end call
 	})
 	
+	instance.web.form.FieldFloat.include({
+		navigate_interface:function(e){
+			switch (e.which) {
+            case $.ui.keyCode.UP:
+            	tr = $(e.srcElement).parents('tr:first');
+            	td_index = $($(e.srcElement).parents('td')[0]).index();
+            	tr_prev = tr.prev();
+            	tr_prev.children("td").eq(td_index).find("input").focus();
+            	break;
+            case $.ui.keyCode.DOWN:
+            	console.log("down");
+            	parent = $(e.srcElement).parents('tr:first');
+            	td_index = $($(e.srcElement).parents('td')[0]).index();
+            	tr_next = parent.next();
+            	tr_next.children("td").eq(td_index).find("input").focus();
+                break;
+            case $.ui.keyCode.RIGHT:
+            	console.log("right");
+            	parent = $(e.srcElement).parents('td:first');
+            	td_next = parent.next();
+            	td_next.find("input").focus();	            		            	
+            	break;
+            case $.ui.keyCode.LEFT:
+            	console.log("left");
+            	parent = $(e.srcElement).parents('td:first');
+            	td_next = parent.prev();
+            	td_next.find("input").focus();	            		            		            	
+            	break;
+			}
+		},
+		renderElement:function(){
+			var self =this
+			this._super();
+			$input_field = this.$el.find('input')
+			if ($input_field.length > 0){
+				$input_field.on("keydown",self,self.navigate_interface)
+			}
+		},
+	})
+	
 	function sortProperties(obj)
 	{
 	  // convert object into array
@@ -436,7 +476,22 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 							self.calculate_subtotal_qty(conc[0]);
 						});
 						self.on_check_availability(self.product_data[flavor[0]][conc[0]],self);
-					}//end if
+					}
+					else{
+						widget = new instance.web.form.FieldFloat(self.dfm,{
+			                attrs: {
+			                    name: "dummy",
+			                    type: "float",
+			                    context: {
+			                    },
+			                    modifiers: '{"readonly": true}',
+			                },
+			            });
+						$input = $("<input readonly='1' style='width:%width%'/>".replace("%width%",width))
+						widget.appendTo($col)
+						widget.$el.find("span.oe_form_char_content").empty().append($input)
+						$input.on("keydown",self,widget.navigate_interface)
+					} // endif
 					$row.append($col)
 				}) //end each
 				// * Now render the prices and subtotal cells
