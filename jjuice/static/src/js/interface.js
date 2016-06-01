@@ -559,8 +559,8 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			this._super(parent);
 			this.tech_tab_name = remove_spaces(dataset.name);
 			this.class_state = class_state;
-			this.$tab = $(QWeb.render("nav_tabs", {'tab_name':dataset.name,'class_state':class_state,'tech_tab_name':this.tech_tab_name}));
-			this.$body = $(QWeb.render("tab_panes", {'tab_name':dataset.name,'class_state':class_state,'tech_tab_name':this.tech_tab_name}));
+			this.$tab = $(QWeb.render("nav_tabs", {'tab_name':dataset.name,'class_state':class_state,'tech_tab_name':this.tech_tab_name,'tab_id':dataset.id}));
+			this.$body = $(QWeb.render("tab_panes", {'tab_name':dataset.name,'class_state':class_state,'tech_tab_name':this.tech_tab_name,'tab_id':dataset.id}));
 			this.parent = parent;
 			this.dataset = dataset;
 		},

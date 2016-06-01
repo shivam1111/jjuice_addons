@@ -114,21 +114,21 @@
 	<!-- Nav Tabs -->
 	<t t-name = "nav_tabs">
 		<t t-if="class_state == true">
-			<li role="presentation" class="active"><a t-att-href="'#'+tech_tab_name" t-att-aria-controls="tech_tab_name" role="tab" data-toggle="tab"><t t-esc="tab_name"></t></a></li>
+			<li role="presentation" class="active"><a t-att-href="'#'+tab_id" t-att-aria-controls="tab_id" role="tab" data-toggle="tab"><t t-esc="tab_name"></t></a></li>
 		</t>
 		<t t-if="class_state == false">
-			<li role="presentation" ><a t-att-href="'#'+tech_tab_name" t-att-aria-controls="tech_tab_name" role="tab" data-toggle="tab"><t t-esc="tab_name"></t></a></li>
+			<li role="presentation" ><a t-att-href="'#'+tab_id" t-att-aria-controls="tab_id" role="tab" data-toggle="tab"><t t-esc="tab_name"></t></a></li>
 		</t>		
 	</t>
 	
 	<!-- Tab panes -->
 	<t t-name = "tab_panes">
 		<t t-if = "class_state == true" >
-			<div role="tabpanel" class="tab-pane active" t-att-id="tech_tab_name">
+			<div role="tabpanel" class="tab-pane active" t-att-id="tab_id">
 			</div>
 		</t>
 		<t t-if = "class_state == false" >
-			<div role="tabpanel" class="tab-pane" t-att-id="tech_tab_name">
+			<div role="tabpanel" class="tab-pane" t-att-id="tab_id">
 				<div>
 				</div>	
 			</div>
