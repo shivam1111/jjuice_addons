@@ -179,15 +179,12 @@ class sale_order(models.Model):
                     
                     if flavor_id and conc_id:
                         # available concentration and available flavors
-                        print "**************************tab_id,available_conc",tab_id.id,available_conc
                         if tab_id.id in available_conc.keys():
                             available_conc[tab_id.id].add((conc_id.id,conc_id.name))
-                            print "**************************tab_id,available_conc if",tab_id.id,available_conc
                         else:
                             available_conc.update({
                                                    tab_id.id:set([(conc_id.id,conc_id.name)])
                                                    })
-                            print "**************************tab_id,available_conc else",tab_id.id,available_conc
                         if tab_id.id in available_flavor.keys():
                             available_flavor[tab_id.id].add((flavor_id.id,flavor_id.name))
                         else:

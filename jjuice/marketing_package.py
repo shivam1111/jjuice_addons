@@ -57,7 +57,7 @@ class marketing_package_line(models.Model):
         self.price_subtotal = total
     
     package_id = fields.Many2one('marketing.package','Marketing Package')
-    product_id = fields.Many2one('product.product','Product',domain=[('market_case','=',True)])
+    product_id = fields.Many2one('product.product','Product')
     price = fields.Float('Price')
     qty = fields.Float('Quantity')
     discount = fields.Float('Discount %')
