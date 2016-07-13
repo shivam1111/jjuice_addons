@@ -145,6 +145,7 @@ class product_tab(models.Model):
     ]    
     
     def calculate_discount(self,internal=0,external=0):
+        internal = float(internal)
         discount_factor = ((100.00-internal) * (100.00-external))/100
         discount = 100 - discount_factor
         return discount
