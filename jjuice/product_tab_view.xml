@@ -83,7 +83,7 @@
         </record>
 	
 		<menuitem action="action_product_tab_view"
-            id="menu_action_product_tab_view"
+            id="menu_action_product_tab_view" groups = "base.group_sale_manager"
             parent="base.menu_product" sequence="0" />        
 	</data>
 </openerp>
