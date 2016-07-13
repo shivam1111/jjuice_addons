@@ -62,10 +62,10 @@ class product_tab(models.Model):
             vals = {
                     'tab_id':pair[0],
                     'flavor_id': pair[1].id,
-                    'vol_id':pair[2],
-                    'conc_id':pair[3],
+                    'vol_id':pair[2].id,
+                    'conc_id':pair[3].id,
                     'type':self.consumable_stockable,
-                    'name':pair[1].name,
+                    'name':" | ".join([pair[1].name,pair[2].name,pair[3].name]), 
                     'sale_ok':True,
                     'purchase_ok':True,
                 
@@ -80,7 +80,7 @@ class product_tab(models.Model):
         product_obj = self.env['product.product']
         for pair in pairs:
             product_ids = product_obj.search([('tab_id','=',pair[0]),('flavor_id','=',pair[1].id),
-                                ('vol_id','=',pair[2]),('conc_id','=',pair[3])])
+                                ('vol_id','=',pair[2].id),('conc_id','=',pair[3].id)])
             if product_ids:
                 product_ids.unlink()
         return True
@@ -117,9 +117,9 @@ class product_tab(models.Model):
     def _create_pair(self):
         pairs = []
         for line in self.flavor_conc_line:
-            tab_id,flavor_id,vol_id = line.tab_id.id,line.flavor_id,line.tab_id.vol_id.id 
+            tab_id,flavor_id,vol_id = line.tab_id.id,line.flavor_id,line.tab_id.vol_id 
             for conc in line.conc_ids:
-                pairs.append((tab_id,flavor_id,vol_id,conc.id))
+                pairs.append((tab_id,flavor_id,vol_id,conc))
         return pairs        
         
     @api.multi
