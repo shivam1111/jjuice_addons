@@ -812,7 +812,9 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			var self = this;
 			product_ids = []
 			$.each(self.product_ids,function(key,product){
-				product_ids.push(product.data.id)
+				if (product.get_value() > 0 ){
+					product_ids.push(product.data.id)
+				}
 			});
 			product_not_available = []
 			$.when(self.get_product_information(product_ids,['virtual_available','incoming_qty','tab_id'])).done(function(data){
