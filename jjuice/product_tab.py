@@ -56,6 +56,7 @@ class product_tab(models.Model):
     @api.model  
     def _create_product(self,pairs):
         #(tab_id,flavor_id,vol_id,conc_id) ---> pair
+        return
         product_obj = self.env['product.product']
         product_ids = []
         for pair in pairs:
