@@ -61,8 +61,11 @@ openerp.jjuice.pos = function (instance,local) {
 		},
 	})
 	
-	function sortProperties(obj)
+	function sortProperties(obj,type='asc')
 	{
+	   if (!type){
+		   type = 'asc'
+	   }
 	  // convert object into array
 	    var sortable=[];
 	    for(var key in obj)
@@ -72,7 +75,12 @@ openerp.jjuice.pos = function (instance,local) {
 	    // sort items by value
 	    sortable.sort(function(a, b)
 	    {
-	    	return a[1].localeCompare(b[1]); // compare numbers
+	    	if (type == 'asc'){
+	    		return a[1].localeCompare(b[1]); // compare numbers
+	    	}else{
+	    		return b[1].localeCompare(a[1]); // compare numbers
+	    	}
+	    	
 	    });
 	    return sortable; // array in format [ [ key1, val1 ], [ key2, val2 ], ... ]
 	}	
@@ -386,8 +394,8 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 						}
 				}//end else
 			}) // end each
-			self.available_flavors = sortProperties(self.available_flavors);
-			self.available_conc = sortProperties(self.available_conc);
+			self.available_flavors = sortProperties(self.available_flavors,'asc');
+			self.available_conc = sortProperties(self.available_conc,'desc');
 		},
 		get_prices:function(){
 			return this.tab_parent.parent.prices[this.data.vol_id[0]] || 0; 
@@ -458,6 +466,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			var self=this;
 			price = self.get_prices();
 			width = self.get_width();
+			
 			//Fetch Volume Prices first
 			self.$el = $(QWeb.render('flavor_conc_matrix_table',{"concentration":self.available_conc,'tab_style':self.data.tab_style}))
 			$.each(self.available_flavors,function(index_flavor,flavor){
