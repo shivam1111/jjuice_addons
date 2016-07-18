@@ -325,7 +325,7 @@ openerp.jjuice.marketing_package = function(instance,local){
 	            });
 				self.discount[product.id] = widget;
 				widget.appendTo($col);
-				self.set_value(widget,self.get_price(product),self.tab_parent);
+				self.set_value(widget,0,self.tab_parent);
 				widget.on("changed_value",widget,function(event){
 					self.calculate_subtotal_money(product.id)
 				});
