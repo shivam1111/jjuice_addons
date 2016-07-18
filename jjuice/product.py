@@ -339,15 +339,6 @@ class product_product(osv.osv):
     
     def name_get(self, cr, uid, ids, context=None):
         result = super(product_product,self).name_get(cr, uid, ids, context=None)
-        final_result = []
-        for product in result:
-            product_brw = self.browse(cr,uid,product[0],context)
-            if product_brw.tab_id and product_brw.tab_id.tab_style in [1,5]: # Change names only if the product has tab_id and tab style is matrix
-                name = ' / '.join([(product_brw.vol_id.name or "No vol"),(product_brw.conc_id.name or "No Conc")])
-                name = ' / '.join([product[1],name])
-                final_result.append((product_brw.id,name))
-            else:
-                final_result.append(product)
         return final_result
         
     _sql_constraints = [
