@@ -339,7 +339,7 @@ class product_product(osv.osv):
     
     def name_get(self, cr, uid, ids, context=None):
         result = super(product_product,self).name_get(cr, uid, ids, context=None)
-        return final_result
+        return result
         
     _sql_constraints = [
                         ('properties_uniq', 'unique(tab_id,vol_id,conc_id,flavor_id)', ("The Concentration,Volume,Flavor and Tab of a  product should be unique!"))
