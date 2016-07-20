@@ -31,20 +31,17 @@ openerp.jjuice.pos = function (instance,local) {
             	tr_prev.children("td").eq(td_index).find("input").focus();
             	break;
             case $.ui.keyCode.DOWN:
-            	console.log("down");
             	parent = $(e.srcElement).parents('tr:first');
             	td_index = $($(e.srcElement).parents('td')[0]).index();
             	tr_next = parent.next();
             	tr_next.children("td").eq(td_index).find("input").focus();
                 break;
             case $.ui.keyCode.RIGHT:
-            	console.log("right");
             	parent = $(e.srcElement).parents('td:first');
             	td_next = parent.next();
             	td_next.find("input").focus();	            		            	
             	break;
             case $.ui.keyCode.LEFT:
-            	console.log("left");
             	parent = $(e.srcElement).parents('td:first');
             	td_next = parent.prev();
             	td_next.find("input").focus();	            		            		            	
@@ -525,7 +522,6 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		                    modifiers: '{"required": false}',
 		                },
 		            });
-					
 					self.set_value(widget_price,price,self.tab_parent) 
 					widget_price.appendTo($col_price)
 					widget_price.set_dimensions("auto",width);
@@ -711,7 +707,6 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		},
 		recalculate_total:function(){
 			var self = this;
-			console.log(self.line)
 			self.total = 0.00;
 			_.each(self.line,function(line){
 				self.total = self.total + parseFloat(line.amount.get_value() || 0)
@@ -866,6 +861,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			//Fetch Prices of current customer
 			volume_prices_ids = self.field_manager.datarecord.volume_prices
 			if (volume_prices_ids.length > 0){
+				self.prices = {};
 				vol_price = new openerp.Model('volume.prices.line'); 
 				vol_price.call('read',{
 					'ids':volume_prices_ids,
@@ -874,14 +870,13 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 					_.each(prices,function(elem){
 						if (elem.product_attribute){
 							self.prices[elem.product_attribute[0]]=elem.price; 
-						}						
+						}
 					})
 					self.$prices.resolve()
 				})
 			}else{
 				self.$prices.resolve()
 			}//end if else
-			
 			$.when(main_def,self.$prices).done(function(res){
 				self.tabs_object = {}
 				self.tabs_data = res.tabs; // Saving Tab data in Main widget
@@ -1160,6 +1155,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 				 * we empty the $el of the parent and render according the new customer record
 				 */  
 				self.$el.empty();
+				self.$prices = $.Deferred()
 				self.renderElement();
 			});			
 		}
