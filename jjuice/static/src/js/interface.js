@@ -960,6 +960,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
                 },
             });
 			self.shipping_handling.appendTo($body.find("#s_h"))
+			self.shipping_handling.on("change",self,self.trigger_recalculate);
 				 
 			self.order_notes = new instance.web.form.FieldText(self.dfm,{
                 attrs: {
@@ -1150,9 +1151,9 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			self.on("recalc_total",self,self.recalculate);
 			self.on("recalc_tax",self,self.tax_changed);
 			self.on("recalc_discount",self,self.changed_discount);
-			self.shipping_handling.on("change",self,self.trigger_recalculate);
 			self.on("recalc_balance",self,self.recalculate_balance);
-			this.field_manager.on("change",self,function(event){
+			console.log(self.field_manager)
+			self.field_manager.on("change",self,function(event){
 				/*
 				 * The view is not refreshed when we change the partner record. For that if we detect a change in field manager,
 				 * we empty the $el of the parent and render according the new customer record
