@@ -923,6 +923,9 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 
 		renderElement:function(){
 			var self = this;
+			if (! self.field_manager.datarecord.id){
+				return // This means we are creating a record. So do not render anything then
+			}
 			self._super();
 			self.renderTabs();
 			$body = self.$el.find("tbody#main_body")
