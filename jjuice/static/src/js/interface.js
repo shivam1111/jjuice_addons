@@ -5,19 +5,19 @@ openerp.jjuice.pos = function (instance,local) {
 	var QWeb = instance.web.qweb;
 	instance.web.jjuice = instance.web.jjuice || {};
 
-	Array.prototype.last = function(){
-		if (this.length > 0){
-			return this.length - 1;
-		}else{
-			return 0
-		}
-	}
+//	Array.prototype.last = function(){
+//		if (this.length > 0){
+//			return this.length - 1;
+//		}else{
+//			return 0
+//		}
+//	}
 	
-	main_def = $.Deferred();
+	main_defs = $.Deferred();
 	$(document).ready(function(){
     	var mod = new instance.web.Model("product.tab", {}, []); // MODEL,CONTEXT,DOMAIN
     	mod.call("fetch_static_data",[]).done(function(res){ //search_read method will automatically not load active = False records
-    		main_def.resolve(res)
+    		main_defs.resolve(res)
     	})//end call
 	})
 	
@@ -734,7 +734,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
     		"click button#confirm":"execute_confirm_order",
     	},
     	init: function(field_manager,node) {
-			this._super(field_manager, node);
+    		this._super(field_manager, node);
     		this.field_manager = field_manager;
     		this.prices = {};
     		this.$prices = $.Deferred();
@@ -877,7 +877,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			}else{
 				self.$prices.resolve()
 			}//end if else
-			$.when(main_def,self.$prices).done(function(res){
+			$.when(main_defs,self.$prices).done(function(res){
 				self.tabs_object = {}
 				self.tabs_data = res.tabs; // Saving Tab data in Main widget
 				_.each(res.taxes,function(tax){
@@ -1054,7 +1054,6 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
                 }
             });	
 			self.payment_method.appendTo($body.find("td#payment_method"))
-			
 			self.payment_plan = new local.payment_plan(self);
 			self.payment_plan.appendTo($body.find("td#payment_plans"))
 		},
@@ -1152,7 +1151,6 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			self.on("recalc_tax",self,self.tax_changed);
 			self.on("recalc_discount",self,self.changed_discount);
 			self.on("recalc_balance",self,self.recalculate_balance);
-			console.log(self.field_manager)
 			self.field_manager.on("change",self,function(event){
 				/*
 				 * The view is not refreshed when we change the partner record. For that if we detect a change in field manager,
