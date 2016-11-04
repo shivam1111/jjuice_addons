@@ -1,5 +1,31 @@
 from openerp import models, fields, api, _
 
+class account_move_line(models.Model):
+    _inherit = "account.move.line"
+    _description = "Account Commission Line"
+
+    @api.one
+    @api.depends(
+        'debit',
+        'credit',
+        'type_account',
+        'partner_id',
+    )
+    def _calculate_commission(self):
+        commission = 0.00
+        diff = self.debit - self.credit
+        if diff > 0:
+            if self.type_account in ['retailer','website']:
+                self.commission = 0.2 * diff
+            else:
+                self.commission = 0.1 * diff
+        else:
+            self.commission = 0
+    
+    type_account = fields.Selection(related='partner_id.classify_finance',type="selection",string='Type of A/C')
+    commission = fields.Float('Commission',help = "Commission is calculated as x% of difference between\
+                                                         total debit - total credit in the columns",compute="_calculate_commission")
+
 class account_commissions(models.Model):
     _name = "account.commissions"
     _description = "Commissions Calculator"
@@ -35,28 +61,11 @@ class account_commissions(models.Model):
                 payment_ids = map(lambda x:x[0],res)
         self.payment_ids = payment_ids
     
-    @api.one
-    @api.depends(
-        'user',
-        'from_date',
-        'to_date',
-    )
-    def _calculate_commission(self):
-        balance = 0.00
-        commission = 0.00
-        for i in self.payment_ids:
-            diff = i.debit - i.credit
-            balance+=diff
-        if balance > 0:
-            self.commission = 0.1*balance
-
     user= fields.Many2one('res.users',string = "Sales Person",required=True)
     from_date = fields.Date('From',required=True)
     to_date = fields.Date('To',required=True)
     payment_ids = fields.Many2many('account.move.line', string='Payments',
         compute='_compute_payments') 
-    commission = fields.Float('Commission',help = "Commission is calculated as x% of difference between\
-                                                         total debit - total credit in the columns",compute="_calculate_commission")
     
     
     

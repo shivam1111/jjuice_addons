@@ -28,7 +28,7 @@
    """,
     'website': '',
     'images' : [], #'/images/image_name.png'
-    'depends' : ['base','account'],#account_analytic_analysis
+    'depends' : ['base','account','jjuice'],#account_analytic_analysis
     'data': [
              'wizard/account_commissions_view.xml',
              ],
