@@ -55,22 +55,6 @@ class account_invoice(models.Model):
               if record.id and record.state in ['open','paid']:
                 record.paid_balance = record.amount_total - record.residual
 
-    @api.multi
-    @api.depends('name')
-    def _compute_payments_commission(self):
-        for record in self:
-              if record.id:
-                  self._cr.execute('''
-                  select order_id from sale_order_invoice_rel where invoice_id = %s 
-                  ''' %(record.id))
-                  order_id = self._cr.fetchall() 
-                  total = 0
-                  for sale in order_id:
-                      sale_order = self.env['sale.order'].search([('id','=',sale[0])])
-                      total = total + sale_order.t_commission
-                  record.commission = total
-                  
-    
     @api.one
     @api.depends('invoice_line','invoice_line.product_id')    
     def _check_shipping_free(self):
@@ -119,8 +103,9 @@ class account_invoice(models.Model):
     amount_before_discount_tax = fields.Float(string='Amount Before Discount and Tax', digits=dp.get_precision('Account'),
         store=True, readonly=True, compute='_compute_amount', track_visibility='always')
 
-
-    commission = fields.Float("Commission",compute='_compute_payments_commission',store=True)
+    account_state = fields.Selection([('uncollected','Uncollected A/C Receivables'),('toxic','Toxic Accounts')],
+                                     default="uncollected"
+                                     )    
     payment_plan_ids=fields.Many2many("payment.plan","payment_id","paymen_invoice_relation","invoice_id","Payment Plan Id",compute='_compute_payments_jjuice')
     paid_balance = fields.Float("Paid",compute='_compute_payments_paid',store=True)
     free_shipping_check=fields.Boolean("Free Shipping",compute = '_check_shipping_free')
