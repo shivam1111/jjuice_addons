@@ -1,6 +1,18 @@
 from openerp import tools
 from openerp.osv import fields,osv
 
+FINANCE_CLASSIFY  = [
+                 ('retailer','Retailer'),
+                 ('wholesale','Wholesaler / Distributer'),
+                 ('private_label','Private Label'),
+                 ('website','Vapejjuice.com'),
+                 ]
+
+ACCOUNT_TYPE  = [('smoke_shop',"Smoke Shop"),('vape_shop','Vape Shop'),('convenient_gas_store','Convenient Store/ Gas Station'),
+                 ('website','Online Store'),
+                 ]
+
+
 class account_treasury_report(osv.osv):
     _inherit = "account.treasury.report"
     _description = "Treasury Analysis"
@@ -8,8 +20,8 @@ class account_treasury_report(osv.osv):
     
     _columns = {
                 'partner_id':fields.many2one('res.partner','Partner',readonly=True),
-                'account_type':fields.char("Type Of Account",readonly=True),
-                'classify_finance':fields.char("Account Classification(For Finance)",readonly=True)
+                'account_type':fields.selection(ACCOUNT_TYPE,string = "Type Of Account",readonly=True),
+                'classify_finance':fields.selection(FINANCE_CLASSIFY,string = "Account Classification(For Finance)",readonly=True)
                 }
     
     def init(self, cr):

@@ -32,7 +32,6 @@
     'data': ['jjuice_data.xml',
              'fields_view.xml',
              'product_wizard_view.xml',
-             'commission_view.xml',
              'customers_view_change.xml',
              'res_partner_view.xml',
              'jjuice.xml',
