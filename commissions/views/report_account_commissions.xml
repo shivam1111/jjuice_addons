@@ -33,6 +33,7 @@
 		                    </tr>
 		               </thead>
 		               <tbody class="sale_body">
+		               		<t t-set="commission_total" t-value="0.00"/>
 		               		<tr t-foreach="o.payment_ids" t-as="l">
 		                        <td>
 		                           <span t-field="l.name"/>
@@ -60,11 +61,24 @@
 		                        </td>
 		                        <td>
 		                        	<span t-field="l.commission" />
-		                        </td>		              
+		                        </td>		    
+		                        <t t-set="commission_total" t-value="commission_total+l.commission"/>           
 		               		</tr>
 		               </tbody>
-		               	
-	               </table>            			                
+	               </table>
+		            <div class="row">
+		                <div class="col-xs-4 pull-right">
+		                    <table class="table">
+		                        <tr class="border-black">
+		                            <td><strong>Total Commission</strong></td>
+		                            <td class="text-right">
+		                                <span><t t-esc="commission_total"
+		                                    t-field-options='{"widget": "monetary", "display_currency": "o.user.company_id.currency_id.id"}'/></span>
+		                            </td>
+		                        </tr>
+	                        </table>
+                        </div>
+                     </div>	                           			                
 				</div>
 			</t>
 		</template>
