@@ -28,9 +28,14 @@
    """,
     'website': '',
     'images' : [], #'/images/image_name.png'
-    'depends' : ['base','account','jjuice'],#account_analytic_analysis
+    'depends' : ['base','account','jjuice','hr'],#account_analytic_analysis
     'data': [
+             'security/commission_security.xml',
+             'security/ir.model.access.csv',
              'wizard/account_commissions_view.xml',
+             'account_commissions_archive_view.xml',
+             'commissions_report.xml',
+             'views/report_account_commissions.xml',
              ],
     'demo': [],
     'test': [],

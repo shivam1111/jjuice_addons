@@ -6,8 +6,6 @@
 	            <field name="model">account.commissions</field>
 	            <field name="arch" type="xml">
 			     	<form string = "form view">
-			     		<header>
-			     		</header>
 			     		<group>
 			     			<field name="user"/>
 			     		</group>
@@ -32,18 +30,21 @@
 								</field>
 							</page>
 						</notebook>
+						<footer>
+							<button name = "generate_archive" type="object" string = "Generate Commission Receipt" class = "oe_highlight"/>
+						</footer>
 					</form>
 				</field>
 			</record>
 	        <record id="action_account_commission_view" model="ir.actions.act_window">
-	            <field name="name">Sales Person Commission</field>
+	            <field name="name">Commission Calculator</field>
 	            <field name="type">ir.actions.act_window</field>
 	            <field name="res_model">account.commissions</field>
 	            <field name="view_type">form</field>
 	            <field name="view_mode">form</field>
 	            <field name = "target">new</field>
 	        </record>
-			<menuitem id = "account_menu_commission" action = "action_account_commission_view" parent = "base.menu_sales" /> 			
+			<menuitem id = "account_menu_commission" groups = "commission_calculator" action = "action_account_commission_view" parent = "hr.menu_hr_main" /> 			
 			
 		</data>
 </openerp>

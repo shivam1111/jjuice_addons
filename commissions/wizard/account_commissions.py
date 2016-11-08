@@ -1,4 +1,5 @@
 from openerp import models, fields, api, _
+from openerp.exceptions import except_orm
 
 class account_move_line(models.Model):
     _inherit = "account.move.line"
@@ -26,17 +27,32 @@ class account_move_line(models.Model):
     commission = fields.Float('Commission',help = "Commission is calculated as x% of difference between\
                                                          total debit - total credit in the columns",compute="_calculate_commission")
 
-class account_commissions(models.Model):
+class account_commissions(models.TransientModel):
     _name = "account.commissions"
     _description = "Commissions Calculator"
 
+    @api.multi
+    def generate_archive(self):
+        archive = self.env['account.commissions.archive'].create({
+                'user':self.user.id,
+                'from_date':self.from_date,
+                'to_date':self.to_date,
+            })
+        return {
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'account.commissions.archive',
+            'target': 'current',
+            'res_id':archive.id,
+        }
+            
     @api.one
     @api.depends(
         'user',
         'from_date',
         'to_date',
     )
-    
     def _compute_payments(self):
         payment_ids = []
         if self.user and self.from_date and self.to_date:
@@ -66,7 +82,4 @@ class account_commissions(models.Model):
     to_date = fields.Date('To',required=True)
     payment_ids = fields.Many2many('account.move.line', string='Payments',
         compute='_compute_payments') 
-    
-    
-    
-    
+
