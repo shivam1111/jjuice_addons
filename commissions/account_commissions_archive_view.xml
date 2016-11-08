@@ -17,7 +17,7 @@
 						</group>
 						<notebook>
 							<page string = "Details">
-								<field name = "payment_ids" nolabel = "1" >
+								<field name = "payment_ids" nolabel = "1"  editable="bottom" >
 									<tree string = "Payment Lines">
 										<field name = "name" />
 										<field name = "period_id" />
