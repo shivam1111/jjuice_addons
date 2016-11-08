@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="account.invoice_form" />
             <field name="arch" type="xml">
 				<xpath expr = "/form/sheet/h1" position = "before">
-					<field name="account_state" class="oe_right" widget="statusbar"  statusbar_visible="uncollected,toxic" clickable="1" statusbar_colors='{"toxic":"red","uncollected":"blue"}'/>
+					<field name="account_state" groups="jjuice.access_account_state_field" class="oe_right" widget="statusbar"  statusbar_visible="uncollected,toxic" clickable="1" statusbar_colors='{"toxic":"red","uncollected":"blue"}'/>
 				</xpath>
 				<xpath expr = "/form/sheet/notebook/page/field/tree/field[@name='invoice_line_tax_id']" position = "before" >
 					<field name="total_subtotal_before_discount"  string="Amount Before Discount" />

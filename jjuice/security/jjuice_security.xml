@@ -31,15 +31,6 @@
 	    	<field name="perm_create" eval = "True"/>
 	    </record> 
 
-	<!-- Sales man should see their own commisions -->
-	    <record id="jjuice_see_own_commisions" model="ir.rule">
-	        <field name="name">See own Commisions</field>
-	        <field ref="model_commission_employee" name="model_id"/>
-	        <field name="domain_force">[('name.user_id', '=' ,user.id)]</field>
-	        <field name="groups" eval="[(4,ref('base.group_sale_salesman'))]"/>
-	    	<field name="perm_read" eval="True"/>
-	    </record>	    
-
 	<!-- Sales man should see their own Invoices -->
 	    <record id="jjuice_see_own_invoices" model="ir.rule">
 	        <field name="name">See own Invoices</field>
@@ -50,6 +41,15 @@
 	    	<field name="perm_write" eval="True"/>
 	    	<field name="perm_create" eval = "True"/>	    	
 	    </record>	    	    
+	</data>
+	<data noupdate="0">
+	    <record id="access_account_state_field" model="res.groups">
+	        <field name="name">Toxic Accounts Declaration Right</field>
+	    </record>		
+
+	    <record id="payment_verification_access" model="res.groups">
+	        <field name="name">Payment Verification Access</field>
+	    </record>		
 	    
 	</data>
 </openerp>
