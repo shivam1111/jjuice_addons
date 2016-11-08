@@ -57,6 +57,6 @@
 	            <field name="view_mode">tree,form</field>
 	        </record>
 			<menuitem id = "account_menu_commission_archive" action = "action_account_commission_view_archive" 
-			 groups = "base.group_hr_user" parent="hr.menu_hr_main"/> 			
+			 groups = "base.group_hr_user,base.group_user" parent="hr.menu_hr_main"/> 			
 		</data>
 </openerp>
