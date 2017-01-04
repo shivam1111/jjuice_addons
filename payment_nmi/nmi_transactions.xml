@@ -6,8 +6,13 @@
             <field name="arch" type="xml">
         		<form string = "NMI Transactions">
         			<sheet>
+	                    <div class="oe_right">
+	                        <label for="name" />
+	                        <h1>
+	                            <field name="name"  readonly="1"/>
+	                        </h1>
+	                    </div>        			
         				<group>
-        					<field name = "name" />
         					<field name = "partner_id" />
         				</group>
         			</sheet>

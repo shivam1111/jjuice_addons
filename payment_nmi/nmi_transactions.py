@@ -10,5 +10,5 @@ class nmi_transactions(models.Model):
         vals['name'] = sequence
         return super(nmi_transactions,self).create(vals)    
     
-    name = fields.Char("Name")
+    name = fields.Char("Serial Number")
     partner_id = fields.Many2one('res.partner',string = "Partner",required = True)
