@@ -34,10 +34,13 @@ NMI Payment Gateway
     'website': 'https://www.jginfosystems.com',
     'images': [],
     'depends': ['base',
-                'payment',
-                'account'
+                'integrations'
                 ],
     'data': [
+        'sequence.xml',
+        'menu.xml',
+        'security/nmi.xml',
+        'nmi_transactions.xml',
     ],
     'test': [
     ],

@@ -48,7 +48,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
       </record>
-      <menuitem id = "child_fedex_account_menu" parent = "integrations.integrations_menu" name = "FEDEX" />
+      <menuitem id = "child_fedex_account_menu" sequence="1" parent = "integrations.integrations_menu" name = "FEDEX" />
       <menuitem id = "child_child_fedex_account_menu" parent = "child_fedex_account_menu" action = "action_fedex_accoount" groups = "jjuice_fedex.group_fedex_account_access" />  	
 	</data>
 </openerp>

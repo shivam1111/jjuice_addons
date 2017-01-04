@@ -1,0 +1,30 @@
+<openerp>
+	<data>
+        <record id="nmi_transactions_form_view" model="ir.ui.view">
+            <field name="name">NMI Transactions</field>
+            <field name="model">nmi.transactions</field>
+            <field name="arch" type="xml">
+        		<form string = "NMI Transactions">
+        			<sheet>
+        				<group>
+        					<field name = "name" />
+        					<field name = "partner_id" />
+        				</group>
+        			</sheet>
+        		</form>
+            </field>
+        </record>	
+        
+        <record id = "action_nmi_transactions" model="ir.actions.act_window">
+            <field name="name">NMI Transactions</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">nmi.transactions</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+      </record>
+      
+      <menuitem id = "nmi_payment_transactions_menu" parent = "child_nmi_menu_main" action = "action_nmi_transactions" 
+      groups = "payment_nmi.group_nmi_transactions" />
+      	
+	</data>
+</openerp>
