@@ -21,36 +21,23 @@
 
 
 {
-    'name': 'FEDEX',
+    'name': 'NMI',
     'version': '1.1',
     'category': 'JJuice',
     'sequence': 19,
-    'summary': 'FEDEX Integration',
+    'summary': 'NMI Payment Gateway',
     'description': """
-FEDEX INTEGRATION
+NMI Payment Gateway
 =================
     """,
     'author': 'J & G Infosystems',
     'website': 'https://www.jginfosystems.com',
     'images': [],
     'depends': ['base',
-                'integrations',
-                'knowledge',
-                'stock',
-                'jjuice',
-                'web'
+                'payment',
+                'account'
                 ],
     'data': [
-             'security/fedex_security.xml',
-             'fedex_account_view.xml',
-             'wizard/track_shipment_view.xml',
-             'wizard/rate_request.xml',
-             'fedex_account_sequence.xml',
-             'create_shipment.xml',
-             'wizard/fedex_message.xml',
-             'stock_view.xml',
-             'views/jjuice_fedex.xml',
-             'report/print_label.xml'
     ],
     'test': [
     ],

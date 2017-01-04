@@ -18,44 +18,26 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-
-
 {
-    'name': 'FEDEX',
-    'version': '1.1',
-    'category': 'JJuice',
-    'sequence': 19,
-    'summary': 'FEDEX Integration',
-    'description': """
-FEDEX INTEGRATION
-=================
-    """,
-    'author': 'J & G Infosystems',
-    'website': 'https://www.jginfosystems.com',
-    'images': [],
-    'depends': ['base',
-                'integrations',
-                'knowledge',
-                'stock',
-                'jjuice',
-                'web'
-                ],
+    'name' : 'Intgerations',
+    'version' : '0.1',
+    'author' : 'J & G Infosystems',
+    'category' : 'Jjuice',
+    'description' : """
+        This module is just a wrapper for all the integrations in Odoo
+   """,
+    'website': 'www.jginfosystems.com',
+    'images' : [], #'/images/image_name.png'
+    'depends' : ['base'],#account_analytic_analysis
     'data': [
-             'security/fedex_security.xml',
-             'fedex_account_view.xml',
-             'wizard/track_shipment_view.xml',
-             'wizard/rate_request.xml',
-             'fedex_account_sequence.xml',
-             'create_shipment.xml',
-             'wizard/fedex_message.xml',
-             'stock_view.xml',
-             'views/jjuice_fedex.xml',
-             'report/print_label.xml'
+             'integrations.xml'
+             ],
+
+    'qweb' : [
     ],
-    'test': [
-    ],
-    'demo': [
-    ],
+             
+    'demo': [],
+    'test': [],
     'installable': True,
     'auto_install': False,
 }

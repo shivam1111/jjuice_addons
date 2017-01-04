@@ -1,6 +1,5 @@
 <openerp>
 	<data>
-		<menuitem id = "fedex_menu" name = "Fedex" />
 		<record id="fedex_account_form" model="ir.ui.view">
 		     <field name="name">Fedex Account</field>
 		     <field name="model">fedex.account</field>
@@ -49,7 +48,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
       </record>
-      <menuitem id = "child_fedex_account_menu" parent = "fedex_menu" name = "FEDEX" />
+      <menuitem id = "child_fedex_account_menu" parent = "integrations.integrations_menu" name = "FEDEX" />
       <menuitem id = "child_child_fedex_account_menu" parent = "child_fedex_account_menu" action = "action_fedex_accoount" groups = "jjuice_fedex.group_fedex_account_access" />  	
 	</data>
 </openerp>
