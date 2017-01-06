@@ -4,6 +4,7 @@ from helper import get_vault_detail,delete_vault
 import xml.etree.ElementTree as ET
 from openerp.exceptions import Warning
 import urlparse
+from openerp.exceptions import except_orm
 
 class customer_vault(models.Model):
     _name = 'customer.vault'
