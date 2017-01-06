@@ -89,7 +89,7 @@
             			</group>
             			<group>
             				<group>
-            					<group string = "Personal Info">
+            					<group string = "Billing Info">
             						<field name = "first_name"  />
             						<field name = "last_name" />
             						<field name = "company"  />
