@@ -42,6 +42,7 @@ NMI Payment Gateway
         'sequence.xml',
         'menu.xml',
         'security/nmi.xml',
+        'security/ir.model.access.csv',
         'res_config.xml',
         'nmi_transactions.xml',
         'res_partner.xml',
