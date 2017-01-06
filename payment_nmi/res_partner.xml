@@ -11,7 +11,7 @@
             	<xpath expr = "//notebook" position = "inside">
 					<page string = "Customer Vault" groups = "payment_nmi.group_nmi_transactions">
 						<field name = "customer_vault_ids">
-							<tree string = "Vault" editable="top">
+							<tree string = "Vault">
 								<field name = "customer_vault_id" />
 								<button string = "Details" type = "object" name = "get_vault_details" />
 							</tree>
