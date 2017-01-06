@@ -13,13 +13,9 @@ def doPost(query):
     curlObj.setopt(pycurl.HEADER,0)
     curlObj.setopt(pycurl.SSL_VERIFYPEER,0)
     curlObj.setopt(pycurl.WRITEFUNCTION,responseIO.write);
-
     curlObj.setopt(pycurl.URL,"https://secure.nmi.com/api/transact.php")
-
     curlObj.setopt(pycurl.POSTFIELDS,query)
-
     curlObj.perform()
-
     data = responseIO.getvalue()
     temp = urlparse.parse_qs(data)
     for key,value in temp.iteritems():
@@ -28,7 +24,6 @@ def doPost(query):
 def doSale():
     query  = ""
     # Login Information
-
     query = query + "username=" + urllib.quote('jjuicewholesale') + "&"
     query += "password=" + urllib.quote('vapejjuice.com16') + "&"
     
