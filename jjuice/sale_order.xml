@@ -1,6 +1,6 @@
 <openerp>
 	<data>
-		  <record id="view_picking_ids_sale_order" model="ir.ui.view">
+		  <record id="view_picking_ids_sale_orders" model="ir.ui.view">
 		        <field name="name">sale.order</field>
 		        <field name="model">sale.order</field>
 		        <field name="inherit_id" ref="sale.view_order_form"/>
@@ -33,7 +33,6 @@
 							</field>
 						</page>
 					</xpath>
-					
 		 		</field>
 		</record>
 	</data>

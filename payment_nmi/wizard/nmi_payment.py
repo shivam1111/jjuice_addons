@@ -66,6 +66,7 @@ class nmi_payment_wizard(models.TransientModel):
                 'target': 'new',
                 'domain': '[]',
                 'context': {
+                    'active_ids':[inv.id],
                     'payment_expected_currency': inv.currency_id.id,
                     'default_partner_id': self.pool.get('res.partner')._find_accounting_partner(inv.partner_id).id,
                     'default_amount': inv.type in ('out_refund', 'in_refund') and -payment_made or payment_made,

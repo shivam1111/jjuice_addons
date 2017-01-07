@@ -4,7 +4,6 @@ import sale_order
 import fields
 import payment_plan
 import product_wizard
-import commission
 import product
 import res_partner
 import account_invoice

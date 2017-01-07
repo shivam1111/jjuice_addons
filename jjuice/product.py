@@ -3,18 +3,6 @@ from openerp.tools.translate import _
 import openerp.addons.decimal_precision as dp
 from openerp import SUPERUSER_ID
 
-
-class product_attribute_value(osv.osv):
-    _inherit = "product.attribute.value"
-    
-    _defaults = {
-                 'commission':0,
-                 }
-
-    _columns = {
-                'commission':fields.float("Commision Value"),
-                }
-    
 class product_product(osv.osv):
     _inherit = "product.product"
     

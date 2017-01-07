@@ -12,6 +12,14 @@ class account_voucher(osv.osv):
                                              ('yes',"Verified")],string = "Verification status")
                 }
     
+    def button_proforma_voucher(self,cr,uid,ids,context=None):
+        if context is None:
+            context={}
+        invoice_obj=self.pool.get('account.invoice')
+        ids_invoice=context.get('active_ids',[])
+        super(account_voucher,self).button_proforma_voucher(cr,uid,ids,context)
+        return invoice_obj.action_invoice_sent(cr,uid,ids_invoice,context)    
+    
     def change_verification_status_no(self,cr,uid,ids,context):
         for i in ids:
             self.write(cr,uid,i,{'verified':"no"},context)

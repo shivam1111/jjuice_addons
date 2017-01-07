@@ -153,12 +153,6 @@ openerp.jjuice= function (instance,local) {
 	    				conc_records.forEach(function(conc){
 	    					context.conc_id_internal.push(conc);
 	    				});
-	    				var commisions_employee= new instance.Model('commission.employee');
-	    				commisions_employee.query(['id','name']).filter([]).all().then(function(emp){
-		    				emp.forEach(function(records){
-		    					context.employ.push(records);
-		    				});    
-	    				});
 	    			});
 	    		});
 			});

@@ -331,8 +331,6 @@ class sale_order(models.Model):
                'product_list':product_list             
              }
 
-        print "***************************data",data
-        
         if context.get('stock_picking',False):
             data.update({'model':'stock.picking'})
             return {
@@ -350,3 +348,16 @@ class sale_order(models.Model):
                     }
     
     payment_plan_ids=fields.Many2many("payment.plan","payment_plan_sale_relation","order_id","payment_id","Payment Plans",)
+    shipment = fields.Char('Shipment',char=240)
+    internal_sale = fields.Boolean('Internal Sale')
+    state = fields.Selection([
+            ('draft', 'Consignment'),
+            ('sent', 'Consignment Mailed'),
+            ('cancel', 'Cancelled'),
+            ('waiting_date', 'Waiting Schedule'),
+            ('progress', 'Sale Order'),
+            ('manual', 'Approved'),
+            ('shipping_except', 'Shipping Exception'),
+            ('invoice_except', 'Invoice Exception'),
+            ('done', 'Done')])
+    

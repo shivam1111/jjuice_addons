@@ -100,7 +100,6 @@
 				</xpath>
 				<xpath expr="//field[@name='partner_id']" position= "after">
 					<field name ="internal_sale"/>
-					<field name="sale_rep" widget="many2many_tags"/>
 				</xpath>
 				<xpath expr="//field[@name='user_id']" position= "attributes">
 					<attribute name="invisible">1</attribute>
@@ -150,27 +149,6 @@
 							</field>	
 						</group>
                   </page>
-				</xpath>
-			</field>
-		</record>
-		
-		   <!-- commission field in sale order -->
-		   <record id="view_inheritance_commission_view" model="ir.ui.view">
-            <field name="name">first.view.commission</field>
-            <field name="model">sale.order</field>
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <field name="arch" type="xml">
-				<xpath expr="//sheet/notebook/page/field/tree/field[@name='price_subtotal']" position= "after">
-					<field name ="commission" />
-				</xpath>
-				  <xpath expr="//sheet/notebook/page/field/tree/field[@name='product_uos_qty']" position="attributes">
-					<attribute name='on_change'>product_id_change(parent.pricelist_id, product_id, product_uom_qty, product_uom, product_uos_qty, product_uos, name, parent.partner_id, False, False, parent.date_order, False, parent.fiscal_position, True, context)</attribute>
-				</xpath>
-				<xpath expr="//sheet/notebook/page/field/tree/field[@name='price_unit']" position="attributes">
-					<attribute name='on_change'>price_unit_change(price_unit,product_id,product_uos_qty)</attribute>
-				</xpath>
-				<xpath expr="//field[@name='amount_total']" position= "after">
-					<field name ="t_commission" readonly='1'/>
 				</xpath>
 			</field>
 		</record>

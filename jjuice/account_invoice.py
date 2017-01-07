@@ -4,6 +4,10 @@ import openerp.addons.decimal_precision as dp
 class account_invoice(models.Model):
     _inherit = "account.invoice"
 
+    def action_invoice_sent(self,cr,uid,ids,context=None):
+        context={}
+        return super(account_invoice,self).action_invoice_sent(cr,uid,ids,context)
+
     def open_invoice(self,cr,uid,id,context):
         dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'account', 'invoice_form')
         return {
@@ -22,7 +26,6 @@ class account_invoice(models.Model):
         assert len(ids) == 1;
         if not ids: return []
         dummy, view_id = self.pool.get('ir.model.data').get_object_reference(cr, uid, 'account_voucher', 'view_vendor_receipt_dialog_form')
-
         inv = self.browse(cr, uid, ids[0], context=context)
         return {
             'name':_("Pay Invoice"),

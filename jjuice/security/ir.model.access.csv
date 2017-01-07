@@ -1,6 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_commission_module,commission.employee,model_commission_employee,base.group_sale_salesman,1,0,0,0
-access_commission_record,commission.record,model_commission_record,base.group_sale_salesman,1,0,0,0
 access_payment_plan,payment.plan,model_payment_plan,base.group_sale_manager,1,1,1,1
 access_payment_plan,payment.plan,model_payment_plan,base.group_sale_salesman,1,1,1,0
 access_marketing_package,marketing.package,model_marketing_package,,1,1,1,0
