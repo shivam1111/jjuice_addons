@@ -364,3 +364,4 @@ class sale_order(models.Model):
 class sale_order_line(models.Model):
     _inherit = "sale.order.line"
     commission = fields.Float('Commission')
+    t_commission = fields.Float('t_commission')
