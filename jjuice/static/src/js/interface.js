@@ -880,28 +880,29 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			$.when(main_defs,self.$prices).done(function(res){
 				self.tabs_object = {}
 				self.tabs_data = res.tabs; // Saving Tab data in Main widget
-				_.each(res.taxes,function(tax){
-					$row = $("<tr><td><span><strong>%NAME%</strong></span></td></tr>".replace("%NAME%",tax.name))
-					$col = $("<td></td>")
-					var tax_widget = new instance.web.form.FieldBoolean(self.dfm,{
-		                attrs: {
-		                    name: "tax_input",
-		                    type: "boolean",
-		                    context: {
-		                    },
-		                    modifiers: '{"required": false}',
-		                },
-					});
-					tax_widget.appendTo($col);
-					tax_widget.set({
-						'id':tax.id,
-						'amount':tax.amount,
-					});
-					tax_widget.on("change",self,self.tax_changed)
-					$row.append($col);
-					self.$el.find("tbody#taxes").append($row);
-					self.taxes.push(tax_widget)
-				});
+				// Do not required tax widget as of now
+//				_.each(res.taxes,function(tax){
+//					$row = $("<tr><td><span><strong>%NAME%</strong></span></td></tr>".replace("%NAME%",tax.name))
+//					$col = $("<td></td>")
+//					var tax_widget = new instance.web.form.FieldBoolean(self.dfm,{
+//		                attrs: {
+//		                    name: "tax_input",
+//		                    type: "boolean",
+//		                    context: {
+//		                    },
+//		                    modifiers: '{"required": false}',
+//		                },
+//					});
+//					tax_widget.appendTo($col);
+//					tax_widget.set({
+//						'id':tax.id,
+//						'amount':tax.amount,
+//					});
+//					tax_widget.on("change",self,self.tax_changed)
+//					$row.append($col);
+//					self.$el.find("tbody#taxes").append($row);
+//					self.taxes.push(tax_widget)
+//				});
 				$.each(self.tabs_data ,function(index,tab){
 					// Check first if the tab is to be displayed for this customer
 					if (!tab.visible_all_customers){
@@ -966,6 +967,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
                 attrs: {
                     name: "order_notes_input",
                     type: "text",
+                    placeholder:"Order Notes",
                     context: {
                     },
                     modifiers: '{"required": false}',
