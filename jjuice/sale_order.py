@@ -361,3 +361,6 @@ class sale_order(models.Model):
             ('invoice_except', 'Invoice Exception'),
             ('done', 'Done')])
     
+class sale_order_line(models.Model):
+    _inherit = "sale.order.line"
+    commission = fields.Float('Commission')
