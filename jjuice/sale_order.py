@@ -350,7 +350,6 @@ class sale_order(models.Model):
     payment_plan_ids=fields.Many2many("payment.plan","payment_plan_sale_relation","order_id","payment_id","Payment Plans",)
     shipment = fields.Char('Shipment',char=240)
     internal_sale = fields.Boolean('Internal Sale')
-    t_commission = fields.Float('t_commission')
     state = fields.Selection([
             ('draft', 'Consignment'),
             ('sent', 'Consignment Mailed'),
@@ -361,7 +360,3 @@ class sale_order(models.Model):
             ('shipping_except', 'Shipping Exception'),
             ('invoice_except', 'Invoice Exception'),
             ('done', 'Done')])
-    
-class sale_order_line(models.Model):
-    _inherit = "sale.order.line"
-    commission = fields.Float('Commission')
