@@ -49,7 +49,8 @@ NMI Payment Gateway
         'customer_vault.xml',
         'wizard/customer_vault_wizard.xml',
         'wizard/nmi_payment.xml',
-        'account_invoice.xml'
+        'account_invoice.xml',
+        'account_journal.xml'
     ],
     'test': [
     ],

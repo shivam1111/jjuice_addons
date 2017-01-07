@@ -258,6 +258,16 @@
 													
 												</td>
 											</tr>
+											<tr>
+												<td colspan="2">
+													<button type="button" style="width:100% !important;" class="oe_stat_button btn btn-default oe_inline">
+												        <div class="stat_button_icon fa fa-strikethrough fa-fw"></div>
+													    <div>
+					    									<strong>Pay By NMI</strong>
+					    								</div>
+				    								</button>																									
+												</td>
+											</tr>
 										</tbody>
 									</table>
 								</td>

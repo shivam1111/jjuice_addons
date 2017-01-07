@@ -4,3 +4,4 @@ import res_config
 import res_partner
 import wizard
 import account_invoice
+import account_journal

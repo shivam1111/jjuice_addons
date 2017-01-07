@@ -55,17 +55,7 @@ class nmi_payment_wizard(models.TransientModel):
         if self.invoice_id and self.register_payment and (self.invoice_id.partner_id == self.partner_id):
             view_id = self.env.ref('account_voucher.view_vendor_receipt_dialog_form')
             inv = self.invoice_id
-            return {
-                'name':_("Pay Invoice"),
-                'view_mode': 'form',
-                'view_id': view_id.id,
-                'view_type': 'form',
-                'res_model': 'account.voucher',
-                'type': 'ir.actions.act_window',
-                'nodestroy': True,
-                'target': 'new',
-                'domain': '[]',
-                'context': {
+            set_context = {
                     'active_ids':[inv.id],
                     'payment_expected_currency': inv.currency_id.id,
                     'default_partner_id': self.pool.get('res.partner')._find_accounting_partner(inv.partner_id).id,
@@ -77,7 +67,23 @@ class nmi_payment_wizard(models.TransientModel):
                     'default_type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment',
                     'type': inv.type in ('out_invoice','out_refund') and 'receipt' or 'payment',
                     'default_name':",".join(transaction_ids),
-                }
+            }
+            journal = self.env['account.journal'].search([('is_nmi_journal','=',True)],limit=1)
+            print "----------------journal",journal,journal[0].id
+            if len(journal) > 0:
+                set_context.update({'default_journal_id':journal[0].id})
+            
+            return {
+                'name':_("Pay Invoice"),
+                'view_mode': 'form',
+                'view_id': view_id.id,
+                'view_type': 'form',
+                'res_model': 'account.voucher',
+                'type': 'ir.actions.act_window',
+                'nodestroy': True,
+                'target': 'new',
+                'domain': '[]',
+                'context':set_context,
             }            
                     
     
