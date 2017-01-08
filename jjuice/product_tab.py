@@ -44,6 +44,10 @@ class product_tab(models.Model):
         res.update({
                     'taxes':tax_info
                     })
+        nmi_journal = self.pool.get('account.journal').search(cr,uid,[('is_nmi_journal','=',True)],limit=1)
+        res.update({
+                'nmi_journal_id':nmi_journal and nmi_journal[0] or False,
+            })
         return res
     
     @api.model

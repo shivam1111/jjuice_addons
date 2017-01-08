@@ -11,9 +11,10 @@
 					</header>
 					<sheet>
 						<group>
-							<field name = "invoice_id"  invisible="context.get('default_invoice_id',False)"
+							<field name = "invoice_id"  invisible="context.get('default_invoice_id',False) or context.get('hide_invoice',False)"
+							readonly = "context.get('read_invoice_id',False)"
 							domain = "[('type','=','out_invoice'),('state','=','open')]"/>
-							<field name = "partner_id" />
+							<field name = "partner_id" readonly = "context.get('read_partner_id',False)"/>
 							<field name = "register_payment" attrs = "{'invisible':[('invoice_id','=',False)]}" />
 							<field name = "invoice_balance" attrs = "{'invisible':[('invoice_id','=',False)]}" />
 							<field name = "diff_balance" attrs = "{'invisible':[('invoice_id','=',False)]}" />							

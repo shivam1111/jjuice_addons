@@ -186,13 +186,25 @@
 		</div>
 	</t>
 	
+	<t t-name = "confirm_dialog">
+		<div class="modal hide fade">
+		  <div class="modal-body">
+		    Are you sure you want to generate invoice and proceed with the payment ?
+		  </div>
+		  <div class="modal-footer">
+		    <button type="button" data-dismiss="modal" class="btn btn-primary" id="confirm">Ok</button>
+		    <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+		  </div>
+		</div>			
+	</t>
+	
 	<!-- Main -->
 	<t t-name = "interface">
 		<div>
 			<ul class="nav nav-tabs" role="tablist">
 			
 			</ul>
-			<div class = "oe_button_box oe_right">
+			<div class = "oe_button_box oe_right" style="padding-top:8px;padding-bottom:8px;">
 				<button type="button" id="confirm" class = "oe_highlight"  >Confirm Order</button>
 				<button type="button" id = "check_availability" class = "oe_highlight">Check Availability</button>
 				<button type="button" id = "rate_request" class = "oe_highlight">Rate Request</button>
@@ -260,11 +272,9 @@
 											</tr>
 											<tr>
 												<td colspan="2">
-													<button type="button" style="width:100% !important;" class="oe_stat_button btn btn-default oe_inline">
+													<button type="button" id = "nmi_payment_button" style="width:100% !important;display:none;" class="text-center oe_highlight oe_inline">
 												        <div class="stat_button_icon fa fa-strikethrough fa-fw"></div>
-													    <div>
-					    									<strong>Pay By NMI</strong>
-					    								</div>
+														<strong>Pay By NMI</strong>
 				    								</button>																									
 												</td>
 											</tr>

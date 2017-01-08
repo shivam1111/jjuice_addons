@@ -69,7 +69,7 @@ class nmi_payment_wizard(models.TransientModel):
                     'default_name':",".join(transaction_ids),
             }
             journal = self.env['account.journal'].search([('is_nmi_journal','=',True)],limit=1)
-            print "----------------journal",journal,journal[0].id
+
             if len(journal) > 0:
                 set_context.update({'default_journal_id':journal[0].id})
             
@@ -134,6 +134,7 @@ class nmi_payment_wizard(models.TransientModel):
         self.partner_id = self.invoice_id.partner_id
         self.register_payment = True
     
+    @api.multi
     @api.onchange('partner_id')
     def onchange_partner_id(self):
         self.line_ids = map(lambda x:(0,0,{'vault_id':x.id,'active':True}),self.partner_id.customer_vault_ids)

@@ -28,7 +28,8 @@
    """,
     'website': '',
     'images' : [], #'/images/image_name.png'
-    'depends' : ['base','hr','crm','sale','account','stock','sale_stock','sale_crm','account_acquisition'],#account_analytic_analysis
+    'depends' : ['base','hr','crm','sale','account','stock','payment_nmi',
+                 'sale_stock','sale_crm','account_acquisition'],#account_analytic_analysis
     'data': [
              'jjuice_data.xml',
              'sale_order.xml',
