@@ -755,7 +755,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			var taxes = []
 			if (!(parseFloat(self.balance.get_value()) == 0)){
 				self.do_warn("Note","You cannot cofirm the under until the balance is 0.");
-				return
+				return $.Deferred()
 			}
 			_.each(self.taxes,function(tax){
 				if (tax.get_value() == true){
@@ -769,7 +769,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			var payment_plan = self.payment_plan.order_report();
 			if (lines.length == 0){
 				self.do_warn("Invalid Order","No product Added");
-				return
+				return $.Deferred()
 			}
 			payment_method = self.payment_method.get_value();
 			result = {
