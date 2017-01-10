@@ -24,6 +24,7 @@ class nmi_payment_wizard(models.TransientModel):
         payment_made = 0.00
         payment_ref = ""
         transaction_ids = []
+        remarks = [] 
         for j in self.line_ids:
             if j.active and j.amount > 0:
                 data = make_payment(username,pwd,j.vault_id.customer_vault_id,j.amount,self.invoice_id.name or False)
@@ -37,6 +38,7 @@ class nmi_payment_wizard(models.TransientModel):
                     'transaction_id':temp.get('transactionid') and temp.get('transactionid')[0] or '',
                     'amount':j.amount
                 })
+                remarks.append(temp.get('responsetext') and temp.get('responsetext')[0] or '-')
                 if temp.get('response_code')[0] == '100' and temp.get('transactionid'):
                     # This means transaction was successsfull
                     payment_made = payment_made + j.amount
@@ -74,7 +76,7 @@ class nmi_payment_wizard(models.TransientModel):
                 set_context.update({'default_journal_id':journal[0].id})
             
             return {
-                'name':_("Pay Invoice"),
+                'name':remarks and _(" | ".join(["Pay Invoice | Transaction Status -: "]+remarks)) or _("Pay Invoice"),
                 'view_mode': 'form',
                 'view_id': view_id.id,
                 'view_type': 'form',
