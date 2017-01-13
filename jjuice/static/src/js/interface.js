@@ -945,7 +945,6 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			self.renderTabs();
 			$body = self.$el.find("tbody#main_body")
 			self.confirm_dialogue = self.$el.find("div#confirm")
-			self.nmi_payment_button = self.$el.find('button#nmi_payment_button');
 			self.total_units = new instance.web.form.FieldFloat(self.dfm,{
                 attrs: {
                     name: "total_unit_input",
@@ -1174,6 +1173,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		},
 		start:function(){
 			var self = this;
+			self.nmi_payment_button = self.$el.find('button#nmi_payment_button');
 			self.on("subtotal_change",self,self.subtotal_changed)
 			self.on("subtotal_money_changed",self,self.subtotal_money_changed)
 			self.on("recalc_total",self,self.recalculate);
@@ -1258,7 +1258,8 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 				/*
 				 * The view is not refreshed when we change the partner record. For that if we detect a change in field manager,
 				 * we empty the $el of the parent and render according the new customer record
-				 */  
+				 */
+				console.log("changed")
 				self.$el.empty();
 				self.$prices = $.Deferred()
 				self.renderElement();
