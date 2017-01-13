@@ -935,9 +935,84 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 				})
 			}) // end when			
 		},
-
+		on_click_nmi_payment_button:function(){
+			var self = this;
+			// Open the the nmi payment wizard
+			var lines = self.get_order_lines();
+			var partner_id = self.field_manager.datarecord.id;
+			var paid = parseFloat(self.paid.get_value()) || 0;
+			if (paid == 0 ){
+				self.do_warn("Sorry!","There is no amount to be paid!")
+				return					
+			}
+			if (!(self.balance.get_value()==0)){
+				self.do_warn("Note","You cannot move ahead until the balance = 0. Plz create payment plans if needed!")
+				return
+			}
+			if (lines.length == 0){
+				self.do_warn("Invalid Order","No product Added");
+				return
+			}
+			bootbox.confirm({
+			    message: "Are you sure you want to generate invoice and proceed with the payment ?",
+			    buttons: {
+			        confirm: {
+			            label: 'Yes',
+			            className: 'btn-success'
+			        },
+			        cancel: {
+			            label: 'No',
+			            className: 'btn-danger'
+			        }
+			    },
+			    callback: function (result) {
+			    	if (result){
+			    		self.$el.find("button#confirm").remove();
+						self._execute_confirm_order(partner_id,lines).done(function(action_data){
+							var invoice_id = action_data.res.res_id;
+							var wizard_model = new openerp.web.Model('nmi.payment.wizard') 
+							wizard_model.call('create'
+							,[{'partner_id':partner_id,'invoice_id':invoice_id,'register_payment':true}]).done(function(res_id){
+								wizard_model.call('onchange_partner_id',[[res_id],{}]).done(function(){
+									var data = {
+							                type: 'ir.actions.act_window',
+					    		            views: [[false, 'form']],
+					    		            res_id:res_id,
+							                res_model: "nmi.payment.wizard",
+							                context:{
+							                	"read_partner_id":true,
+							                	"read_invoice_id":true,
+							                },
+							                target: 'new',
+										}
+									function on_close(){
+										var data = action_data.res;
+										self.do_action({
+					    		             'type': 'ir.actions.act_window',
+					    		             'view_type': 'form',
+					    		             'res_id':data.res_id,
+					    		             'view_mode': 'form',
+					    		             'res_model': 'account.invoice',
+					    		             'views': [[data.invoice_view_id, 'form']],
+					    		             'view_id': data.invoice_view_id,
+					    		             'target': 'current',		    								
+										  },{clear_breadcrumbs: true})
+									}
+									
+									self.do_action(data,{
+										'on_close':on_close,
+									})												
+								})
+							})				    		
+						})
+						
+			    	} // end bootbox if
+			    }
+			});				
+		},
 		renderElement:function(){
 			var self = this;
+			console.log("renderElement")
 			if (! self.field_manager.datarecord.id){
 				return // This means we are creating a record. So do not render anything then
 			}
@@ -945,6 +1020,11 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			self.renderTabs();
 			$body = self.$el.find("tbody#main_body")
 			self.confirm_dialogue = self.$el.find("div#confirm")
+			self.nmi_payment_button = $body.find('button#nmi_payment_button');
+			self.nmi_payment_button.on('click',function(){
+				self.on_click_nmi_payment_button();
+			})
+			
 			self.total_units = new instance.web.form.FieldFloat(self.dfm,{
                 attrs: {
                     name: "total_unit_input",
@@ -1173,87 +1253,13 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		},
 		start:function(){
 			var self = this;
-			self.nmi_payment_button = self.$el.find('button#nmi_payment_button');
+			console.log("start")
 			self.on("subtotal_change",self,self.subtotal_changed)
 			self.on("subtotal_money_changed",self,self.subtotal_money_changed)
 			self.on("recalc_total",self,self.recalculate);
 			self.on("recalc_tax",self,self.tax_changed);
 			self.on("recalc_discount",self,self.changed_discount);
 			self.on("recalc_balance",self,self.recalculate_balance);
-			self.nmi_payment_button.on('click',function(){
-				// Open the the nmi payment wizard
-				var lines = self.get_order_lines();
-				var partner_id = self.field_manager.datarecord.id;
-				var paid = parseFloat(self.paid.get_value()) || 0;
-				if (paid == 0 ){
-					self.do_warn("Sorry!","There is no amount to be paid!")
-					return					
-				}
-				if (!(self.balance.get_value()==0)){
-					self.do_warn("Note","You cannot move ahead until the balance = 0. Plz create payment plans if needed!")
-					return
-				}
-				if (lines.length == 0){
-					self.do_warn("Invalid Order","No product Added");
-					return
-				}
-				bootbox.confirm({
-				    message: "Are you sure you want to generate invoice and proceed with the payment ?",
-				    buttons: {
-				        confirm: {
-				            label: 'Yes',
-				            className: 'btn-success'
-				        },
-				        cancel: {
-				            label: 'No',
-				            className: 'btn-danger'
-				        }
-				    },
-				    callback: function (result) {
-				    	if (result){
-				    		self.$el.find("button#confirm").remove();
-							self._execute_confirm_order(partner_id,lines).done(function(action_data){
-								var invoice_id = action_data.res.res_id;
-								var wizard_model = new openerp.web.Model('nmi.payment.wizard') 
-								wizard_model.call('create'
-								,[{'partner_id':partner_id,'invoice_id':invoice_id,'register_payment':true}]).done(function(res_id){
-									wizard_model.call('onchange_partner_id',[[res_id],{}]).done(function(){
-										var data = {
-								                type: 'ir.actions.act_window',
-						    		            views: [[false, 'form']],
-						    		            res_id:res_id,
-								                res_model: "nmi.payment.wizard",
-								                context:{
-								                	"read_partner_id":true,
-								                	"read_invoice_id":true,
-								                },
-								                target: 'new',
-											}
-										function on_close(){
-											var data = action_data.res;
-											self.do_action({
-						    		             'type': 'ir.actions.act_window',
-						    		             'view_type': 'form',
-						    		             'res_id':data.res_id,
-						    		             'view_mode': 'form',
-						    		             'res_model': 'account.invoice',
-						    		             'views': [[data.invoice_view_id, 'form']],
-						    		             'view_id': data.invoice_view_id,
-						    		             'target': 'current',		    								
-											  },{clear_breadcrumbs: true})
-										}
-										
-										self.do_action(data,{
-											'on_close':on_close,
-										})												
-									})
-								})				    		
-							})
-							
-				    	} // end bootbox if
-				    }
-				});				
-			});
 			self.field_manager.on("change",self,function(event){
 				/*
 				 * The view is not refreshed when we change the partner record. For that if we detect a change in field manager,
