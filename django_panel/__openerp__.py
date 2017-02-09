@@ -28,7 +28,7 @@
    """,
     'website': '',
     'images' : [], #'/images/image_name.png'
-    'depends' : ['base','web'],#account_analytic_analysis
+    'depends' : ['base','web','product'],#account_analytic_analysis
     'data': [
              'views/menu.xml',
              'views/website_banner.xml',

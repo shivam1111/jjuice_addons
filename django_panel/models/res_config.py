@@ -115,7 +115,20 @@ class django_panel_settings(osv.osv_memory):
         site_name = params.get_param(cr, uid, 'site_name',default='',context=context)        
         return dict(site_name=site_name)                                                                                                                
                                                                                                               
-                                                                                          
+    def set_default_attribute_value_ids(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params = self.pool.get('ir.config_parameter')
+        attribute_value_ids = map(lambda x:x.id,myself.attribute_value_ids)
+        params.set_param(cr, uid, 'attribute_value_ids', (attribute_value_ids), groups=['base.group_system'], context=None)                                                                                      
+    
+    def get_default_attribute_value_ids(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        try:
+            attribute_value_ids = params.get_param(cr, uid, 'attribute_value_ids',default=[],context=context)
+            return dict(attribute_value_ids=[(6,0,eval(attribute_value_ids))])
+        except Exception as e:
+            raise osv.except_osv('Error','Please check the value of Attribute Values. It is invalid!')        
+                                                                                                                            
     
     _columns = {
             'site_name':fields.char("Site Name"),
@@ -126,5 +139,8 @@ class django_panel_settings(osv.osv_memory):
             'website_policy_key' : fields.char("Website Policy Bucket"),
             'aws_base_url':fields.char("S3 Base URL",help="This is required so that when determining the url we do not have to send extra request to determine the location of the bucket"),
             'meta_keywords':fields.text("Meta Keywords"),
-            'meta_description':fields.text('Meta Description')
+            'meta_description':fields.text('Meta Description'),
+            'attribute_value_ids':fields.many2many('product.attribute.value','django_panel_settings_attribute_value',column1='django_panel_settings_id',column2='attribute_value_id',
+                                                   string = "Product Attributes not available for retailer"
+                                                   )
         }
