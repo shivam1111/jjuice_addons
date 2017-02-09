@@ -1,6 +1,9 @@
 eclipse.preferences.version=1
 encoding//account_acquisition/__openerp__.py=utf-8
 encoding//commissions/__openerp__.py=utf-8
+encoding//django_panel/__openerp__.py=utf-8
+encoding//django_panel/models/res_config.py=utf-8
+encoding//document_amazons3/document_s3.py=utf-8
 encoding//integrations/__openerp__.py=utf-8
 encoding//integrations/res_config.py=utf-8
 encoding//jjuice/__openerp__.py=utf-8

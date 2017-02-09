@@ -1,0 +1,49 @@
+<openerp>
+	<data>
+		<record id = "res_config_django_panel_settings" model = "ir.ui.view">
+			<field name="name">Django Panel Settings</field>
+			<field name = "model">django.panel.settings</field>
+			<field name="arch" type="xml">
+                <form string="Django Panel Settings" class="oe_form_configuration">
+                    <header>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                    </header>
+                    <group string = "AWS Settings">
+                    	<group>
+	                    	<field name = "aws_access_id" />
+	                    	<field name = "aws_secret_key" />
+	                     	<field name = "aws_base_url" />   
+                    	</group>
+                    	<group>
+	                    	<field name = "root_bucket"  /> 
+	                    	<field name = "website_banner_key" />
+	                    	<field name = "website_policy_key" />                    	
+                    	</group>
+                    </group>
+                    <group string="Website Info">
+                    	<field name = "site_name" />
+                    </group>
+                   	<group string = "SEO" col="4">
+                    	<field name = "meta_keywords" col="2"/>
+                    	<field name = "meta_description" col="2"/>
+                    </group>
+                </form>                		
+			</field>
+		</record>		
+
+        <record id="action_django_panel_settings" model="ir.actions.act_window">
+            <field name="name">Django Panel Settings</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">django.panel.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+        </record>		
+		
+		<menuitem id = "menu_django_panel_settings" 
+		parent = "django_panel.django_main_menu_settings_view" 
+		action = "action_django_panel_settings" />
+		
+	</data>
+</openerp>
