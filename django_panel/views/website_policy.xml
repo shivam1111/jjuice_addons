@@ -4,7 +4,7 @@
 			<field name="name">website.policy.form.view</field>
 			<field name="model">website.policy</field>
 			<field name="arch" type="xml">
-				<form string="Website Policy">
+				<form string="Website Promotions">
 					<sheet>
 						<group>
 							<group>
@@ -13,7 +13,6 @@
 							</group>
 							<group>
 								<field name = "file_name" />							
-								<!-- <field name = "url" widget="url" /> -->
 							</group>
 						</group>
 						<notebook>
@@ -43,7 +42,7 @@
 		</record> 	
 		
 		<record model="ir.actions.act_window" id="action_website_policy">
-			<field name="name">Website Policy</field>
+			<field name="name">Website Promotions</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="res_model">website.policy</field>
 			<field name="view_type">form</field>

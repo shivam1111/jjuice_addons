@@ -1,35 +1,28 @@
 from openerp import models, fields, api, _
+from helpers import BinaryS3Field,delete_object_bucket,get_bucket_location
+from openerp.exceptions import except_orm
 
 class website_policy(models.Model):
     _name = "website.policy"
     _description="Website Policy"
-    _inherits = {
-            's3.object':'s3_object_id'
-    }
+    _order = "sequence"
 
     @api.multi
     def unlink(self):
         for rec in self:
-            rec.s3_object_id.unlink()
+            try:
+                root_bucket = self.env['ir.config_parameter'].get_param('root_bucket','jjuice-django')
+                assert root_bucket, "Sorry the root bucket is not available" 
+                access_key_id = self.env['ir.config_parameter'].get_param('aws_access_id')
+                secret_access_key = self.env['ir.config_parameter'].get_param('aws_secret_key')
+                assert access_key_id and secret_access_key, "Invalid Credentials"
+                delete_object_bucket(self._table,self.id,access_key_id,secret_access_key,root_bucket)
+            except AssertionError as e:
+                raise except_orm('Error',e)
         return super(website_policy,self).unlink()
-
-    @api.multi
-    def write(self,vals):
-        if vals.get('datas',False):
-            for rec in self:
-                rec.s3_object_id.datas = vals['datas']
-            vals.pop('datas')
-        return super(website_policy,self).write(vals)
     
-    @api.model
-    def create(self,vals):
-        if vals.get('datas',False):
-            website_policy_key = self.env['ir.config_parameter'].get_param('website_policy_key','website_django')
-            s3_object = self.env['s3.object'].with_context(folder_key=website_policy_key).create(vals)
-            vals['s3_object_id'] = s3_object.id
-        return super(website_policy,self).create(vals)
-    
-    s3_object_id = fields.Many2one('s3.object','S3 Object',ondelete="cascade",required=True)
     sequence = fields.Integer('Sequence') 
     name = fields.Char('Name',required=True)
+    file_name = fields.Char('File Name')
     description = fields.Text('Description')
+    datas = BinaryS3Field(string="Image",key_name=False)

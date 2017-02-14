@@ -1,19 +1,60 @@
+from openerp.fields import Binary
 import boto3,botocore
-import urlparse,os
-import base64
-import logging
-import hashlib
+import urlparse,os,base64,hashlib,logging
+from openerp.exceptions import except_orm
+
 _logger = logging.getLogger(__name__)
+
+class BinaryS3Field(Binary):
+    def _data_get(self,record):
+        read=None
+        key_name = self.key_name or record._table
+        try:
+            root_bucket = record.env['ir.config_parameter'].get_param('root_bucket','jjuice-django')
+            assert root_bucket, "Sorry the root bucket is not available" 
+            access_key_id = record.env['ir.config_parameter'].get_param('aws_access_id')
+            secret_access_key = record.env['ir.config_parameter'].get_param('aws_secret_key')
+            assert access_key_id and secret_access_key, "Invalid Credentials"
+            s3_conn = get_s3_client(access_key_id,secret_access_key)
+            exists = lookup(s3_conn,root_bucket,os.path.join(key_name,str(record.id)))
+            if exists:        
+                bin_value  = s3_conn.get_object(Bucket=root_bucket, Key = os.path.join(key_name,str(record.id)))
+                read = base64.b64encode(bin_value.get('Body').read())
+                record._cache[self] = read
+        except AssertionError as e:
+            raise except_orm('Error',e)
+    
+    def _data_set(self,record):
+        key_name = self.key_name or record._table
+        try:
+            root_bucket = record.env['ir.config_parameter'].get_param('root_bucket','jjuice-django')
+            assert root_bucket, "Sorry the root bucket is not available" 
+            access_key_id = record.env['ir.config_parameter'].get_param('aws_access_id')
+            secret_access_key = record.env['ir.config_parameter'].get_param('aws_secret_key')
+            assert access_key_id and secret_access_key, "Invalid Credentials"
+            # Establish Connection
+            s3_conn = get_s3_client(access_key_id,secret_access_key)
+            bin_value = record._cache[self].decode('base64')
+            # Checking whether configured folder exist
+            # For checking if folder is present it has to end with forward slash        
+            exists = lookup(s3_conn,root_bucket,os.path.join(key_name,'')) # adding slash safely
+            if not exists:
+                s3_conn.put_object(Bucket=root_bucket, Key = os.path.join(key_name,''),Body='')
+            s3_conn.put_object(Bucket=root_bucket, Key = os.path.join(key_name,str(record.id)),Body=bin_value)
+        except AssertionError as e:
+            raise except_orm('Error',e)
+    compute = _data_get
+    inverse = _data_set
+    store=False
+
 
 def get_url(bucket_location,bucket,key,fname):
     return os.path.join(bucket_location,bucket,key,fname)
 
-def get_bucket_location(self,bucket):
+def get_bucket_location(access_key_id,secret_access_key,bucket):
     # This method just takes in bucket name and then joins accesss key and id with bucket to create a standard url
     # accepted by other method
     # accpeted location is -: amazons3://access_key_id:secret_access_key@jjuice-django
-    access_key_id = self.env['ir.config_parameter'].get_param('aws_access_id')
-    secret_access_key = self.env['ir.config_parameter'].get_param('aws_secret_key')
     return ('').join(['amazons3://',access_key_id,":",secret_access_key,"@",bucket])
 
 def get_s3_client(access_key_id,secret_access_key):
@@ -89,22 +130,11 @@ def get_object_bucket(location,key,fname):
             read = base64.b64encode(bin_value.get('Body').read())
     return read
 
-def delete_object_bucket(location,key,fname):
+def delete_object_bucket(key,fname,access_key_id,secret_access_key,root_bucket):
     delete = None
     if fname:
-        loc_parse = urlparse.urlparse(location)
-        assert loc_parse.scheme == 'amazons3', \
-            "This method is intended only for amazons3://"
-    
-        access_key_id = loc_parse.username
-        secret_key = loc_parse.password
-    
-        if not access_key_id or not secret_key:
-            assert False, \
-                "Must define access_key_id and secret_access_key in amazons3:// scheme"
-            
-        s3_conn = get_s3_client(access_key_id,secret_key)             
-        exists = lookup(s3_conn,loc_parse.hostname,'/'.join([key,fname])) 
+        s3_conn = get_s3_client(access_key_id,secret_access_key)             
+        exists = lookup(s3_conn,root_bucket,os.path.join(key,str(fname))) 
         if exists:
-            delete = s3_conn.delete_object(Bucket=loc_parse.hostname, Key = '/'.join([key,fname]))
+            delete = s3_conn.delete_object(Bucket=root_bucket, Key = os.path.join(key,str(fname)))
         return delete

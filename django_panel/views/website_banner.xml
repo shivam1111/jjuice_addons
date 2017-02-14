@@ -16,7 +16,7 @@
 							</group>
 						</group>
 						<notebook>
-							<page string = "Attachment Banner">
+							<page string = "Attach Banner">
 								<group>
 									<field name = "datas" filename="file_name" widget="image" nolabel="1" readonly="0"/>
 								</group>

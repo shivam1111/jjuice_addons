@@ -124,23 +124,67 @@ class django_panel_settings(osv.osv_memory):
     def get_default_attribute_value_ids(self,cr,uid,ids,context=None):
         params = self.pool.get('ir.config_parameter')
         try:
-            attribute_value_ids = params.get_param(cr, uid, 'attribute_value_ids',default=[],context=context)
+            attribute_value_ids = params.get_param(cr, uid, 'attribute_value_ids',default='[]',context=context)
             return dict(attribute_value_ids=[(6,0,eval(attribute_value_ids))])
         except Exception as e:
-            raise osv.except_osv('Error','Please check the value of Attribute Values. It is invalid!')        
-                                                                                                                            
+            raise osv.except_osv('Error','Please check the value of Volumes not available for Retailers. It is invalid!')        
+    
+    def set_default_mailing_list_id(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params = self.pool.get('ir.config_parameter')
+        params.set_param(cr, uid, 'mailing_list_id', (myself.mailing_list_id.id), groups=['base.group_system'], context=None)                                                                                      
+    
+    def get_default_mailing_list_id(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        mailing_list_id = params.get_param(cr, uid, 'mailing_list_id',default=[],context=context)
+        return dict(mailing_list_id=eval(mailing_list_id))
+     
+    def _get_domain_volume(self,context=None):
+        # We have access to self.env in this context.
+        ids = self.env.ref('jjuice.attribute_vol').id
+        return [('attribute_id','=', ids)]
+
+    def set_default_attributes_available_ids(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params = self.pool.get('ir.config_parameter')
+        attributes_available_ids = map(lambda x:x.id,myself.attributes_available_ids)
+        params.set_param(cr, uid, 'attributes_available_ids', (attributes_available_ids), groups=['base.group_system'], context=None)                                                                                      
+    
+    def get_default_attributes_available_ids(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        try:
+            attributes_available_ids = params.get_param(cr, uid, 'attributes_available_ids',default='[]',context=context)
+            return dict(attributes_available_ids=[(6,0,eval(attributes_available_ids))])
+        except Exception as e:
+            raise osv.except_osv('Error','Please check the value of Volumes available for website display . It is invalid!')        
+
+    def set_default_volume_key(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params.set_param(cr, uid, 'volume_key', (myself.volume_key or '').strip(), groups=['base.group_system'], context=None)
+
+    def get_default_volume_key(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        volume_key = params.get_param(cr, uid, 'volume_key',default='',context=context)        
+        return dict(volume_key=volume_key)                                                                                                       
+    
     
     _columns = {
             'site_name':fields.char("Site Name"),
             'aws_access_id' : fields.char("AWS Access ID"),
             'aws_secret_key' : fields.char('AWS Secret Key'),
             'root_bucket':fields.char("Root Bucket"),
-            'website_banner_key' : fields.char("Website Banner Bucket"),
-            'website_policy_key' : fields.char("Website Policy Bucket"),
+            'website_banner_key' : fields.char("Website Banner Bucket Key"),
+            'website_policy_key' : fields.char("Website Policy Bucket Key"),
+            'volume_key':fields.char("Volumes Bucket Key"),
             'aws_base_url':fields.char("S3 Base URL",help="This is required so that when determining the url we do not have to send extra request to determine the location of the bucket"),
             'meta_keywords':fields.text("Meta Keywords"),
             'meta_description':fields.text('Meta Description'),
             'attribute_value_ids':fields.many2many('product.attribute.value','django_panel_settings_attribute_value',column1='django_panel_settings_id',column2='attribute_value_id',
-                                                   string = "Product Attributes not available for retailer"
-                                                   )
+                                                   string = "Volumes not available for Retailers",domain=_get_domain_volume,
+                                                   ),
+            'mailing_list_id':fields.many2one('mail.mass_mailing.list','News Letter Mailing List'),
+            'attributes_available_ids':fields.many2many('product.attribute.value','django_panel_settings_attribute_value_available',column1='django_panel_settings_id',column2='attribute_value_id',
+                                                   string = "Volumes available for website display",domain=_get_domain_volume,
+                                                   ),
         }

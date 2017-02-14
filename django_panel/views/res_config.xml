@@ -19,12 +19,33 @@
                     	<group>
 	                    	<field name = "root_bucket"  /> 
 	                    	<field name = "website_banner_key" />
-	                    	<field name = "website_policy_key" />                    	
+	                    	<field name = "website_policy_key" /> 
+       	                   	<field name = "volume_key" />
                     	</group>
                     </group>
-                    <group string="Website Info">
-                    	<field name = "site_name" />
-                    	<field name = "attribute_value_ids" widget = "many2many_tags" options="{'no_create': True,'no_quick_create':True,'no_create_edit': True}"/>
+                    <group string="Website Info" col="3">
+                    	<group col="1">
+                    		<div>
+	                    		<label for="site_name" />
+	                    		<field name = "site_name" nolabel="1" />	                    		
+                    		</div>
+                    		<div>
+	                    		<label for="attribute_value_ids" />
+	                    		<field name = "attribute_value_ids" nolabel="1" widget = "many2many_tags" options="{'no_create': True,'no_quick_create':True,'no_create_edit': True}"/>                    		
+                    		</div>
+                    	</group>
+                    	<group col="1">
+                    		<div>
+	                    		<label for="attributes_available_ids" />
+	                    		<field name = "attributes_available_ids" nolabel="1" widget = "many2many_tags" options="{'no_create': True,'no_quick_create':True,'no_create_edit': True}"/>                    		
+                    		</div>                    		                    		
+                    	</group>
+                    	<group col="1">
+                    		<div>
+	                    		<label for="mailing_list_id" />
+	                    		<field name = "mailing_list_id" nolabel="1" required = "1" />
+                    		</div>
+                    	</group>
                     </group>
                    	<group string = "SEO" col="4">
                     	<field name = "meta_keywords" col="2"/>

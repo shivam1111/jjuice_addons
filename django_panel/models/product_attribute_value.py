@@ -2,10 +2,9 @@ from openerp import models, fields, api, _
 from helpers import BinaryS3Field,delete_object_bucket,get_bucket_location
 from openerp.exceptions import except_orm
 
-class website_banner(models.Model):
-    _name = "website.banner"
-    _description="Website Banners"
-    _rec_name = "file_name"
+class product_attribute_value(models.Model):
+    _inherit = "product.attribute.value"
+    _description = "Adding S3 Object"
     _order = "sequence"
     
     @api.multi
@@ -20,8 +19,13 @@ class website_banner(models.Model):
                 delete_object_bucket(self._table,self.id,access_key_id,secret_access_key,root_bucket)
             except AssertionError as e:
                 raise except_orm('Error',e)
-        return super(website_banner,self).unlink()
-    
-    sequence = fields.Integer('Sequence')
-    datas =  BinaryS3Field(string="Image",key_name=False)
-    file_name = fields.Char('File Name',required=True)
+        return super(product_attribute_value,self).unlink()
+
+    file_name = fields.Char(string = "File Name")
+    datas = BinaryS3Field(string = "Image",key_name = False)
+    weight = fields.Float("Weight")
+    msrp = fields.Float('MSRP')
+    wholesale_price = fields.Float('WholeSale Price')
+    ratio = fields.Float('VG/PG')
+    old_price = fields.Float('Old Price')
+        

@@ -28,12 +28,16 @@
    """,
     'website': '',
     'images' : [], #'/images/image_name.png'
-    'depends' : ['base','web','product'],#account_analytic_analysis
+    'depends' : ['base','web','product','jjuice'],#account_analytic_analysis
     'data': [
              'views/menu.xml',
              'views/website_banner.xml',
              'views/res_config.xml',
              'views/website_policy.xml',
+             'views/product_attribute_value.xml',
+             'views/product_flavors.xml',
+             'views/product.xml',
+             'security/ir.model.access.csv',
          ],
     'demo': [],
     'test': [],
