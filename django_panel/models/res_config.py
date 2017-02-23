@@ -140,7 +140,7 @@ class django_panel_settings(osv.osv_memory):
         try:
             return dict(mailing_list_id=eval(mailing_list_id))
         except Exception as e:
-            return False
+            return []
      
     def _get_domain_volume(self,context=None):
         # We have access to self.env in this context.
