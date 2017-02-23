@@ -14,13 +14,14 @@
                     	<group>
 	                    	<field name = "aws_access_id" />
 	                    	<field name = "aws_secret_key" />
-	                     	<field name = "aws_base_url" />   
+	                     	   
                     	</group>
                     	<group>
 	                    	<field name = "root_bucket"  /> 
-	                    	<field name = "website_banner_key" />
+	                    	<field name = "aws_base_url" />
+<!-- 	                    	<field name = "website_banner_key" />
 	                    	<field name = "website_policy_key" /> 
-       	                   	<field name = "volume_key" />
+       	                   	<field name = "volume_key" /> -->
                     	</group>
                     </group>
                     <group string="Website Info" col="3">

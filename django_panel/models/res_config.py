@@ -45,15 +45,15 @@ class django_panel_settings(osv.osv_memory):
         aws_secret_key = params.get_param(cr, uid, 'aws_secret_key',default='',context=context)        
         return dict(aws_secret_key=aws_secret_key) 
     
-    def set_default_website_banner_key(self,cr,uid,ids,context=None):
-        params = self.pool.get('ir.config_parameter')
-        myself = self.browse(cr,uid,ids[0],context=context)
-        params.set_param(cr, uid, 'website_banner_key', (myself.website_banner_key or '').strip(), groups=['base.group_system'], context=None)
-
-    def get_default_website_banner_key(self,cr,uid,ids,context=None):
-        params = self.pool.get('ir.config_parameter')
-        website_banner_key = params.get_param(cr, uid, 'website_banner_key',default='',context=context)        
-        return dict(website_banner_key=website_banner_key)                                                                                                   
+#     def set_default_website_banner_key(self,cr,uid,ids,context=None):
+#         params = self.pool.get('ir.config_parameter')
+#         myself = self.browse(cr,uid,ids[0],context=context)
+#         params.set_param(cr, uid, 'website_banner_key', (myself.website_banner_key or '').strip(), groups=['base.group_system'], context=None)
+# 
+#     def get_default_website_banner_key(self,cr,uid,ids,context=None):
+#         params = self.pool.get('ir.config_parameter')
+#         website_banner_key = params.get_param(cr, uid, 'website_banner_key',default='',context=context)        
+#         return dict(website_banner_key=website_banner_key)                                                                                                   
 
     def set_default_root_bucket(self,cr,uid,ids,context=None):
         params = self.pool.get('ir.config_parameter')
@@ -75,15 +75,15 @@ class django_panel_settings(osv.osv_memory):
         aws_base_url = params.get_param(cr, uid, 'aws_base_url',default='',context=context)        
         return dict(aws_base_url=aws_base_url)                                                                                                   
 
-    def set_default_website_policy_key(self,cr,uid,ids,context=None):
-        params = self.pool.get('ir.config_parameter')
-        myself = self.browse(cr,uid,ids[0],context=context)
-        params.set_param(cr, uid, 'website_policy_key', (myself.website_policy_key or '').strip(), groups=['base.group_system'], context=None)
-
-    def get_default_website_policy_key(self,cr,uid,ids,context=None):
-        params = self.pool.get('ir.config_parameter')
-        website_policy_key = params.get_param(cr, uid, 'website_policy_key',default='',context=context)        
-        return dict(website_policy_key=website_policy_key)
+#     def set_default_website_policy_key(self,cr,uid,ids,context=None):
+#         params = self.pool.get('ir.config_parameter')
+#         myself = self.browse(cr,uid,ids[0],context=context)
+#         params.set_param(cr, uid, 'website_policy_key', (myself.website_policy_key or '').strip(), groups=['base.group_system'], context=None)
+# 
+#     def get_default_website_policy_key(self,cr,uid,ids,context=None):
+#         params = self.pool.get('ir.config_parameter')
+#         website_policy_key = params.get_param(cr, uid, 'website_policy_key',default='',context=context)        
+#         return dict(website_policy_key=website_policy_key)
 
     def set_default_meta_keywords(self,cr,uid,ids,context=None):
         params = self.pool.get('ir.config_parameter')
@@ -161,24 +161,24 @@ class django_panel_settings(osv.osv_memory):
         except Exception as e:
             raise osv.except_osv('Error','Please check the value of Volumes available for website display . It is invalid!')        
 
-    def set_default_volume_key(self,cr,uid,ids,context=None):
-        params = self.pool.get('ir.config_parameter')
-        myself = self.browse(cr,uid,ids[0],context=context)
-        params.set_param(cr, uid, 'volume_key', (myself.volume_key or '').strip(), groups=['base.group_system'], context=None)
-
-    def get_default_volume_key(self,cr,uid,ids,context=None):
-        params = self.pool.get('ir.config_parameter')
-        volume_key = params.get_param(cr, uid, 'volume_key',default='',context=context)        
-        return dict(volume_key=volume_key)                                                                                                       
+#     def set_default_volume_key(self,cr,uid,ids,context=None):
+#         params = self.pool.get('ir.config_parameter')
+#         myself = self.browse(cr,uid,ids[0],context=context)
+#         params.set_param(cr, uid, 'volume_key', (myself.volume_key or '').strip(), groups=['base.group_system'], context=None)
+# 
+#     def get_default_volume_key(self,cr,uid,ids,context=None):
+#         params = self.pool.get('ir.config_parameter')
+#         volume_key = params.get_param(cr, uid, 'volume_key',default='',context=context)        
+#         return dict(volume_key=volume_key)                                                                                                       
 
     _columns = {
             'site_name':fields.char("Site Name"),
             'aws_access_id' : fields.char("AWS Access ID"),
             'aws_secret_key' : fields.char('AWS Secret Key'),
             'root_bucket':fields.char("Root Bucket"),
-            'website_banner_key' : fields.char("Website Banner Bucket Key"),
-            'website_policy_key' : fields.char("Website Policy Bucket Key"),
-            'volume_key':fields.char("Volumes Bucket Key"),
+#             'website_banner_key' : fields.char("Website Banner Bucket Key"),
+#             'website_policy_key' : fields.char("Website Policy Bucket Key"),
+#             'volume_key':fields.char("Volumes Bucket Key"),
             'aws_base_url':fields.char("S3 Base URL",help="This is required so that when determining the url we do not have to send extra request to determine the location of the bucket"),
             'meta_keywords':fields.text("Meta Keywords"),
             'meta_description':fields.text('Meta Description'),
