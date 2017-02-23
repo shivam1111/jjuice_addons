@@ -136,9 +136,11 @@ class django_panel_settings(osv.osv_memory):
     
     def get_default_mailing_list_id(self,cr,uid,ids,context=None):
         params = self.pool.get('ir.config_parameter')
-        mailing_list_id = params.get_param(cr, uid, 'mailing_list_id',default=False,context=context)
-        if mailing_list_id:
+        mailing_list_id = params.get_param(cr, uid, 'mailing_list_id',default=[],context=context)
+        try:
             return dict(mailing_list_id=eval(mailing_list_id))
+        except Exception as e:
+            return False
      
     def _get_domain_volume(self,context=None):
         # We have access to self.env in this context.
