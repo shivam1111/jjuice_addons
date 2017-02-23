@@ -143,9 +143,6 @@ class product_tab(models.Model):
     _sql_constraints = [
         ('name_uniq', 'unique(name)',
             'Name of a tab must be unique!'),
-        ('prod_uniq', 'unique(name)',
-            'Tab,Volume,Concentration,Flavor. This combination should be unique!'),                        
-                        
     ]    
     
     def calculate_discount(self,internal=0,external=0):

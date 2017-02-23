@@ -167,8 +167,7 @@ class django_panel_settings(osv.osv_memory):
         params = self.pool.get('ir.config_parameter')
         volume_key = params.get_param(cr, uid, 'volume_key',default='',context=context)        
         return dict(volume_key=volume_key)                                                                                                       
-    
-    
+
     _columns = {
             'site_name':fields.char("Site Name"),
             'aws_access_id' : fields.char("AWS Access ID"),

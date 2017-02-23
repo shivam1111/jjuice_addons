@@ -15,9 +15,21 @@ class product_product(osv.osv):
             return False
         return True
     
-    
+    def _check_unqiue_product(self,cr,uid,ids,context=None):
+        for product in self.browse(cr,uid,ids,context):
+            if product.flavor_id and product.conc_id and product.vol_id:
+                res = self.search(cr,uid,[('vol_id','=',product.vol_id.id),
+                                            ('conc_id','=',product.conc_id.id),
+                                            ('product_tmpl_id.type','=',product.product_tmpl_id.type),
+                                            ('flavor_id','=',product.flavor_id.id),
+                                        ])
+                if len(res) > 1:
+                    return False
+            return True
+        
     _constraints = [
         (_check_shipping, 'Error: There can be only one shipping product', ['shipping']),
+        (_check_unqiue_product,'Flavor,Concentration,Type of Product,Volume. This combnation should be unique',['flavor_id','vol_id','conc_id','product_tmpl_id.type'])
     ]
 
 #     [{'id': 10, 'name': '10ml'}, {'id': 11, 'name': '350ml'}]

@@ -6,3 +6,4 @@ import product_attribute_value
 import flavor_reviews
 import product_flavors
 import product
+import res_partner
