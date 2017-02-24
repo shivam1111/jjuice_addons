@@ -37,6 +37,7 @@
              'views/product_attribute_value.xml',
              'views/product_flavors.xml',
              'views/product.xml',
+             'views/hr_employee.xml',
              'security/ir.model.access.csv',
          ],
     'demo': [],
