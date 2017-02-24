@@ -17,6 +17,7 @@
 			<field name="priority" eval="1000"/>
 			<field name="arch" type="xml" >
 				<tree string = "Employees" editable="top">
+					<field name = "sequence" widget="handle" />
 					<field name = "name" string = "Name" />
 					<field name = "publish" />
 				</tree>
