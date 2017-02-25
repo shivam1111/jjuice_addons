@@ -2,11 +2,11 @@ from openerp import models, fields, api, _
 from openerp.exceptions import except_orm
 
 _RATING = [
-        ('0','Very Bad'),
-        ('1','Bad'),
-        ('2', 'Normal'),
-        ('3', 'Good'),
-        ('4','Very Good')
+        ('1','Very Bad'),
+        ('2','Bad'),
+        ('3', 'Normal'),
+        ('4', 'Good'),
+        ('5','Very Good')
     ] 
 
 

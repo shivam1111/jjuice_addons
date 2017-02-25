@@ -26,6 +26,6 @@ class product_attribute_value(models.Model):
     weight = fields.Float("Weight")
     msrp = fields.Float('MSRP')
     wholesale_price = fields.Float('WholeSale Price')
-    ratio = fields.Float('VG/PG')
+    ratio = fields.Char('VG/PG')
     old_price = fields.Float('Old Price')
         

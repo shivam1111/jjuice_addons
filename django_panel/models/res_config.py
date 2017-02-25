@@ -183,10 +183,10 @@ class django_panel_settings(osv.osv_memory):
             'meta_keywords':fields.text("Meta Keywords"),
             'meta_description':fields.text('Meta Description'),
             'attribute_value_ids':fields.many2many('product.attribute.value','django_panel_settings_attribute_value',column1='django_panel_settings_id',column2='attribute_value_id',
-                                                   string = "Volumes not available for Retailers",domain=_get_domain_volume,
+                                                   string = "Volumes available to Normal Website Visitors",domain=_get_domain_volume,
                                                    ),
             'mailing_list_id':fields.many2one('mail.mass_mailing.list','News Letter Mailing List'),
             'attributes_available_ids':fields.many2many('product.attribute.value','django_panel_settings_attribute_value_available',column1='django_panel_settings_id',column2='attribute_value_id',
-                                                   string = "Volumes available for website display",domain=_get_domain_volume,
+                                                   string = "Volumes available to Businesses",domain=_get_domain_volume,
                                                    ),
         }

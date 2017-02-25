@@ -40,7 +40,8 @@
 											<field name = "email"  required="1" />
 											<field name = "title" required="1" />
 											<field name = "description" required="1" />
-											<field name = "rating" widget="priority" />
+											<field name = "rating" widget="priority"/>
+											<!-- <field name = "rating" widget="priority" /> -->
 										</tree>
  									</field>
  								</group>
