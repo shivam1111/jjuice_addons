@@ -17,7 +17,7 @@ class product_product(osv.osv):
     
     def _check_unqiue_product(self,cr,uid,ids,context=None):
         for product in self.browse(cr,uid,ids,context):
-            if product.flavor_id and product.conc_id and product.vol_id:
+            if product.flavor_id and product.conc_id and product.vol_id and product.product_tmpl_id.type == "product" :
                 res = self.search(cr,uid,[('vol_id','=',product.vol_id.id),
                                             ('conc_id','=',product.conc_id.id),
                                             ('product_tmpl_id.type','=',product.product_tmpl_id.type),
@@ -25,7 +25,7 @@ class product_product(osv.osv):
                                         ])
                 if len(res) > 1:
                     return False
-            return True
+        return True
         
     _constraints = [
         (_check_shipping, 'Error: There can be only one shipping product', ['shipping']),
