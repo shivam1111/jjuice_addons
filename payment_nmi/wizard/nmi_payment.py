@@ -17,7 +17,7 @@ class nmi_payment_wizard(models.TransientModel):
         if self.invoice_id and (self.invoice_id.partner_id != self.partner_id):
             raise except_orm('Error!',"The selected partner and invoice partner mismatch!") 
         
-        params = self.env['ir.config_parameter']
+        params = self.env['ir.config_parameter'].sudo()
         username =  params.get_param('nmi_username',default="username")
         pwd = params.get_param('nmi_password',default="password")
         nmi_transaction = self.env['nmi.transactions']
@@ -92,7 +92,7 @@ class nmi_payment_wizard(models.TransientModel):
     @api.multi
     def get_vault_details(self):
         assert len(self) == 1
-        params = self.env['ir.config_parameter']
+        params = self.env['ir.config_parameter'].sudo()
         username =  params.get_param('nmi_username',default="username")
         pwd = params.get_param('nmi_password',default="password")   
         for j in self.line_ids:

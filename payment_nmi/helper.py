@@ -24,7 +24,8 @@ def get_vault_detail(username,pwd,vault_id):
     query += "password=" + urllib.quote(pwd) + "&"
     query += "report_type=" + urllib.quote("customer_vault") + "&"
     query += "customer_vault_id=" + urllib.quote(vault_id) 
-    return doPost(query,url)
+    data = doPost(query,url)
+    return data
 
 
 def create_vault(username,pwd,vals):

@@ -13,7 +13,7 @@ class customer_vault(models.Model):
     @api.multi
     def delete_vault(self):
         assert len(self) == 1
-        params = self.env['ir.config_parameter']
+        params = self.env['ir.config_parameter'].sudo()
         username =  params.get_param('nmi_username',default="username")
         pwd = params.get_param('nmi_password',default="password")        
         data = delete_vault(username,pwd,self.customer_vault_id)
@@ -23,7 +23,7 @@ class customer_vault(models.Model):
     @api.multi
     def get_vault_details(self):
         assert len(self) == 1
-        params = self.env['ir.config_parameter']
+        params = self.env['ir.config_parameter'].sudo()
         username =  params.get_param('nmi_username',default="username")
         pwd = params.get_param('nmi_password',default="password")        
         details = get_vault_detail(username,pwd,self.customer_vault_id)

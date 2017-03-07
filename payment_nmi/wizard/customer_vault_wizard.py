@@ -9,7 +9,7 @@ class customer_vault_wizard(models.TransientModel):
     @api.multi
     def create_vault(self):
         assert len(self) == 1
-        params = self.env['ir.config_parameter']
+        params = self.env['ir.config_parameter'].sudo()
         username =  params.get_param('nmi_username',default="username")
         pwd = params.get_param('nmi_password',default="password")
         vals = {}
