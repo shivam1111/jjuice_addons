@@ -20,6 +20,7 @@
 ##############################################################################
 
 from openerp.osv import fields, osv
+from helpers import BinaryS3Field,delete_object_bucket,get_bucket_location
 
 class django_panel_settings(osv.osv_memory):
     _name = 'django.panel.settings'
@@ -161,15 +162,54 @@ class django_panel_settings(osv.osv_memory):
         except Exception as e:
             raise osv.except_osv('Error','Please check the value of Volumes available for website display . It is invalid!')        
 
-#     def set_default_volume_key(self,cr,uid,ids,context=None):
-#         params = self.pool.get('ir.config_parameter')
-#         myself = self.browse(cr,uid,ids[0],context=context)
-#         params.set_param(cr, uid, 'volume_key', (myself.volume_key or '').strip(), groups=['base.group_system'], context=None)
-# 
-#     def get_default_volume_key(self,cr,uid,ids,context=None):
-#         params = self.pool.get('ir.config_parameter')
-#         volume_key = params.get_param(cr, uid, 'volume_key',default='',context=context)        
-#         return dict(volume_key=volume_key)                                                                                                       
+    def set_default_aboutus_banner(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('aboutus_banner','=',True),('id','!=',myself.aboutus_banner.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.aboutus_banner.id,{'aboutus_banner':True})
+    
+    def get_default_aboutus_banner(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('aboutus_banner','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(aboutus_banner=s3_object_ids[0])
+        else:
+            return dict(aboutus_banner=False)
+
+    def set_default_contactus_banner(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('contactus_banner','=',True),('id','!=',myself.contactus_banner.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.contactus_banner.id,{'contactus_banner':True})
+    
+    def get_default_contactus_banner(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('contactus_banner','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(contactus_banner=s3_object_ids[0])
+        else:
+            return dict(contactus_banner=False)        
+
+    def set_default_customerreview_banner(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('customerreview_banner','=',True),('id','!=',myself.customerreview_banner.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.customerreview_banner.id,{'customerreview_banner':True})
+    
+    def get_default_customerreview_banner(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('customerreview_banner','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(customerreview_banner=s3_object_ids[0])
+        else:
+            return dict(customerreview_banner=False)                
+            
 
     _columns = {
             'site_name':fields.char("Site Name"),
@@ -189,4 +229,7 @@ class django_panel_settings(osv.osv_memory):
             'attributes_available_ids':fields.many2many('product.attribute.value','django_panel_settings_attribute_value_available',column1='django_panel_settings_id',column2='attribute_value_id',
                                                    string = "Volumes available to Businesses",domain=_get_domain_volume,
                                                    ),
+            'aboutus_banner':fields.many2one('s3.object',string="About Us Banner"),
+            'contactus_banner':fields.many2one('s3.object',string="Contact Us Banner"),
+            'customerreview_banner':fields.many2one('s3.object',string="Customer Review Banner"),
         }

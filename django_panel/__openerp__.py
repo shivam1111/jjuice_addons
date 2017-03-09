@@ -38,7 +38,9 @@
              'views/product_flavors.xml',
              'views/product.xml',
              'views/hr_employee.xml',
+             'views/partner_reviews.xml',
              'security/ir.model.access.csv',
+             
          ],
     'demo': [],
     'test': [],

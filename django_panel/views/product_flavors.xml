@@ -17,12 +17,23 @@
 							</group>
 						</group>
 						<notebook>
-							<page string = "Attach Image">
+							<page string = "Banner">
 								<group>
-									<field name = "file_name" />
+									<field name = "banner_file_name" />
 								</group>
 								<group>
-									<field name = "datas" filename="file_name" widget="image" nolabel="1" readonly="0"/>
+									<field name = "banner_datas" filename="banner_file_name" widget="image" nolabel="1" readonly="0"/>
+								</group>
+							</page>
+							<page string = "Attach Images">
+								<group>
+									<field name = "attribute_image_line" nolabel="1">
+										<tree string = "Attach Images" editable="top">
+											<field name = "attribute_id" />
+											<field name =  "datas" filename="file_name" />
+											<field name = "file_name" />
+										</tree>
+									</field>									
 								</group>
 							</page>
 							<page string = "Additional Info">

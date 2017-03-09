@@ -1,5 +1,58 @@
 <openerp>
 	<data>
+		<record id = "res_config_s3_object_form_view_aboutus" model = "ir.ui.view">
+			<field name="name">S3 Object Form View</field>
+			<field name = "model">s3.object</field>
+			<field name="arch" type="xml">
+				<form string="Banner">
+					<group>
+						<field name = "file_name" />
+						<field name = "aboutus_banner" invisible="1" />
+					</group>
+					<notebook>
+						<page string = "Attachment">
+							<field name = "datas" widget="image" filename="file_name"/>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>
+		<record id = "res_config_s3_object_form_view_contactus" model = "ir.ui.view">
+			<field name="name">S3 Object Form View</field>
+			<field name = "model">s3.object</field>
+			<field name="arch" type="xml">
+				<form string="Banner">
+					<group>
+						<field name = "file_name" />
+						<field name = "contactus_banner" invisible="1" />
+					</group>
+					<notebook>
+						<page string = "Attachment">
+							<field name = "datas" widget="image" filename="file_name"/>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>
+
+		<record id = "res_config_s3_object_form_view_customerreview" model = "ir.ui.view">
+			<field name="name">S3 Object Form View</field>
+			<field name = "model">s3.object</field>
+			<field name="arch" type="xml">
+				<form string="Banner">
+					<group>
+						<field name = "file_name" />
+						<field name = "customerreview_banner" invisible="1" />
+					</group>
+					<notebook>
+						<page string = "Attachment">
+							<field name = "datas" widget="image" filename="file_name"/>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>		
+				
 		<record id = "res_config_django_panel_settings" model = "ir.ui.view">
 			<field name="name">Django Panel Settings</field>
 			<field name = "model">django.panel.settings</field>
@@ -19,9 +72,6 @@
                     	<group>
 	                    	<field name = "root_bucket"  /> 
 	                    	<field name = "aws_base_url" />
-<!-- 	                    	<field name = "website_banner_key" />
-	                    	<field name = "website_policy_key" /> 
-       	                   	<field name = "volume_key" /> -->
                     	</group>
                     </group>
                     <group string="Website Info" col="3">
@@ -34,18 +84,32 @@
 	                    		<label for="attribute_value_ids" />
 	                    		<field name = "attribute_value_ids" nolabel="1" widget = "many2many_tags" options="{'no_create': True,'no_quick_create':True,'no_create_edit': True}"/>                    		
                     		</div>
+                    		<div>
+	                    		<label for="customerreview_banner" />
+	                    		<field name = "customerreview_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_customerreview','default_customerreview_banner':True}"/>                    		
+                    		</div>                       		                    		
+                    		
                     	</group>
                     	<group col="1">
                     		<div>
 	                    		<label for="attributes_available_ids" />
 	                    		<field name = "attributes_available_ids" nolabel="1" widget = "many2many_tags" options="{'no_create': True,'no_quick_create':True,'no_create_edit': True}"/>                    		
-                    		</div>                    		                    		
+                    		</div>   
+                    		<div>
+	                    		<label for="aboutus_banner" />
+	                    		<field name = "aboutus_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_aboutus','default_aboutus_banner':True}"/>                    		
+                    		</div>                       		
+                    		                 		                    		
                     	</group>
                     	<group col="1">
                     		<div>
 	                    		<label for="mailing_list_id" />
 	                    		<field name = "mailing_list_id" nolabel="1" required = "1" />
                     		</div>
+                    		<div>
+	                    		<label for="contactus_banner" />
+	                    		<field name = "contactus_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_contactus','default_contactus_banner':True}"/>                    		
+                    		</div>                       		                    		
                     	</group>
                     </group>
                    	<group string = "SEO" col="4">

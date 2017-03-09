@@ -23,6 +23,8 @@ class product_attribute_value(models.Model):
 
     file_name = fields.Char(string = "File Name")
     datas = BinaryS3Field(string = "Image",key_name = False)
+    banner_file_name = fields.Char(string = "File Name")
+    banner_datas = BinaryS3Field(string = "Image",key_name = "product_attribute_value_banner")
     weight = fields.Float("Weight")
     msrp = fields.Float('MSRP')
     wholesale_price = fields.Float('WholeSale Price')

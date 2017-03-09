@@ -8,3 +8,4 @@ import product_flavors
 import product
 import res_partner
 import hr_employee
+import partner_reviews

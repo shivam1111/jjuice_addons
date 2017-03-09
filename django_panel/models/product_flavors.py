@@ -21,9 +21,10 @@ class product_flavors(models.Model):
                 raise except_orm('Error',e)
         return super(product_attribute_value,self).unlink()
 
-    file_name = fields.Char(string = "File Name")
-    datas = BinaryS3Field(string = "Image",key_name = False)    
     sequence = fields.Integer(string="Sequence")
     short_description = fields.Text('Short Description')
     long_description = fields.Text('Long Description')
     review_ids = fields.One2many('flavor.reviews','flavor_id','Reviews')
+    attribute_image_line = fields.One2many('s3.object','flavor_id','Images')
+    banner_file_name = fields.Char("File Name")
+    banner_datas = BinaryS3Field(string = "Image",key_name = "product_flavor_banner")
