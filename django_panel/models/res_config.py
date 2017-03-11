@@ -209,7 +209,66 @@ class django_panel_settings(osv.osv_memory):
             return dict(customerreview_banner=s3_object_ids[0])
         else:
             return dict(customerreview_banner=False)                
-            
+
+    def set_default_promo_business_ids(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params = self.pool.get('ir.config_parameter')
+        promo_business_ids = map(lambda x:x.id,myself.promo_business_ids)
+        params.set_param(cr, uid, 'promo_business_ids', (promo_business_ids), groups=['base.group_system'], context=None)                                                                                      
+    
+    def get_default_promo_business_ids(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        try:
+            promo_business_ids = params.get_param(cr, uid, 'promo_business_ids',default='[]',context=context)
+            return dict(promo_business_ids=[(6,0,eval(promo_business_ids))])
+        except Exception as e:
+            raise osv.except_osv('Error','Please check the value of business promotions. It is invalid!')                    
+    
+    def set_default_promo_non_business_ids(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params = self.pool.get('ir.config_parameter')
+        promo_non_business_ids = map(lambda x:x.id,myself.promo_non_business_ids)
+        params.set_param(cr, uid, 'promo_non_business_ids', (promo_non_business_ids), groups=['base.group_system'], context=None)                                                                                      
+    
+    def get_default_promo_non_business_ids(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        try:
+            promo_non_business_ids = params.get_param(cr, uid, 'promo_non_business_ids',default='[]',context=context)
+            return dict(promo_non_business_ids=[(6,0,eval(promo_non_business_ids))])
+        except Exception as e:
+            raise osv.except_osv('Error','Please check the value of Volumes not available for Retailers. It is invalid!')                            
+
+    def set_default_privacy_policy_banner(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('privacy_policy_banner','=',True),('id','!=',myself.privacy_policy_banner.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.privacy_policy_banner.id,{'privacy_policy_banner':True})
+    
+    def get_default_privacy_policy_banner(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('privacy_policy_banner','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(privacy_policy_banner=s3_object_ids[0])
+        else:
+            return dict(privacy_policy_banner=False)        
+    
+    def set_default_terms_conditions_banner(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('terms_conditions_banner','=',True),('id','!=',myself.terms_conditions_banner.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.terms_conditions_banner.id,{'terms_conditions_banner':True})
+    
+    def get_default_terms_conditions_banner(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('terms_conditions_banner','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(terms_conditions_banner=s3_object_ids[0])
+        else:
+            return dict(terms_conditions_banner=False)                
 
     _columns = {
             'site_name':fields.char("Site Name"),
@@ -230,6 +289,12 @@ class django_panel_settings(osv.osv_memory):
                                                    string = "Volumes available to Businesses",domain=_get_domain_volume,
                                                    ),
             'aboutus_banner':fields.many2one('s3.object',string="About Us Banner"),
+            'terms_conditions_banner':fields.many2one('s3.object',string="Terms & Conditions Banner"),
+            'privacy_policy_banner':fields.many2one('s3.object',string="Privacy Policy Banner"),
             'contactus_banner':fields.many2one('s3.object',string="Contact Us Banner"),
             'customerreview_banner':fields.many2one('s3.object',string="Customer Review Banner"),
+            'promo_business_ids':fields.many2many('website.policy','django_panel_settings_website_policy',column1='django_panel_settings_id',column2='policy_id',
+                                                   string = "Business Promotions"),
+            'promo_non_business_ids':fields.many2many('website.policy','django_panel_settings_non_business_website_policy',column1='django_panel_settings_id',column2='policy_id',
+                                                   string = "Non Business Promotions"),                
         }

@@ -22,7 +22,9 @@ class product_attribute_value(models.Model):
         return super(product_attribute_value,self).unlink()
 
     file_name = fields.Char(string = "File Name")
-    datas = BinaryS3Field(string = "Image",key_name = False)
+    datas = BinaryS3Field(string = "Drop Down Image",key_name = False)
+    file_name_category = fields.Char(string = "File Name")
+    category_datas = BinaryS3Field(string = "Category Image",key_name = "product_attribute_value_category")
     banner_file_name = fields.Char(string = "File Name")
     banner_datas = BinaryS3Field(string = "Image",key_name = "product_attribute_value_banner")
     weight = fields.Float("Weight")

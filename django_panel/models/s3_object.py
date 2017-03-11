@@ -27,6 +27,10 @@ class s3_object(models.Model):
     sequence = fields.Integer(string="Sequence")
     attribute_id = fields.Many2one('product.attribute.value','Attribute')
     flavor_id = fields.Many2one('product.flavors','Flavor')
+    is_featured_item = fields.Boolean("Featured Item")
     aboutus_banner = fields.Boolean('Is About us Banner ?')
     contactus_banner = fields.Boolean('Is Contact us Banner ?')
     customerreview_banner = fields.Boolean('Is Customer Review us Banner ?')
+    privacy_policy_banner = fields.Boolean("Is Privacy Policy Banner")
+    terms_conditions_banner = fields.Boolean("Is Terms & Conditions Banner ?")
+    

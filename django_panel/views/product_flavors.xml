@@ -29,6 +29,7 @@
 								<group>
 									<field name = "attribute_image_line" nolabel="1">
 										<tree string = "Attach Images" editable="top">
+											<field name = "is_featured_item" />
 											<field name = "attribute_id" />
 											<field name =  "datas" filename="file_name" />
 											<field name = "file_name" />

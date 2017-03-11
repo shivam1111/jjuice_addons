@@ -9,3 +9,4 @@ import product
 import res_partner
 import hr_employee
 import partner_reviews
+import website_contactus

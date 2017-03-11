@@ -34,10 +34,14 @@ class BinaryS3Field(Binary):
             assert access_key_id and secret_access_key, "Invalid Credentials"
             # Establish Connection
             s3_conn = get_s3_client(access_key_id,secret_access_key)
-            bin_value = record._cache[self].decode('base64')
+            if record._cache[self]:
+                bin_value = record._cache[self].decode('base64')
+            else:
+                delete_conn_object_bucket(s3_conn,key_name,record.id,root_bucket)
+                return
             # Checking whether configured folder exist
             # For checking if folder is present it has to end with forward slash        
-            exists = lookup(s3_conn,root_bucket,os.path.join(key_name,'')) # adding slash safely
+            exists = lookup(s3_conn,root_bucket,os.path.join(key_name,'')) # adding slash safely(s3_conn,bucket,key='/'):
             if not exists:
                 s3_conn.put_object(Bucket=root_bucket, Key = os.path.join(key_name,''),Body='')
             s3_conn.put_object(Bucket=root_bucket, Key = os.path.join(key_name,str(record.id)),Body=bin_value)
@@ -130,11 +134,17 @@ def get_object_bucket(location,key,fname):
             read = base64.b64encode(bin_value.get('Body').read())
     return read
 
+def delete_conn_object_bucket(s3_conn,key,fname,root_bucket):
+    delete = None
+    if fname:
+        delete = s3_conn.delete_object(Bucket=root_bucket, Key = os.path.join(key,str(fname)))
+    return delete
+
 def delete_object_bucket(key,fname,access_key_id,secret_access_key,root_bucket):
     delete = None
     if fname:
         s3_conn = get_s3_client(access_key_id,secret_access_key)             
         exists = lookup(s3_conn,root_bucket,os.path.join(key,str(fname))) 
         if exists:
-            delete = s3_conn.delete_object(Bucket=root_bucket, Key = os.path.join(key,str(fname)))
-        return delete
+            delete = delete_conn_object_bucket(s3_conn,key,fname,root_bucket)
+    return delete    

@@ -39,6 +39,7 @@
              'views/product.xml',
              'views/hr_employee.xml',
              'views/partner_reviews.xml',
+             'views/website_contactus.xml',
              'security/ir.model.access.csv',
              
          ],
