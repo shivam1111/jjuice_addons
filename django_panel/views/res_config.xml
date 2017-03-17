@@ -35,6 +35,24 @@
 				</form>
 			</field>
 		</record>
+
+		<record id = "res_config_s3_object_form_view_search_banner" model = "ir.ui.view">
+			<field name="name">S3 Object Form View</field>
+			<field name = "model">s3.object</field>
+			<field name="arch" type="xml">
+				<form string="Search Page Banner">
+					<group>
+						<field name = "file_name" />
+						<field name = "search_banner" invisible="1" />
+					</group>
+					<notebook>
+						<page string = "Attachment">
+							<field name = "datas" widget="image" filename="file_name"/>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>		
 		
 		<record id = "res_config_s3_object_form_view_term_conditions" model = "ir.ui.view">
 			<field name="name">S3 Object Form View</field>
@@ -160,7 +178,11 @@
                     		<div>
 	                    		<label for="privacy_policy_banner" />
 	                    		<field name = "privacy_policy_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_privacy_policy','default_privacy_policy_banner':True}"/>                    		
-                    		</div>                       		                    		                    		
+                    		</div>
+                    		<div>
+	                    		<label for="search_banner" />
+	                    		<field name = "search_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_search_banner','default_search_banner':True}"/>                    		
+                    		</div>                    		
                     	</group>
                     </group>
                    	<group string = "SEO" col="4">

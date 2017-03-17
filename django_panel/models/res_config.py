@@ -270,6 +270,22 @@ class django_panel_settings(osv.osv_memory):
         else:
             return dict(terms_conditions_banner=False)                
 
+    def set_default_search_banner(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('search_banner','=',True),('id','!=',myself.search_banner.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.search_banner.id,{'search_banner':True})
+    
+    def get_default_search_banner(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('search_banner','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(search_banner=s3_object_ids[0])
+        else:
+            return dict(search_banner=False)                        
+
     _columns = {
             'site_name':fields.char("Site Name"),
             'aws_access_id' : fields.char("AWS Access ID"),
@@ -291,10 +307,11 @@ class django_panel_settings(osv.osv_memory):
             'aboutus_banner':fields.many2one('s3.object',string="About Us Banner"),
             'terms_conditions_banner':fields.many2one('s3.object',string="Terms & Conditions Banner"),
             'privacy_policy_banner':fields.many2one('s3.object',string="Privacy Policy Banner"),
+            'search_banner':fields.many2one('s3.object',string = "Search Banner"),
             'contactus_banner':fields.many2one('s3.object',string="Contact Us Banner"),
             'customerreview_banner':fields.many2one('s3.object',string="Customer Review Banner"),
             'promo_business_ids':fields.many2many('website.policy','django_panel_settings_website_policy',column1='django_panel_settings_id',column2='policy_id',
                                                    string = "Business Promotions"),
             'promo_non_business_ids':fields.many2many('website.policy','django_panel_settings_non_business_website_policy',column1='django_panel_settings_id',column2='policy_id',
-                                                   string = "Non Business Promotions"),                
+                                                   string = "Non Business Promotions"),  
         }

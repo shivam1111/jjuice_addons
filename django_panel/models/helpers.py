@@ -16,11 +16,12 @@ class BinaryS3Field(Binary):
             secret_access_key = record.env['ir.config_parameter'].get_param('aws_secret_key')
             assert access_key_id and secret_access_key, "Invalid Credentials"
             s3_conn = get_s3_client(access_key_id,secret_access_key)
-            exists = lookup(s3_conn,root_bucket,os.path.join(key_name,str(record.id)))
-            if exists:        
-                bin_value  = s3_conn.get_object(Bucket=root_bucket, Key = os.path.join(key_name,str(record.id)))
-                read = base64.b64encode(bin_value.get('Body').read())
-                record._cache[self] = read
+            for i in  record:
+                exists = lookup(s3_conn,root_bucket,os.path.join(key_name,str(i.id)))
+                if exists:        
+                    bin_value  = s3_conn.get_object(Bucket=root_bucket, Key = os.path.join(key_name,str(i.id)))
+                    read = base64.b64encode(bin_value.get('Body').read())
+                    record._cache[self] = read
         except AssertionError as e:
             raise except_orm('Error',e)
     
