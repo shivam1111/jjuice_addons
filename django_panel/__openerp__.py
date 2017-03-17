@@ -30,6 +30,7 @@
     'images' : [], #'/images/image_name.png'
     'depends' : ['base','web','product','jjuice'],#account_analytic_analysis
     'data': [
+             'security/django_panel_security.xml',        
              'views/menu.xml',
              'views/website_banner.xml',
              'views/res_config.xml',
@@ -41,7 +42,6 @@
              'views/partner_reviews.xml',
              'views/website_contactus.xml',
              'security/ir.model.access.csv',
-             
          ],
     'demo': [],
     'test': [],

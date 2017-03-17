@@ -10,10 +10,10 @@ class BinaryS3Field(Binary):
         read=None
         key_name = self.key_name or record._table
         try:
-            root_bucket = record.env['ir.config_parameter'].get_param('root_bucket','jjuice-django')
+            root_bucket = record.env['ir.config_parameter'].sudo().get_param('root_bucket','jjuice-django')
             assert root_bucket, "Sorry the root bucket is not available" 
-            access_key_id = record.env['ir.config_parameter'].get_param('aws_access_id')
-            secret_access_key = record.env['ir.config_parameter'].get_param('aws_secret_key')
+            access_key_id = record.env['ir.config_parameter'].sudo().get_param('aws_access_id')
+            secret_access_key = record.env['ir.config_parameter'].sudo().get_param('aws_secret_key')
             assert access_key_id and secret_access_key, "Invalid Credentials"
             s3_conn = get_s3_client(access_key_id,secret_access_key)
             for i in  record:
@@ -28,10 +28,10 @@ class BinaryS3Field(Binary):
     def _data_set(self,record):
         key_name = self.key_name or record._table
         try:
-            root_bucket = record.env['ir.config_parameter'].get_param('root_bucket','jjuice-django')
+            root_bucket = record.env['ir.config_parameter'].sudo().get_param('root_bucket','jjuice-django')
             assert root_bucket, "Sorry the root bucket is not available" 
-            access_key_id = record.env['ir.config_parameter'].get_param('aws_access_id')
-            secret_access_key = record.env['ir.config_parameter'].get_param('aws_secret_key')
+            access_key_id = record.env['ir.config_parameter'].sudo().get_param('aws_access_id')
+            secret_access_key = record.env['ir.config_parameter'].sudo().get_param('aws_secret_key')
             assert access_key_id and secret_access_key, "Invalid Credentials"
             # Establish Connection
             s3_conn = get_s3_client(access_key_id,secret_access_key)
