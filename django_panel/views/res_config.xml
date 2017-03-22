@@ -1,7 +1,7 @@
 <openerp>
 	<data>
 		<record id = "res_config_s3_object_form_view_aboutus" model = "ir.ui.view">
-			<field name="name">S3 Object Form View</field>
+			<field name="name">Aboutus Banner</field>
 			<field name = "model">s3.object</field>
 			<field name="arch" type="xml">
 				<form string="Banner">
@@ -19,7 +19,7 @@
 		</record>
 
 		<record id = "res_config_s3_object_form_view_privacy_policy" model = "ir.ui.view">
-			<field name="name">S3 Object Form View</field>
+			<field name="name">Privacy Policy Banner</field>
 			<field name = "model">s3.object</field>
 			<field name="arch" type="xml">
 				<form string="Privacy Policy Banner">
@@ -37,7 +37,7 @@
 		</record>
 
 		<record id = "res_config_s3_object_form_view_search_banner" model = "ir.ui.view">
-			<field name="name">S3 Object Form View</field>
+			<field name="name">Search Page Banner</field>
 			<field name = "model">s3.object</field>
 			<field name="arch" type="xml">
 				<form string="Search Page Banner">
@@ -54,8 +54,25 @@
 			</field>
 		</record>		
 		
+		<record id = "res_config_s3_object_form_view_checkout" model = "ir.ui.view">
+			<field name="name">Checkout Banner</field>
+			<field name = "model">s3.object</field>
+			<field name="arch" type="xml">
+				<form string="Term &amp; Conditions Banner">
+					<group>
+						<field name = "file_name" />
+						<field name = "checkout_banner" invisible="1" />
+					</group>
+					<notebook>
+						<page string = "Attachment">
+							<field name = "datas" widget="image" filename="file_name"/>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>				
 		<record id = "res_config_s3_object_form_view_term_conditions" model = "ir.ui.view">
-			<field name="name">S3 Object Form View</field>
+			<field name="name">Terms And Conditions Banner</field>
 			<field name = "model">s3.object</field>
 			<field name="arch" type="xml">
 				<form string="Term &amp; Conditions Banner">
@@ -73,7 +90,7 @@
 		</record>		
 		
 		<record id = "res_config_s3_object_form_view_contactus" model = "ir.ui.view">
-			<field name="name">S3 Object Form View</field>
+			<field name="name">Contactus Banner</field>
 			<field name = "model">s3.object</field>
 			<field name="arch" type="xml">
 				<form string="Banner">
@@ -91,7 +108,7 @@
 		</record>
 
 		<record id = "res_config_s3_object_form_view_customerreview" model = "ir.ui.view">
-			<field name="name">S3 Object Form View</field>
+			<field name="name">Customer Review Banner</field>
 			<field name = "model">s3.object</field>
 			<field name="arch" type="xml">
 				<form string="Banner">
@@ -146,7 +163,11 @@
                     		<div>
 	                    		<label for="promo_business_ids" />
 	                    		<field name = "promo_business_ids" nolabel="1" widget = "many2many_tags" options="{'no_create': True,'no_quick_create':True,'no_create_edit': True}"/>                    		
-                    		</div>                       		
+                    		</div>
+                    		<div>
+	                    		<label for="checkout_banner" />
+	                    		<field name = "checkout_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_checkout','default_checkout_banner':True}"/>                    		
+                    		</div>                    		                       		
                     	</group>
                     	<group col="1">
                     		<div>

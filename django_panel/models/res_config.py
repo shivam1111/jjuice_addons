@@ -178,6 +178,22 @@ class django_panel_settings(osv.osv_memory):
         else:
             return dict(aboutus_banner=False)
 
+    def set_default_checkout_banner(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('checkout_banner','=',True),('id','!=',myself.checkout_banner.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.checkout_banner.id,{'checkout_banner':True})
+    
+    def get_default_checkout_banner(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('checkout_banner','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(checkout_banner=s3_object_ids[0])
+        else:
+            return dict(checkout_banner=False)        
+
     def set_default_contactus_banner(self,cr,uid,ids,context=None):
         myself = self.browse(cr,uid,ids[0],context=context)
         s3_object = self.pool.get('s3.object')
@@ -305,6 +321,7 @@ class django_panel_settings(osv.osv_memory):
                                                    string = "Volumes available to Businesses",domain=_get_domain_volume,
                                                    ),
             'aboutus_banner':fields.many2one('s3.object',string="About Us Banner"),
+            'checkout_banner':fields.many2one('s3.object',string="Checkout Banner"),
             'terms_conditions_banner':fields.many2one('s3.object',string="Terms & Conditions Banner"),
             'privacy_policy_banner':fields.many2one('s3.object',string="Privacy Policy Banner"),
             'search_banner':fields.many2one('s3.object',string = "Search Banner"),
