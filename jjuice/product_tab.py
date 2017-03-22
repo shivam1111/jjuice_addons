@@ -138,6 +138,8 @@ class product_tab(models.Model):
             self._create_pair_products(existing_pairs,new_pairs)
         else:
             result =  super(product_tab,self).write(vals)
+        if vals.get('consumable_stockable',False):
+            self.product_ids.write({'type':vals.get('consumable_stockable',False)})
         return result
     
     _sql_constraints = [
