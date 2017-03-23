@@ -6,6 +6,21 @@ from openerp import SUPERUSER_ID
 class product_product(osv.osv):
     _inherit = "product.product"
     
+    def write(self,cr,uid,ids,vals,context=None):
+        product_tmpl = self.pool.get('product.template')
+        res = super(product_product,self).write(cr,uid,ids,vals,context)
+        if vals.get('vol_id',False) or vals.get('conc_id',False):
+            for  i in self.browse(cr,uid,ids,context):
+                name = ''
+                if i.flavor_id:
+                    name += i.flavor_id.name
+                    if i.vol_id:
+                        name+= " | %s"%(i.vol_id.name)
+                    if i.conc_id:
+                        name+= " | %s"%(i.conc_id.name)
+                product_tmpl.write(cr,uid,i.product_tmpl_id.id,{'name':name})
+        return res
+
     def _check_shipping(self, cr, uid, ids, context=None):
         cr.execute('''
             select count(*) from product_product where shipping = true
