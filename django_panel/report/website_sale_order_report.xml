@@ -1,0 +1,46 @@
+<openerp>
+	<data>
+		<template id="report_qweb_order_website_report">
+			<t t-call="report.html_container">
+				<t t-call="report.external_layout">
+					<div class="oe_structure"/>
+					<t t-foreach="docs" t-as="o">
+						<t t-foreach="o.invoice_ids" t-as="inv">
+							<t t-if="inv.state == 'open' or inv.state=='paid' "  >
+								<div class="page">
+						            <div class="row">
+						                <div class="col-xs-6">
+						                    <strong t-if="o.partner_shipping_id == o.partner_invoice_id">Invoice and shipping address:</strong>
+						                    <strong t-if="o.partner_shipping_id != o.partner_invoice_id">Invoice address:</strong>
+						                    <div t-field="o.partner_invoice_id" 
+						                        t-field-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": true}'/>
+						                    <p t-if="o.partner_id.vat">VAT: <span t-field="o.partner_id.vat"/></p>
+						                    <div t-if="o.partner_shipping_id != o.partner_invoice_id" class="mt8">
+						                        <strong>Shipping address:</strong>
+						                        <div t-field="o.partner_shipping_id" 
+						                            t-field-options='{"widget": "contact", "fields": ["address", "name", "phone", "fax"], "no_marker": true}'/>
+						                        <p t-if="o.partner_id.vat">VAT: <span t-field="o.partner_id.vat"/></p>
+						                    </div>                        
+						                </div>
+						                <br/>
+						                <div class="col-xs-5 col-xs-offset-1">
+						                    <div t-field="o.partner_id"
+						                        t-field-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}' />
+						                </div>
+						            </div>									
+								</div>											
+							</t>
+						</t>
+					</t>
+				</t>
+			</t>
+		</template>
+		<report id="report_qweb_order_website_report_register"
+		        string="Invoice"
+                model="sale.order"
+			    report_type="qweb-pdf"
+			    menu="True"
+			    file="django_panel.website_sale_order_report"
+			    name="django_panel.report_qweb_order_website_report" />			
+	</data>
+</openerp>

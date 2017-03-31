@@ -22,6 +22,10 @@
                                 <label for="nmi_password"/>
                                 <field name="nmi_password" class="oe_inline" password="1"/>                   	 			
                    	 		</div>                   	 		
+                   	 		<div>
+                                <label for="nmi_key"/>
+                                <field name="nmi_key" class="oe_inline" password="1"/>                   	 			
+                   	 		</div>                   	 		                   	 		
                    	 	</div>
                     </group>		
                 </form>

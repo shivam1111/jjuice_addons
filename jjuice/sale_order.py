@@ -314,7 +314,8 @@ class sale_order(models.Model):
         for tab in available_flavor:
             available_flavor[tab] = list(sorted(available_flavor[tab],key=itemgetter(1)))
     
-        data= {'paid_stamp':paid_stamp,
+        data= {
+               'paid_stamp':paid_stamp,
                'shipping_stamp':shipping_stamp,
                'grand_total':grand_total,
                'invoice_line':invoice_lines,

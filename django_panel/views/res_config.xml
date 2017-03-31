@@ -106,6 +106,24 @@
 				</form>
 			</field>
 		</record>
+		
+		<record id = "res_config_s3_object_form_view_shippingreturns" model = "ir.ui.view">
+			<field name="name">Shipping &amp; Returns Policy Banner</field>
+			<field name = "model">s3.object</field>
+			<field name="arch" type="xml">
+				<form string="Banner">
+					<group>
+						<field name = "file_name" />
+						<field name = "shipping_returns_policy_banner" invisible="1" />
+					</group>
+					<notebook>
+						<page string = "Attachment">
+							<field name = "datas" widget="image" filename="file_name"/>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>		
 
 		<record id = "res_config_s3_object_form_view_customerreview" model = "ir.ui.view">
 			<field name="name">Customer Review Banner</field>
@@ -185,7 +203,12 @@
                     		<div>
 	                    		<label for="terms_conditions_banner" />
 	                    		<field name = "terms_conditions_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_term_conditions','default_terms_conditions_banner':True}"/>                    		
-                    		</div>                       		                    		                    		                    		                 		                    		
+                    		</div> 
+                    		<div>
+	                    		<label for="shipping_returns_policy_banner" />
+	                    		<field name = "shipping_returns_policy_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_shippingreturns','default_shipping_returns_policy_banner':True}"/>                    		
+                    		</div>                     		
+                    		                      		                    		                    		                    		                 		                    		
                     	</group>
                     	<group col="1">
                     		<div>

@@ -35,4 +35,4 @@ class s3_object(models.Model):
     terms_conditions_banner = fields.Boolean("Is Terms & Conditions Banner ?")
     search_banner = fields.Boolean('Is Search Banner?')
     checkout_banner = fields.Boolean('Is Checkout Banner?')
-    
+    shipping_returns_policy_banner = fields.Boolean('Is Shipping & Returns Policy Banner ?')

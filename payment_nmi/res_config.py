@@ -44,7 +44,18 @@ class integration_config_settings(osv.osv_memory):
         nmi_password = params.get_param(cr, uid, 'nmi_password',default='',context=context)        
         return dict(nmi_password=nmi_password)        
 
+    def set_default_nmi_key(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params.set_param(cr, uid, 'nmi_key', (myself.nmi_key or '').strip(), groups=['base.group_system'], context=None)
+
+    def get_default_nmi_key(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        nmi_key = params.get_param(cr, uid, 'nmi_key',default='',context=context)        
+        return dict(nmi_key=nmi_key)            
+
     _columns = {
                 'nmi_username':fields.char('Username'),
                 'nmi_password':fields.char('Password'),
+                'nmi_key':fields.char('NMI API Key'),
             }

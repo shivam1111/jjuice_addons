@@ -104,6 +104,7 @@ class rate_fedex_request(models.TransientModel):
             for i in response.get('msg',False): # This will be a list of tuple [(service type,currency,price)]
                 msg = msg + "Serive Type:{0} -> Net Charge:{1} {2}\n".format(i[0],i[1],i[2])
             self.response = msg
+            self.rate = i[2]
         compose_form = self.env.ref('jjuice_fedex.rate_request_form', False)
         return {
             'name': _('Rate Request'),
@@ -136,6 +137,32 @@ class rate_fedex_request(models.TransientModel):
             self.to_country = self.recipient_id.country_id.id
             self.to_postal_code = self.recipient_id.zip 
             self.to_residential = self.recipient_id.is_residential    
+    
+    
+    @api.model
+    def calculate_rates_for_address(self,address,items):
+        product = self.env['product.product']
+        if len(items) > 0:
+            net_weight = 0.00
+            for i in items:
+                pr = product.search([('id','=',i[0])],limit=1)
+                weight = pr.product_tmpl_id.weight_net or pr.vol_id.weight or 0.00
+                qty = i[1]
+                gross_weight = qty*weight
+                net_weight+=weight
+            request_id = self.create({
+                    'to_country':address.get('country_id',False),
+                    'to_postal_code':address.get('zip',False),
+                    'package_ids':[(0,0,{
+                            'weight':net_weight,
+                        })]
+                })
+            request_id.get_rates()
+            return {
+                    'rate':request_id.rate,
+                    'msg':request_id.response
+                }
+        return False
     
     @api.multi
     def _get_rates_fedex(self):
@@ -231,7 +258,6 @@ class rate_fedex_request(models.TransientModel):
                     package.SpecialServicesRequested.CodDetail.CollectionType = self.cod_collection_type                
             try:    
                 rate_request.send_request()
-                print rate_request.response
 #             print "HighestSeverity:", rate_request.response.HighestSeverity
             # RateReplyDetails can contain rates for multiple ServiceTypes if ServiceType was set to None
             except Exception, e:
@@ -316,7 +342,7 @@ class rate_fedex_request(models.TransientModel):
                                             ('PERSONAL_CHECK','Personal Check')
                                             ],'Collection Type')
     cod_currency = fields.Selection(fedex_lists._fedex_currency,string = "COD Currency",default="CAD")
-        
+    rate = fields.Float("Rate")   
 class rate_commodity_package(models.TransientModel):
     _name = "rate.commodity.package"
     _description = "Commodity Details"

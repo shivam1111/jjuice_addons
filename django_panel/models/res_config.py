@@ -300,7 +300,23 @@ class django_panel_settings(osv.osv_memory):
         if s3_object_ids:
             return dict(search_banner=s3_object_ids[0])
         else:
-            return dict(search_banner=False)                        
+            return dict(search_banner=False)
+
+    def set_default_shipping_returns_policy_banner(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('shipping_returns_policy_banner','=',True),('id','!=',myself.shipping_returns_policy_banner.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.shipping_returns_policy_banner.id,{'shipping_returns_policy_banner':True})
+    
+    def get_default_shipping_returns_policy_banner(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('shipping_returns_policy_banner','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(shipping_returns_policy_banner=s3_object_ids[0])
+        else:
+            return dict(shipping_returns_policy_banner=False)                                
 
     _columns = {
             'site_name':fields.char("Site Name"),
@@ -320,6 +336,7 @@ class django_panel_settings(osv.osv_memory):
             'attributes_available_ids':fields.many2many('product.attribute.value','django_panel_settings_attribute_value_available',column1='django_panel_settings_id',column2='attribute_value_id',
                                                    string = "Volumes available to Businesses",domain=_get_domain_volume,
                                                    ),
+            'shipping_returns_policy_banner':fields.many2one('s3.object',string="Shipping & Returns Policy Banner"),
             'aboutus_banner':fields.many2one('s3.object',string="About Us Banner"),
             'checkout_banner':fields.many2one('s3.object',string="Checkout Banner"),
             'terms_conditions_banner':fields.many2one('s3.object',string="Terms & Conditions Banner"),

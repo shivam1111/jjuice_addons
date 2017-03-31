@@ -213,6 +213,7 @@
 		<report id="report_qweb_report_order_register"
 		        string="Order Details"
                 model="sale.order"
+                menu="False"
 			    report_type="qweb-pdf"
 			    file="jjuice.report_sale_order"
 			    name="jjuice.report_qweb_order_attachment" />	
