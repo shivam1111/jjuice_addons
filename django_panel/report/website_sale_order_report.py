@@ -30,13 +30,26 @@ class order_website_report(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context=None):
         super(order_website_report, self).__init__(cr, uid, name, context=context)
         self.localcontext.update( {
+            'is_shipping_free':self.is_shipping_free
         })
         self.context = context
     
-
+    def is_shipping_free(self,order):
+        print dir(self)
+        self.cr.execute('''
+            select id from product_product where shipping =true and active = true limit 1
+        ''')
+        shipping_id = self.cr.fetchone()[0]
+        shipping = True
+        if shipping_id:
+            for i in order.order_line:
+                if i.product_id.id == shipping_id and i.price_subtotal > 0:
+                    shipping = False
+                    break
+        return shipping
+        
     def set_context(self, objects, data, ids, report_type=None,context=None):
         if data == None:data={}
-        print "================================objetcts",objects
 #         if data.get('model',False) == 'stock.picking':
 #             brw_object = self.pool.get('sale.order').browse(self.cr,SUPERUSER_ID,data.get('data',False).get('ids',False),context=None)
 #             if brw_object:

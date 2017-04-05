@@ -3,7 +3,8 @@ import openerp.addons.decimal_precision as dp
 
 class account_invoice(models.Model):
     _inherit = "account.invoice"
-
+    
+    
     def action_invoice_sent(self,cr,uid,ids,context=None):
         context={}
         return super(account_invoice,self).action_invoice_sent(cr,uid,ids,context)
@@ -90,7 +91,15 @@ class account_invoice(models.Model):
                   list_invoice_plan = self.env['payment.plan'].search([('invoice_id','=',record.id)])
                   list_plan = list_plan + map(lambda x:x.id , list_invoice_plan)
                   record.payment_plan_ids = list_plan 
-
+    @api.one
+    @api.depends('partner_id')
+    def _get_shipping_partner(self):
+        if self.partner_id:
+            addr = self.partner_id.address_get(['delivery'])
+            delivery_partner = self.env['res.partner'].browse(addr.get('delivery'))
+            self.shipping_partner_id = delivery_partner
+        
+    
     @api.one
     @api.depends('invoice_line.price_subtotal', 'tax_line.amount')
     def _compute_amount(self):
@@ -112,7 +121,8 @@ class account_invoice(models.Model):
     payment_plan_ids=fields.Many2many("payment.plan","payment_id","paymen_invoice_relation","invoice_id","Payment Plan Id",compute='_compute_payments_jjuice')
     paid_balance = fields.Float("Paid",compute='_compute_payments_paid',store=True)
     free_shipping_check=fields.Boolean("Free Shipping",compute = '_check_shipping_free')
-    
+    shipping_partner_id = fields.Many2one('res.partner', string='Shipping Entity',compute ='_get_shipping_partner',
+        help="The commercial entity that will be used on Journal Entries for this invoice")
 class account_invoice_line(models.Model):
     _inherit = "account.invoice.line"
     _order = "invoice_id,sequence,id"

@@ -30,9 +30,12 @@
     'images' : [], #'/images/image_name.png'
     'depends' : ['base'],
     'data': [
+             'security/ir.model.access.csv',
              'res_partner.xml',
              'account_acquisition.xml',
-             'security/ir.model.access.csv',
+             'data.xml'
+             
+             
              ],
     'qweb' :[],
     'demo': [],

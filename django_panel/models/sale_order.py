@@ -5,6 +5,15 @@ from datetime import date
 class sale_order(models.Model):
     _inherit = "sale.order"
     
+    @api.one
+    def get_invoice_report(self):
+        output = PdfFileWriter()  
+        report_obj = self.env['report']
+        pdf = report_obj.get_pdf(self, 'django_panel.report_qweb_order_website_report', data={})
+        output_base64 = pdf.encode("base64"),
+        return output_base64  
+    
+    
     @api.model
     def create_sale_order_from_cart(self,vals):
 #         {'origin': '3057132f9b644f23892a0e84f7e1e0f8', 
@@ -78,9 +87,10 @@ class sale_order(models.Model):
             av.button_proforma_voucher()
             output = PdfFileWriter()  
             report_obj = self.env['report']
-            pdf = report_obj.get_pdf(account_invoice, 'account.report_invoice', data={})
+            pdf = report_obj.get_pdf(order, 'django_panel.report_qweb_order_website_report', data={})
             output_base64 = pdf.encode("base64")
-            
+            template = self.env.ref('account.email_template_edi_invoice', False)
+            self.env['email.template'].browse(template.id).send_mail(account_invoice.id,force_send=False)
         return {
             'name':account_invoice and account_invoice.number or 'No Name',
             'order_id':order and order.id or False,

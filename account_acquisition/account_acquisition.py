@@ -6,7 +6,8 @@ _SOURCE = [
            ('sales_trip','Sales Trip'),
            ('magazine_add','Magazine Add'),
            ('referral','Referral'),
-           ]
+           ('website','Website')
+       ]
 
 class account_acquisition(models.Model):
     _name = "account.acquisition"

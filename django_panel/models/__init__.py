@@ -12,3 +12,4 @@ import partner_reviews
 import website_contactus
 import res_country
 import sale_order
+import res_users
