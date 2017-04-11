@@ -1,0 +1,19 @@
+<openerp>
+	<data>
+        <record id="action_res_partner_website_lead" model="ir.actions.act_window">
+            <field name="name">Website Leads</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain" eval = "[('leads','=',True),('acquisition_id','=',ref('account_acquisition.source_website'))]" />
+        </record>
+
+		<menuitem  
+			id="menu_res_partner_website_lead"
+			parent="base.menu_sales"
+			groups="base.group_user"
+			action="action_res_partner_website_lead"
+			/>		                        		
+	</data>
+</openerp>

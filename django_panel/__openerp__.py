@@ -43,8 +43,10 @@
              'views/partner_reviews.xml',
              'views/website_contactus.xml',
              'views/res_country.xml',
+             'views/res_partner.xml',
              'security/ir.model.access.csv',
              'report/website_sale_order_report.xml',
+             'edi/registration_email_template.xml'
          ],
     'demo': [],
     'test': [],
