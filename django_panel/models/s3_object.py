@@ -36,3 +36,4 @@ class s3_object(models.Model):
     search_banner = fields.Boolean('Is Search Banner?')
     checkout_banner = fields.Boolean('Is Checkout Banner?')
     shipping_returns_policy_banner = fields.Boolean('Is Shipping & Returns Policy Banner ?')
+    contactus_banner_500340 = fields.Boolean('Is Contact Us Image (500x340) ?')

@@ -27,7 +27,7 @@
 									<field name = "file_name_category" />
 								</group>
 								<group>
-									<field name = "category_datas" filename="file_name" widget="image" nolabel="1" readonly="0"/>
+									<field name = "category_datas" filename="file_name_category" widget="image" nolabel="1" readonly="0"/>
 								</group>
 							</page>						
 							<page string = "Drop Down List Image">
