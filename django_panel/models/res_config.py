@@ -34,8 +34,38 @@ class django_panel_settings(osv.osv_memory):
     def get_default_aws_access_id(self,cr,uid,ids,context=None):
         params = self.pool.get('ir.config_parameter')
         aws_access_id = params.get_param(cr, uid, 'aws_access_id',default='',context=context)        
-        return dict(aws_access_id=aws_access_id)                                            
-        
+        return dict(aws_access_id=aws_access_id)
+
+    def set_default_website_url(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params.set_param(cr, uid, 'website_url', (myself.website_url or '').strip(), groups=['base.group_system'], context=None)
+
+    def get_default_website_url(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        website_url = params.get_param(cr, uid, 'website_url',default='',context=context)
+        return dict(website_url=website_url)
+
+    def set_default_website_username(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params.set_param(cr, uid, 'website_username', (myself.website_username or '').strip(), groups=['base.group_system'], context=None)
+
+    def get_default_website_username(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        website_username = params.get_param(cr, uid, 'website_username',default='',context=context)
+        return dict(website_username=website_username)
+
+    def set_default_website_pwd(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        myself = self.browse(cr,uid,ids[0],context=context)
+        params.set_param(cr, uid, 'website_pwd', (myself.website_pwd or '').strip(), groups=['base.group_system'], context=None)
+
+    def get_default_website_pwd(self,cr,uid,ids,context=None):
+        params = self.pool.get('ir.config_parameter')
+        website_pwd = params.get_param(cr, uid, 'website_pwd',default='',context=context)
+        return dict(website_pwd=website_pwd)
+
     def set_default_aws_secret_key(self,cr,uid,ids,context=None):
         params = self.pool.get('ir.config_parameter')
         myself = self.browse(cr,uid,ids[0],context=context)
@@ -366,5 +396,8 @@ class django_panel_settings(osv.osv_memory):
             'promo_business_ids':fields.many2many('website.policy','django_panel_settings_website_policy',column1='django_panel_settings_id',column2='policy_id',
                                                    string = "Business Promotions"),
             'promo_non_business_ids':fields.many2many('website.policy','django_panel_settings_non_business_website_policy',column1='django_panel_settings_id',column2='policy_id',
-                                                   string = "Non Business Promotions"),  
+                                                   string = "Non Business Promotions"),
+            'website_url':fields.char('Website URL'),
+            'website_username':fields.char('Website Username'),
+            'website_pwd': fields.char('Website Password'),
         }

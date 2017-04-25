@@ -189,6 +189,10 @@
 	                    		<field name = "site_name" nolabel="1" />	                    		
                     		</div>
                     		<div>
+	                    		<label for="website_username" />
+	                    		<field name = "website_username" nolabel="1"  />
+                    		</div>
+                    		<div>
 	                    		<label for="attribute_value_ids" />
 	                    		<field name = "attribute_value_ids" nolabel="1" widget = "many2many_tags" options="{'no_create': True,'no_quick_create':True,'no_create_edit': True}"/>                    		
                     		</div>
@@ -209,7 +213,11 @@
                     		<div>
 	                    		<label for="attributes_available_ids" />
 	                    		<field name = "attributes_available_ids" nolabel="1" widget = "many2many_tags" options="{'no_create': True,'no_quick_create':True,'no_create_edit': True}"/>                    		
-                    		</div>   
+                    		</div>
+                    		<div>
+	                    		<label for="website_pwd" />
+	                    		<field name = "website_pwd" nolabel="1" password="1"  />
+                    		</div>
                     		<div>
 	                    		<label for="aboutus_banner" />
 	                    		<field name = "aboutus_banner" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_aboutus','default_aboutus_banner':True}"/>                    		
@@ -229,6 +237,10 @@
                     		                      		                    		                    		                    		                 		                    		
                     	</group>
                     	<group col="1">
+                    		<div>
+	                    		<label for="website_url" />
+	                    		<field name = "website_url" nolabel="1"  />
+                    		</div>
                     		<div>
 	                    		<label for="mailing_list_id" />
 	                    		<field name = "mailing_list_id" nolabel="1" required = "1" />
