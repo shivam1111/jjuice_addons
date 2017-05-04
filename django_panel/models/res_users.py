@@ -24,7 +24,7 @@ class res_users(models.Model):
             if not state:
                 state = self.env['res.country.state'].create({
                         'name':state_name,
-                        'code':"".join(e[0] for e in name.split()),
+                        'code':"".join(e[0] for e in state_name.split()),
                         'country_id':country.id,
                     })
             state_id = state.id
@@ -42,20 +42,26 @@ class res_users(models.Model):
             'city':vals.get('city',''),
             'classify_finance':'website',
             'customer':True,
+            'leads':False,
         }
+
         partner = res_partner.create(values)
         user = self.env['res.users'].sudo()
         values.update({
             'partner_id': partner.id,
             'login':vals.get('email',''),
         })
+
         user._signup_create_user(values)
         user_id = self.search([('login','=',vals.get('email',''))])
+
         if user_id and vals.get('register-confirm-password',False):
             user_id.sudo().password = vals.get('register-confirm-password','')
+
         if vals.get('is_wholesale',False):
             partner.classify_finance = vals.get('type_account','website')
             partner.resale_no = vals.get('vat','')
+            partner.customer = False
             partner.leads = True
             user_id.sudo().active = False
         template = self.env.ref('django_panel.email_template_registration_website', False)
