@@ -34,6 +34,7 @@ class sale_order(models.Model):
                         'product_uom_qty':1,
                         'price_unit':vals.get('shipping_cost',0.00),
                     }])
+            self.env['res.partner'].search([('id','=',vals.get('partner_id',False))])[0].notify_email = 'none'
             order = self.create({
                 'partner_id':vals.get('partner_id',False),
                 'origin':vals.get('origin',''),
