@@ -112,14 +112,6 @@ class res_partner(osv.osv):
     _inherit='res.partner'
     _description='JJUICE'
     
-    def convert_lead_partner(self,cr,uid,ids,context):
-        for i in ids:
-            child_ids = self.search(cr,uid,[('parent_id','child_of',i)])
-            self.write(cr,uid,child_ids,{
-                                            'customer':True,
-                                            'leads':False
-                                         },context)
-    
     def create(self,cr,uid,vals,context):
         return super(res_partner,self).create(cr,uid,vals,context)
     

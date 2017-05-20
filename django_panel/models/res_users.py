@@ -16,6 +16,13 @@ class res_users(models.Model):
         res_partner = self.env['res.partner']
         country = self.env['res.country'].browse(eval(vals.get('country_id',False)))
         source_id = self.env.ref('account_acquisition.source_website')
+
+        # {'website': '', 'city': 'Mandi Gobindgarh', 'vat': 'snd', 'name': 'Shivam Goyal', 'zip': '147301',
+        #  'is_wholesale': 'on', 'street2': '', 'po_box': 'on', 'country_id': '235', 'phone': '9855070234',
+        #  'street': 'Shastri Nagar, Sector 3A', 'company_name': 'Some COmpany Name',
+        #  'register-confirm-password': 'shivam', 'type_account': 'retailer', 'state_id': '2',
+        #  'email': 'shivam_1111@hotmail.com', 'register-password': 'shivam',}
+
         if country.code == "US":
             state_id = eval(vals.get('state_id',False))
         else:
@@ -44,26 +51,45 @@ class res_users(models.Model):
             'customer':True,
             'leads':False,
         }
-
-        partner = res_partner.create(values)
         user = self.env['res.users'].sudo()
-        values.update({
-            'partner_id': partner.id,
-            'login':vals.get('email',''),
-        })
-
-        user._signup_create_user(values)
-        user_id = self.search([('login','=',vals.get('email',''))])
+        if vals.get('is_wholesale',False):
+            company_values = values.copy()
+            company_values.update({
+                'name': vals.get('company_name', 'No Company Name'),
+                'website':vals.get('website', 'No Company Name'),
+                'classify_finance':vals.get('type_account','website'),
+                'resale_no':vals.get('vat',''),
+                'customer':False,
+                'leads':True,
+                'is_company':True,
+            })
+            partner = res_partner.create(company_values)
+            values.update({
+                'classify_finance': vals.get('type_account', 'website'),
+                'customer': False,
+                'leads': True,
+                'parent_id':partner.id,
+                'use_parent_address':True,
+            })
+            res_partner.create(values)
+            company_values.update({
+                'partner_id': partner.id,
+                'login':vals.get('email',''),
+            })
+            user._signup_create_user(company_values)
+            user_id = self.search([('login','=',vals.get('email',''))])
+            user_id.sudo().active = False
+        else:
+            partner = res_partner.create(values)
+            values.update({
+                'partner_id': partner.id,
+                'login': vals.get('email', ''),
+            })
+            user._signup_create_user(values)
+            user_id = self.search([('login', '=', vals.get('email', ''))])
 
         if user_id and vals.get('register-confirm-password',False):
             user_id.sudo().password = vals.get('register-confirm-password','')
-
-        if vals.get('is_wholesale',False):
-            partner.classify_finance = vals.get('type_account','website')
-            partner.resale_no = vals.get('vat','')
-            partner.customer = False
-            partner.leads = True
-            user_id.sudo().active = False
         template = self.env.ref('django_panel.email_template_registration_website', False)
         self.env['email.template'].sudo().browse(template.id).send_mail(partner.id,force_send=False)
         return user_id.id
