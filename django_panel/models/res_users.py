@@ -91,6 +91,8 @@ class res_users(models.Model):
         if user_id and vals.get('register-confirm-password',False):
             user_id.sudo().password = vals.get('register-confirm-password','')
         template = self.env.ref('django_panel.email_template_registration_website', False)
+        template1 = self.env.ref('django_panel.email_template_registration_notification_internal', False)
         self.env['email.template'].sudo().browse(template.id).send_mail(partner.id,force_send=False)
+        self.env['email.template'].sudo().browse(template1.id).send_mail(partner.id, force_send=False)
         return user_id.id
     

@@ -47,7 +47,9 @@
              'security/ir.model.access.csv',
              'report/website_sale_order_report.xml',
              'edi/registration_email_template.xml',
-             'edi/registration_wholesale_email.xml'
+             'edi/registration_wholesale_email.xml',
+             'edi/registration_email_notification.xml'
+
          ],
     'demo': [],
     'test': [],
