@@ -1,11 +1,23 @@
 from openerp import models, fields, api, _
 from helpers import BinaryS3Field,delete_object_bucket,get_bucket_location
 from openerp.exceptions import except_orm
+import json
 
 class product_product(models.Model):
     _inherit = "product.product"
     _description = "Adding S3 Object"
-    
+
+
+    @api.multi
+    def get_product_availability(self):
+        res = {}
+        for i in self:
+            res.update({
+                i.id:{'virtual_available':i.virtual_available}
+            })
+        return json.dumps(res)
+
+
     @api.multi
     def unlink(self):
         for rec in self:
