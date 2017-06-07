@@ -30,8 +30,8 @@
     'images' : [], #'/images/image_name.png'
     'depends' : ['base'],#account_analytic_analysis
     'data': [
-             'integrations.xml',
              'security/security.xml',
+             'integrations.xml',
              'res_config.xml',
              ],
 
