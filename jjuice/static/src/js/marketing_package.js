@@ -15,7 +15,6 @@ openerp.jjuice.marketing_package = function(instance,local){
 		init:function(parent){
 			this._super(parent);
 			this.parent = parent;
-			console.log(parent);
 			this.tab_style = this.parent.parent.data.tab_style;
 			this.fields = ['qty','price','discount']
 			this.subtotal = {} // line id: subtotal

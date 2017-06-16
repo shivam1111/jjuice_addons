@@ -9,6 +9,16 @@
 					<field name = "is_shipping_allowed" />
 				</xpath>
 			</field>
-		</record>		
+		</record>
+		<record id = "res_country_state_shipping_allowed" model= "ir.ui.view">
+			<field name="name">res.country.state</field>
+			<field name="model">res.country.state</field>
+			<field name="inherit_id" ref="base.view_country_state_form"/>
+			<field name="arch" type="xml">
+				<xpath expr = "/form/group" position="inside">
+					<field name = "is_banned" />
+				</xpath>
+			</field>
+		</record>
 	</data>
 </openerp>

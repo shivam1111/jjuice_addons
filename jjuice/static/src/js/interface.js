@@ -5,14 +5,6 @@ openerp.jjuice.pos = function (instance,local) {
 	var QWeb = instance.web.qweb;
 	instance.web.jjuice = instance.web.jjuice || {};
 
-//	Array.prototype.last = function(){
-//		if (this.length > 0){
-//			return this.length - 1;
-//		}else{
-//			return 0
-//		}
-//	}
-	
 	main_defs = $.Deferred();
 	$(document).ready(function(){
     	var mod = new instance.web.Model("product.tab", {}, []); // MODEL,CONTEXT,DOMAIN
