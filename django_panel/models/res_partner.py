@@ -5,6 +5,8 @@ from openerp.exceptions import except_orm
 class res_partner(models.Model):
     _inherit = "res.partner"
 
+    birth_date = fields.Date(string="DOB")
+
     @api.multi
     def convert_lead_partner(self):
         user = self.env['res.users'].sudo()

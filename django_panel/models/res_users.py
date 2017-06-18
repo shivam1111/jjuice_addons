@@ -23,18 +23,19 @@ class res_users(models.Model):
         #  'register-confirm-password': 'shivam', 'type_account': 'retailer', 'state_id': '2',
         #  'email': 'shivam_1111@hotmail.com', 'register-password': 'shivam',}
 
-        if country.code == "US":
-            state_id = eval(vals.get('state_id',False))
-        else:
-            state_name = vals.get('state_id',False)
-            state = self.env['res.country.state'].search([('name','ilike',state_name)])
-            if not state:
-                state = self.env['res.country.state'].create({
-                        'name':state_name,
-                        'code':"".join(e[0] for e in state_name.split()),
-                        'country_id':country.id,
-                    })
-            state_id = state.id
+        # if country.code == "US":
+        #     state_id = eval(vals.get('state_id',False))
+        # else:
+        #     state_name = vals.get('state_id',False)
+        #     state = self.env['res.country.state'].search([('name','ilike',state_name)])
+        #     if not state:
+        #         state = self.env['res.country.state'].create({
+        #                 'name':state_name,
+        #                 'code':"".join(e[0] for e in state_name.split()),
+        #                 'country_id':country.id,
+        #             })
+        #     state_id = state.id
+        state_id = eval(vals.get('state_id', False))
         values = {
             'name':vals.get('name',''),
             'email':vals.get('email',''),
