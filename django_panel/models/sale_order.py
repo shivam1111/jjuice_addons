@@ -4,6 +4,8 @@ from datetime import date
 
 class sale_order(models.Model):
     _inherit = "sale.order"
+
+    promotion_id = fields.Many2one('promotion.codes',string = "Promotion Code")
     
     @api.one
     def get_invoice_report(self):
@@ -38,11 +40,17 @@ class sale_order(models.Model):
             order = self.create({
                 'partner_id':vals.get('partner_id',False),
                 'origin':vals.get('origin',''),
+                'promotion_id':vals.get('promotion_id',False),
                 'note':vals.get('note',''),
                 'order_line':vals.get('order_line',[]),
                 'source_id':medium_id.id,
             })
             order.action_button_confirm();
+
+            for picking in order.picking_ids:
+                picking.order_website_note = vals.get('note','')
+                picking.promotion_id = vals.get('promotion_id',False)
+
             invoice_wizard = self.env['sale.advance.payment.inv'].with_context(active_ids=[order.id],open_invoices=True)
             wizard_id = invoice_wizard.create({'advance_payment_method':'all'})
             res = wizard_id.create_invoices()

@@ -1,0 +1,51 @@
+<openerp>
+	<data>
+		<record id = "promotion_codes_tree" model = "ir.ui.view">
+			<field name="name">Promotion Codes</field>
+			<field name = "model">promotion.codes</field>
+			<field name="arch" type="xml" >
+				<tree string="Promotion Codes" editable="top">
+					<field name = "sequence" widget="handle" />
+					<field name = "name"  />
+                    <field name = "description" />
+				</tree>
+			</field>
+		</record>
+		<record id = "promotion_codes_form" model = "ir.ui.view">
+			<field name="name">Promotion Codes</field>
+			<field name = "model">promotion.codes</field>
+			<field name="arch" type="xml" >
+				<form string="Promotion Codes" editable="top">
+					<sheet>
+						<group>
+							<group>
+								<field name = "name"  />
+							</group>
+							<group>
+								<field name = "sequence" widget="handle" />
+							</group>
+						</group>
+						<notebook>
+							<page string = "Description">
+								<field name = "description" nolabel="1"/>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+        <record id="action_promotion_codes" model="ir.actions.act_window">
+            <field name="name">Promotion Codes</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">promotion.codes</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+		<menuitem id = "menu_product_codes"
+		parent = "django_panel.django_main_menu_website_elements_view"
+		action = "action_promotion_codes"
+		groups = "base.group_user"/>
+	</data>
+</openerp>
