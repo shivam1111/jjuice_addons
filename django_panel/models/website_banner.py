@@ -25,3 +25,4 @@ class website_banner(models.Model):
     sequence = fields.Integer('Sequence')
     datas =  BinaryS3Field(string="Image",key_name=False)
     file_name = fields.Char('File Name',required=True)
+    active = fields.Boolean("Active",default=True)

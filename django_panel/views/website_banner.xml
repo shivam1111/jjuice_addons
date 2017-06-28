@@ -9,6 +9,7 @@
 						<group>
 							<group>
 								<field name="file_name"/>
+								<field name = "active" />
 							</group>
 							<group>
 								<field name = "sequence" />							
