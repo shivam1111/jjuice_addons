@@ -8,6 +8,7 @@
 					<field name = "sequence" widget="handle" />
 					<field name = "name"  />
                     <field name = "description" />
+					<field name = "active" />
 				</tree>
 			</field>
 		</record>
@@ -39,6 +40,7 @@
             <field name="name">Promotion Codes</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">promotion.codes</field>
+			<field name ="context">{'active_test': False}</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
         </record>

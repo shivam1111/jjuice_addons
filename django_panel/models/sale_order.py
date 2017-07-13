@@ -26,6 +26,8 @@ class sale_order(models.Model):
 #         }
         order_line = vals.get('order_line',[])
         order = False
+        promotion_id = vals.get('promotion_id',False)
+        promotion_code = vals.get('promotion_code',False)
         if len(order_line) > 0:
             medium_id = self.env.ref('django_panel.django_website_sale_order_source')
             if vals.get('shipping_cost',0.00) > 0:
@@ -40,7 +42,7 @@ class sale_order(models.Model):
             order = self.create({
                 'partner_id':vals.get('partner_id',False),
                 'origin':vals.get('origin',''),
-                'promotion_id':vals.get('promotion_id',False),
+                'promotion_id':promotion_id,
                 'note':vals.get('note',''),
                 'order_line':vals.get('order_line',[]),
                 'source_id':medium_id.id,
@@ -105,4 +107,6 @@ class sale_order(models.Model):
             'order_id':order and order.id or False,
             'invoice_id':account_invoice and account_invoice.id or False,
             'pdf':output_base64,
+            'promotion_id':promotion_id,
+            'promotion_code':promotion_code,
         }
