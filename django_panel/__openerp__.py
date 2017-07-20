@@ -47,6 +47,7 @@
                 'views/promotion_codes.xml',
                 'views/sale_order.xml',
                 'views/stock_picking.xml',
+                'views/website_notifications.xml',
                 'security/ir.model.access.csv',
                 'report/website_sale_order_report.xml',
                 'edi/registration_email_template.xml',

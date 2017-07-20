@@ -1,0 +1,32 @@
+<openerp>
+	<data>
+
+        <record id = "website_notifications_tree" model= "ir.ui.view">
+			<field name="name">website.notifications.view</field>
+			<field name="model">website.notifications</field>
+			<field name="arch" type="xml">
+				<tree string="Website Notifications" default_order = 'sequence' editable = "top">
+					 <field name = "sequence" widget="handle" />
+					 <field name="name"  />
+					 <field name = "active" />
+				</tree>
+			</field>
+		</record>
+
+		<record model="ir.actions.act_window" id="website_notifications_actions">
+			<field name="name">Website Notifications</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="res_model">website.notifications</field>
+			<field name ="context">{'active_test': False}</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree</field>
+		</record>
+
+		<menuitem
+			id="website_notifications_action"
+			parent="django_panel.django_main_menu_website_elements_view"
+			groups="base.group_user"
+			action="website_notifications_actions"
+			/>
+	</data>
+</openerp>
