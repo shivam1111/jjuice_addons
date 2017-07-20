@@ -26,3 +26,5 @@ class website_banner(models.Model):
     datas =  BinaryS3Field(string="Image",key_name=False)
     file_name = fields.Char('File Name',required=True)
     active = fields.Boolean("Active",default=True)
+    button_title = fields.Char('Text on Button')
+    url_link = fields.Char('URL')

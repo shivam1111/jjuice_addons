@@ -9,10 +9,12 @@
 						<group>
 							<group>
 								<field name="file_name"/>
+								<field name = "url_link" />
 								<field name = "active" />
 							</group>
 							<group>
-								<field name = "sequence" />							
+								<field name = "sequence" />
+								<field name = "button_title" attrs = "{'required':[('url_link','!=',False)],'invisible':[('url_link','=',False)]}" />
 								<!-- <field name = "url" widget="url" /> -->
 							</group>
 						</group>
@@ -43,6 +45,7 @@
 			<field name="name">Website Banners</field>
 			<field name="type">ir.actions.act_window</field>
 			<field name="res_model">website.banner</field>
+			<field name ="context">{'active_test': False}</field>
 			<field name="view_type">form</field>
 			<field name="view_mode">tree,form</field>
 		</record>
