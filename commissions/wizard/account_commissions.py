@@ -17,9 +17,9 @@ class account_move_line(models.Model):
         diff = self.debit - self.credit
         if diff > 0:
             if self.type_account in ['retailer','website']:
-                self.commission = 0.2 * diff
+                self.commission = 0.15 * diff
             else:
-                self.commission = 0.1 * diff
+                self.commission = 0.075 * diff
         else:
             self.commission = 0
     
