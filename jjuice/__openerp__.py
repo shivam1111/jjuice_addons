@@ -64,7 +64,8 @@
               'marketing_package.xml',
               'wizard/mail_compose_message.xml',
               'product_tab_view.xml',
-              'product_flavours_view.xml'
+              'product_flavours_view.xml',
+              'product_attribute_value.xml',
              ],
 
     'qweb' : [

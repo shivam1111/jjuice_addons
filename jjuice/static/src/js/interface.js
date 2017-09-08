@@ -4,7 +4,6 @@ openerp.jjuice.pos = function (instance,local) {
     _lt = instance.web._lt;
 	var QWeb = instance.web.qweb;
 	instance.web.jjuice = instance.web.jjuice || {};
-
 	main_defs = $.Deferred();
 	$(document).ready(function(){
     	var mod = new instance.web.Model("product.tab", {}, []); // MODEL,CONTEXT,DOMAIN
@@ -86,6 +85,26 @@ openerp.jjuice.pos = function (instance,local) {
 				'price_unit':price,
 				'discount':discount,
 			}])
+		},
+		get_total_weight:function(){
+            var self = this;
+            var total = 0.00;
+            if (self.data.tab_style == 1 || self.data.tab_style == 5){
+                _.each(self.product_data,function(flavor){
+                    _.each(flavor,function(product){
+                        total = total + product.get_value()*product.data.weight_net;
+                    })
+                })
+            }else if (self.data.tab_style == 2 || self.data.tab_style == 4){
+                _.each(self.subtotal_qty,function(product){
+                    total = total+product.get_value() * product.data.weight_net;
+                })
+            }else{
+                _.each(self.subtotal_qty,function(product){
+                    total = total+product.get_value() * product.data.weight_net;
+                })
+            }
+            return total;
 		},
 		get_product_information:function(product_ids,fields){
 			if (product_ids.length > 0) {
@@ -179,7 +198,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		get_width:function(){
 			return this.data.input_width
 		},
-		
+
 		get_price:function(product){
 			return product.lst_price;
 		},
@@ -455,7 +474,6 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 			var self=this;
 			price = self.get_prices();
 			width = self.get_width();
-			
 			//Fetch Volume Prices first
 			self.$el = $(QWeb.render('flavor_conc_matrix_table',{"concentration":self.available_conc,'tab_style':self.data.tab_style}))
 			$.each(self.available_flavors,function(index_flavor,flavor){
@@ -780,7 +798,7 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 				"result":result
 			})			
 		},
-		execute_confirm_order:function(){ //working
+		execute_confirm_order:function(){
 			var self = this;
 			var partner_id = self.field_manager.datarecord.id;
 			var lines = self.get_order_lines();
@@ -849,15 +867,22 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 		},
 		execute_rate_request:function(){
 			var self = this;
-			self.do_action({
-                type: 'ir.actions.act_window',
-                res_model: "rate.fedex.request",
-                views: [[false, 'form']],
-                context:{
-                	"default_recipient_id":self.field_manager.datarecord.id
-                },
-                target: 'new'
+			total = 0.00
+			_.each(self.tabs_object,function(tab){
+			    try{
+                    total = total + tab.tab_widget.get_total_weight();
+                    console.log(tab)
+			    }catch(e){
+			        console.log("Error:",e)
+			    }
 			})
+            var rate_fedex_request = new openerp.Model('rate.fedex.request');
+            rate_fedex_request.call('get_interface_rates',{
+                weight:total,
+                partner_id:self.field_manager.datarecord.id
+            }).done(function(res){
+                self.do_action(res)
+            })
 		},
 		renderTabs:function(){
 			var self = this;
@@ -1257,7 +1282,6 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 				 * The view is not refreshed when we change the partner record. For that if we detect a change in field manager,
 				 * we empty the $el of the parent and render according the new customer record
 				 */
-				console.log("changed")
 				self.$el.empty();
 				self.$prices = $.Deferred()
 				self.renderElement();

@@ -2,6 +2,7 @@ from openerp import models, fields, api,_
 import openerp.addons.decimal_precision as dp
 from openerp.exceptions import except_orm, Warning, RedirectWarning
 from datetime import date
+from openerp import SUPERUSER_ID
 
 _list_tab_style = [
                    (1,"Flavor Concentration Matrix"),
@@ -25,18 +26,20 @@ class product_tab(models.Model):
         res = {}
         products = self.pool.get('product.product')
         taxes = self.pool.get('account.tax')
-        tabs = self.search_read(cr,uid,order="sequence")
+        tabs = self.search_read(cr,SUPERUSER_ID,order="sequence")
         marketing_package = self.pool.get('marketing.package')
+        vol_ids = []
         for i in tabs:
+            if i.get("tab_style", False) in [1,5] and i.get("vol_id",False):
+                vol_ids.append(i["vol_id"][0])
             if i.get("tab_style",False) == 3:
                 package_ids = i.get('marketing_packages_ids',False)
                 if package_ids:
                     i.update({
                               "marketing_packages_ids":marketing_package.get_marketing_package(cr,uid,package_ids)
                               })
-                    
             if len(i.get('product_ids',False)) > 0:
-                product_info = products.read(cr,uid,i.get('product_ids'),fields=['name','vol_id','conc_id','flavor_id','lst_price','virtual_available','incoming_qty'])
+                product_info = products.read(cr,uid,i.get('product_ids'),fields=['name','vol_id','conc_id','flavor_id','lst_price','virtual_available','incoming_qty','weight_net'])
                 i["product_ids"] = {}
                 i["product_ids"] = {product['id']:product for product in product_info}
         res.update({'tabs':tabs})
@@ -45,8 +48,11 @@ class product_tab(models.Model):
                     'taxes':tax_info
                     })
         nmi_journal = self.pool.get('account.journal').search(cr,uid,[('is_nmi_journal','=',True)],limit=1)
+        vol_ids = list(set(vol_ids))
+        vol_ids_info = self.pool.get('product.attribute.value').read(cr,uid,vol_ids,['actual_value'],{})
         res.update({
                 'nmi_journal_id':nmi_journal and nmi_journal[0] or False,
+                'vol_ids':vol_ids_info,
             })
         return res
     

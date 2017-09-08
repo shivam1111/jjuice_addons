@@ -9,12 +9,29 @@ import openerp.addons.decimal_precision as dp
 class rate_fedex_request(models.TransientModel):
     _name = "rate.fedex.request"
     _description = "Rate Request from Fedex"
-    
-    
+
+    @api.model
+    def get_interface_rates(self,weight,partner_id):
+        # Takes in total weight and partner_id and gives the shipment rate
+        assert partner_id, "Partner ID is required"
+        number_packages = int(weight/40)
+        package_ids  = []
+        for i in range(0,number_packages):
+            package_ids.append((0,0,{'weight':40}))
+        if weight%40 != 0:
+            package_ids.append((0,0,{'weight':weight%40}))
+        rate_request = self.create({
+            'recipient_id':partner_id,
+            'package_ids':package_ids,
+        })
+        rate_request.onchange_recipient_id()
+        rates = rate_request.get_rates()
+        return rates
+
     @api.model
     def default_get(self,fields_list):
         res= super(rate_fedex_request,self).default_get(fields_list)
-        user_obj = self.env['res.users'] 
+        user_obj = self.env['res.users']
         company = user_obj._get_company()
         company_obj = self.env['res.company'].search([('id','=',company)])
         res.update({
@@ -22,8 +39,8 @@ class rate_fedex_request(models.TransientModel):
                     'from_postal_code':company_obj.zip,
                     'from_residential':company_obj.partner_id.is_residential,
                     })
-        return res    
-    
+        return res
+
     @api.multi
     def create_shipment(self):
         shipment_obj = self.env['create.shipment.fedex']
@@ -77,7 +94,7 @@ class rate_fedex_request(models.TransientModel):
                                   'unit_price':i.unit_price,
                                   'customs_value':i.customs_value,
                                   'harmonized_code':i.harmonized_code
-                                  })        
+                                  })
         compose_form = self.env.ref('jjuice_fedex.create_shipment_form', False)
         return {
             'name': _('Create Shipment'),
@@ -90,9 +107,9 @@ class rate_fedex_request(models.TransientModel):
             'target': 'current',
             'res_id':shipment.id,
             'context':self._context
-           }            
-        
-    
+           }
+
+
     @api.multi
     def get_rates(self):
         response = self._get_rates_fedex()
@@ -118,8 +135,8 @@ class rate_fedex_request(models.TransientModel):
             'res_id':self.id,
             'nodestroy': True,
             'context':self._context
-           }        
-    
+           }
+
     @api.one
     @api.depends('commodity_lines',
                  'commodity_lines.quantity',
@@ -130,15 +147,15 @@ class rate_fedex_request(models.TransientModel):
         for i in self.commodity_lines:
             total = total + i.customs_value
         self.customs_value = total
-        
+
     @api.onchange('recipient_id')
     def onchange_recipient_id(self):
         if self.recipient_id:
             self.to_country = self.recipient_id.country_id.id
-            self.to_postal_code = self.recipient_id.zip 
-            self.to_residential = self.recipient_id.is_residential    
-    
-    
+            self.to_postal_code = self.recipient_id.zip
+            self.to_residential = self.recipient_id.is_residential
+
+
     @api.model
     def calculate_rates_for_address(self,address,items):
         product = self.env['product.product']
@@ -163,13 +180,13 @@ class rate_fedex_request(models.TransientModel):
                     'msg':request_id.response
                 }
         return False
-    
+
     @api.multi
     def _get_rates_fedex(self):
         res = self.env['fedex.account'].get_fedex_account()
         if len(self.package_ids) == 0:
             raise except_orm(_('Empty Package Lines!'),
-                _('The package line items are empty'))            
+                _('The package line items are empty'))
         if res:
             config_object = fedex_config(
                              key=res.get('key',False),
@@ -179,7 +196,7 @@ class rate_fedex_request(models.TransientModel):
                              freight_account_number=res.get('freight_account_number',False),
                              use_test_server=res.get('use_test_server',False)
                              )
-            
+
             # Set this to the INFO level to see the response from Fedex printed in stdout.
             logging.basicConfig(level=logging.DEBUG)
             rate_request = FedexRateServiceRequest(config_object.CONFIG_OBJ)
@@ -199,10 +216,10 @@ class rate_fedex_request(models.TransientModel):
             rate_request.RequestedShipment.Recipient.Address.PostalCode = self.to_postal_code
             rate_request.RequestedShipment.Recipient.Address.CountryCode = self.to_country.code
             rate_request.RequestedShipment.Recipient.Address.Residential = self.to_residential
-            
+
             # International Shipment Quote
             if self.to_country_code != 'US':
-                CustomsClearanceDetail  = rate_request.create_wsdl_object_of_type('CustomsClearanceDetail')  
+                CustomsClearanceDetail  = rate_request.create_wsdl_object_of_type('CustomsClearanceDetail')
                 CustomsClearanceDetail.CustomsValue.Currency = self.customs_currency
                 CustomsClearanceDetail.CustomsValue.Amount = self.customs_value
                 DutiesPayment  = rate_request.create_wsdl_object_of_type('Payment')
@@ -212,7 +229,7 @@ class rate_fedex_request(models.TransientModel):
                 DutiesPayment.Payor.ResponsibleParty.Address.CountryCode = self.from_country.code
                 DutiesPayment.Payor.ResponsibleParty.Address.Residential = self.from_residential
                 CustomsClearanceDetail.DutiesPayment = DutiesPayment
-                CustomsClearanceDetail.ExportDetail.B13AFilingOption = self.B13AFilingOption                
+                CustomsClearanceDetail.ExportDetail.B13AFilingOption = self.B13AFilingOption
                 for i in self.commodity_lines:
                     commodity = rate_request.create_wsdl_object_of_type('Commodity')
                     commodity.Name = i.name
@@ -248,15 +265,15 @@ class rate_fedex_request(models.TransientModel):
                     dimensions.Width = i.width
                     dimensions.Height = i.height
                     dimensions.Units =  LinearUnits
-                    package.Dimensions = dimensions                
+                    package.Dimensions = dimensions
                 rate_request.add_package(package)
                 # Special Services COD
                 if self.special_services_type == 'COD':
                     package.SpecialServicesRequested.SpecialServiceTypes.append('COD')
                     package.SpecialServicesRequested.CodDetail.CodCollectionAmount.Amount = i.cod_amount
                     package.SpecialServicesRequested.CodDetail.CodCollectionAmount.Currency = self.cod_currency
-                    package.SpecialServicesRequested.CodDetail.CollectionType = self.cod_collection_type                
-            try:    
+                    package.SpecialServicesRequested.CodDetail.CollectionType = self.cod_collection_type
+            try:
                 rate_request.send_request()
 #             print "HighestSeverity:", rate_request.response.HighestSeverity
             # RateReplyDetails can contain rates for multiple ServiceTypes if ServiceType was set to None
@@ -285,16 +302,16 @@ class rate_fedex_request(models.TransientModel):
                 return {
                         'type':'error',
                         'msg':str(e)
-                        }                
-                
+                        }
+
         else:
             raise except_orm(_('Account Configuration!'),
                 _("No Fedex Account has been configured")
-                ) 
+                )
 
 
     ##################################VARIABLE DECLARATION##########################################################
-    
+
     dropoff_type = fields.Selection(fedex_lists._list_drop_type,'Dropoff Type',required=True,default = 'REGULAR_PICKUP')
     service_type = fields.Selection(fedex_lists._list_service_type,'Service Type',default='FEDEX_GROUND',help="Leave it blank for all services")
     packaging_type = fields.Selection(fedex_lists._list_packaging_type,'Packaging Type',required=True,default = 'YOUR_PACKAGING')
@@ -315,7 +332,7 @@ class rate_fedex_request(models.TransientModel):
     from_country = fields.Many2one('res.country','Country')
     from_postal_code = fields.Char('Postal Code')
     from_residential = fields.Boolean('Residential',default=False)
-    
+
     # Fields for Recipient
     recipient_id = fields.Many2one('res.partner','Recipient Partner',help="This field is optional.If not filled you can manually set the address")
     to_country = fields.Many2one('res.country','Country',select=True)
@@ -333,7 +350,7 @@ class rate_fedex_request(models.TransientModel):
                                          ('MANUALLY_ATTACHED','Manually Attached'),
                                          ('NOT_REQUIRED','Not Required'),
                                          ('SUMMARY_REPORTING','Summary Reporting')],'B13A Filing Option',default="NOT_REQUIRED")
-    
+
     special_services_type = fields.Selection([('COD','COD')],string = "Request Special Services")
     cod_collection_type = fields.Selection([('ANY','Any'),
                                             ('CASH','Cash'),
@@ -342,19 +359,20 @@ class rate_fedex_request(models.TransientModel):
                                             ('PERSONAL_CHECK','Personal Check')
                                             ],'Collection Type')
     cod_currency = fields.Selection(fedex_lists._fedex_currency,string = "COD Currency",default="CAD")
-    rate = fields.Float("Rate")   
+    rate = fields.Float("Rate")
+
 class rate_commodity_package(models.TransientModel):
     _name = "rate.commodity.package"
     _description = "Commodity Details"
-    
+
     @api.onchange('name')
     def _onchange_name(self):
         self.description = self.name
-        
+
     @api.depends('quantity','unit_price')
     def _compute_customs_value(self):
         self.customs_value = self.unit_price * self.quantity
-        
+
     request_id = fields.Many2one('rate.fedex.request','Rate Request')
     name = fields.Char('Name',required=True)
     description = fields.Text('Description',help="Min. 3 Chars required",required=True)
@@ -372,7 +390,7 @@ class rate_commodity_package(models.TransientModel):
 class fedex_package(models.TransientModel):
     _name = "fedex.package"
     _description = "Fedex Package Details"
-    
+
     request_id = fields.Many2one('rate.fedex.request')
     weight= fields.Float('Weight',required=True,default=0)
     units = fields.Selection(fedex_lists._get_unit_weight,required=True,default = 'LB')
@@ -387,4 +405,3 @@ class fedex_package(models.TransientModel):
                                   ('IN','Inches'),
                                   ('CM','Centimeters')
                           ],'Dimensional Units',default='IN')
-        

@@ -16,3 +16,4 @@ import account_voucher
 import res_company
 import marketing_package
 import mail_mail
+import product_attribute_value
