@@ -89,10 +89,17 @@ openerp.jjuice.pos = function (instance,local) {
 		get_total_weight:function(){
             var self = this;
             var total = 0.00;
+
             if (self.data.tab_style == 1 || self.data.tab_style == 5){
                 _.each(self.product_data,function(flavor){
                     _.each(flavor,function(product){
-                        total = total + product.get_value()*product.data.weight_net;
+                        // in this tab the weight will be taken from the volume weight data
+                        if (product.data.vol_id){
+                            var w_n = self.tab_parent.parent.volume_data[product.data.vol_id[0]] || 0;
+                            total = total + product.get_value() * w_n;
+                        }else{
+                            total = total + product.get_value()*product.data.weight_net;
+                        }
                     })
                 })
             }else if (self.data.tab_style == 2 || self.data.tab_style == 4){
@@ -911,6 +918,10 @@ local.product_lists = instance.Widget.extend(local.AbstractWidget,{
 				self.tabs_object = {}
 				self.nmi_journal_id = res.nmi_journal_id;
 				self.tabs_data = res.tabs; // Saving Tab data in Main widget
+				self.volume_data = res.vol_ids.reduce(function(obj,itm){
+                    obj[itm.id] = itm.actual_value
+                    return obj
+				},{});
 				// Do not required tax widget as of now
 //				_.each(res.taxes,function(tax){
 //					$row = $("<tr><td><span><strong>%NAME%</strong></span></td></tr>".replace("%NAME%",tax.name))
