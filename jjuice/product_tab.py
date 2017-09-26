@@ -241,7 +241,7 @@ class product_tab(models.Model):
                        };
             return action
     
-    name = fields.Char('Tab Name',size=30,required=True)
+    name = fields.Char('Tab Name',required=True)
     visible_all_customers = fields.Boolean("Visible to all Customers")
     specific_customer_ids = fields.Many2many('res.partner','product_tab_res_partners','tab_id','partner_id',string = "Customers",help = "List of Customer to whom this tab will be available to")
     tab_style = fields.Selection(_list_tab_style,string = "Tab Style",required=True,help = "These are options available that will format and determine the functionality of tab")
