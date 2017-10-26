@@ -15,7 +15,7 @@ class res_partner(models.Model):
             i.customer = True
             for child in i.child_ids:
                 child.leads = False
-                child.customer = False
+                child.customer = True
 #             i.child_ids.leads = False
 #             i.child_ids.customer = True
             user = self.env['res.users'].sudo()
