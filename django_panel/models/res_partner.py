@@ -13,11 +13,8 @@ class res_partner(models.Model):
         for i in self:
             i.leads = False
             i.customer = True
-            for child in i.child_ids:
-                child.leads = False
-                child.customer = True
-#             i.child_ids.leads = False
-#             i.child_ids.customer = True
+            i.child_ids.write({'leads':False})
+            i.child_ids.write({'customer':True})
             user = self.env['res.users'].sudo()
             user_id = user.search([('partner_id','=',i.id),('active','=',False)])
             if user_id:
