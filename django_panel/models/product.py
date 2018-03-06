@@ -30,7 +30,7 @@ class product_product(models.Model):
                 delete_object_bucket(self._table,self.id,access_key_id,secret_access_key,root_bucket)
             except AssertionError as e:
                 raise except_orm('Error',e)
-        return super(product_attribute_value,self).unlink()
+        return super(product_product,self).unlink()
 
     file_name = fields.Char(string = "File Name")
     datas = BinaryS3Field(string = "Image",key_name = False)
