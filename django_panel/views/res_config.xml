@@ -1,5 +1,23 @@
 <openerp>
 	<data>
+		<record id = "res_config_s3_object_form_view_company_logo" model = "ir.ui.view">
+			<field name="name">Company Logo</field>
+			<field name = "model">s3.object</field>
+			<field name="arch" type="xml">
+				<form string="Banner">
+					<group>
+						<field name = "file_name" />
+						<field name = "company_logo" invisible="1" />
+					</group>
+					<notebook>
+						<page string = "Attachment">
+							<field name = "datas" widget="image" filename="file_name"/>
+						</page>
+					</notebook>
+				</form>
+			</field>
+		</record>	
+	
 		<record id = "res_config_s3_object_form_view_aboutus" model = "ir.ui.view">
 			<field name="name">Aboutus Banner</field>
 			<field name = "model">s3.object</field>
@@ -261,6 +279,10 @@
 	                    		<label for="contactus_banner_500340" />
 	                    		<field name = "contactus_banner_500340" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_contactus_500x340','default_contactus_banner_500340':True}"/>
                     		</div>
+                    		<div>
+	                    		<label for="company_logo" />
+	                    		<field name = "company_logo" nolabel="1" context="{'form_view_ref':'django_panel.res_config_s3_object_form_view_company_logo','default_company_logo':True}"/>
+                    		</div>                    		
 
                     	</group>
                     </group>

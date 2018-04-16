@@ -366,6 +366,22 @@ class django_panel_settings(osv.osv_memory):
         else:
             return dict(contactus_banner_500340=False)
 
+    def get_default_company_logo(self,cr,uid,ids,context=None):
+        s3_object_ids = self.pool.get('s3.object').search(cr,uid,[('company_logo','=',True)],limit=1)
+        if s3_object_ids:
+            return dict(company_logo=s3_object_ids[0])
+        else:
+            return dict(company_logo=False)
+
+    def set_default_company_logo(self,cr,uid,ids,context=None):
+        myself = self.browse(cr,uid,ids[0],context=context)
+        s3_object = self.pool.get('s3.object')
+        existing_banner_ids = s3_object.search(cr,uid,[('company_logo','=',True),('id','!=',myself.company_logo.id)])
+        if existing_banner_ids:
+            for i in existing_banner_ids:
+                s3_object.unlink(cr,uid,i)
+        s3_object.write(cr,uid,myself.checkout_banner.id,{'company_logo':True})        
+
     _columns = {
             'site_name':fields.char("Site Name"),
             'aws_access_id' : fields.char("AWS Access ID"),
@@ -391,6 +407,7 @@ class django_panel_settings(osv.osv_memory):
             'privacy_policy_banner':fields.many2one('s3.object',string="Privacy Policy Banner"),
             'search_banner':fields.many2one('s3.object',string = "Search Banner"),
             'contactus_banner':fields.many2one('s3.object',string="Contact Us Banner"),
+            'company_logo':fields.many2one('s3.object',string="Company Logo"),
             'contactus_banner_500340': fields.many2one('s3.object', string="Contact Us Banner (500x340)"),
             'customerreview_banner':fields.many2one('s3.object',string="Customer Review Banner"),
             'promo_business_ids':fields.many2many('website.policy','django_panel_settings_website_policy',column1='django_panel_settings_id',column2='policy_id',
