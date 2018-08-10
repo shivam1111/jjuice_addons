@@ -65,8 +65,8 @@
 				</xpath>
 				<xpath expr="//field[@name='website']" position= "after">
 					<field name ="resale_no"/>
-					<field name = "classify_finance" />
-					<field name ="acccount_type"/>
+					<field name = "classify_finance" required = "1"/>
+					<field name ="acccount_type" required = "1"/>
 				</xpath>
 				<xpath expr="//notebook/page[@name='internal_notes']" position="after">
 					<page string="Logs">

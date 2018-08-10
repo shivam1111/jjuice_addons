@@ -1,0 +1,17 @@
+<openerp>
+	<data>
+        <record id="view_inheritance_res_partner_jjuice" model="ir.ui.view">
+            <field name="name">jjuice.view.inheritance.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+            	<xpath expr="/form/sheet/group/group/field[@name='email']" position="attributes">
+            		<attribute name = "required">True</attribute>
+            	</xpath>
+            	<xpath expr="/form/sheet/group/group/field[@name='phone']" position="attributes">
+            		<attribute name = "required">True</attribute>
+            	</xpath>
+            </field>
+        </record>
+	</data>
+</openerp>

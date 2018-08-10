@@ -49,6 +49,7 @@
              'security/jjuice_security.xml',
              'views/report_invoice.xml',
              'views/report_saleorder.xml',
+             'views/res_partner_view.xml',
              'wizard/display_product_availability.xml',
              'wizard/customer_filter_wizard.xml',
              'crm_lead_view.xml',
