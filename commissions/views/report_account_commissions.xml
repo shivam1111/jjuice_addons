@@ -21,12 +21,9 @@
 		            <table class="table table-condensed">
 		                <thead>
 		                    <tr>
-		                        <th>Name</th>
-		                        <th>Period</th>
 		                        <th>Deposit Date</th>
-		                        <th>Reference</th>
 		                        <th>Partner</th>
-		                        <th>Type of A/C</th>
+		                        <th>Remarks</th>
 		                        <th>Debit</th>
 		                        <th>Credit</th>
 		                        <th>Commission</th>
@@ -34,24 +31,15 @@
 		               </thead>
 		               <tbody class="sale_body">
 		               		<t t-set="commission_total" t-value="0.00"/>
-		               		<tr t-foreach="o.payment_ids" t-as="l">
-		                        <td>
-		                           <span t-field="l.name"/>
-		                        </td>		               			
-		                        <td>
-		                           <span t-field="l.period_id.name"/>
-		                        </td>		               			
+		               		<tr t-foreach="o.commission_line_ids" t-as="l">
 		                        <td>
 		                           <span t-field="l.date"/>
-		                        </td>		            
-		                        <td>
-		                           <span t-field="l.ref"/>
-		                        </td>		              
+		                        </td>		               			
 		                        <td>
 		                           <span t-field="l.partner_id.name"/>
 		                        </td>		               			
 		                        <td>
-		                        	<span t-field="l.type_account" />
+		                        		<span t-field="l.remarks" />
 		                        </td>
 		                        <td>
 		                        	<span t-field="l.debit" />
@@ -88,6 +76,18 @@
 		            <t t-raw="translate_doc(doc_id, doc_model, 'user.partner_id.lang', 'commissions.report_account_commissions_doc')"/>
 		        </t>
 		    </t>
-		</template>		
+		</template>
+		
+        <report 
+            id="report_account_commission"
+            string="Commission Receipt"
+            model="account.commissions.archive" 
+            report_type="qweb-pdf"
+            file="commissions.report_account_commissions" 
+            name="commissions.report_account_commissions" 
+        />
+        				
 	</data>
 </openerp>
+
+

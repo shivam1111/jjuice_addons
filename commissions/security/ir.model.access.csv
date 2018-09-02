@@ -3,3 +3,4 @@ access_commission_archive_user,account.commissions.archive.user,model_account_co
 access_commission_archive_manager,account.commissions.archive.manager,model_account_commissions_archive,base.group_hr_manager,1,1,1,0
 access_commission_user,account.commissions,model_account_commissions,base.group_user,0,0,0,0
 access_commission_user_account_line,account.move.line.user,model_account_move_line,base.group_user,1,0,0,0
+access_commission_line_archive,account.commission.line.archive,model_account_commission_line_archive,,1,0,0,0

@@ -1,19 +1,17 @@
 from openerp import models, fields, api, _
 from openerp.exceptions import except_orm
 
-class account_commission_line(models.TransientModel):
-    _name = "account.commission.line"
-    _description = "Commissions Line"
+class account_commission_line_archive(models.Model):
+    _name = "account.commission.line.archive"
+    _description = "Commissions Line Archive"
 
     @api.one
-    @api.depends(
-        'move_line_id',
-    )    
     def _calculate_commission(self):
         commission = 0.00
         credit_move_line_id = self.move_line_id
-        user_id = self.wizard_id.user
-        remarks = ""
+        user_id = self.archive_id.user
+        remarks = []
+        
         """ 
             The account_move_line will be credited to reduce the debtor balance and this same line will reconciled with the 
             move line that was created to debit the partner balance in the sale journal. We have to find that account.move that
@@ -41,110 +39,51 @@ class account_commission_line(models.TransientModel):
                     first_invoice = invoices.sorted(key = lambda r:r.id)[0]
                     if diff > 0:
                         if invoice_id.id == first_invoice.id:
-                            remarks = remarks + "* First Invoice of the customer\n"
+                            remarks.append("* First Invoice of the customer")
                             # This is the first invoice of the customer
                             if partner_id.classify_finance == 'retailer':
-                                remarks = remarks + "* Retail Customer"
+                                remarks.append("* Retail Customer")
                                 # This means customer is a retail customer
                                 # For the first time 20% total commission. 12% - Sales Manager, 8% - Sales rep
                                 am_com = 0.12 * diff
                                 sp_com = 0.8 * diff
                             elif partner_id.classify_finance in  ['wholesale','private_label']:
-                                remarks = remarks + "* Wholesale/Private Label"
+                                remarks.append("* Wholesale/Private Label")
                                 # This means customer is a wholesale/private label 
                                 # For the first time 10% total commission. 12% - Sales Manager, 8% - Sales rep
                                 am_com = 0.06 * diff
                                 sp_com = 0.04 * diff
                         else:
-                            remarks = remarks + "* Repeat Customer\n"
+                            remarks.append("* Repeat Customer\n")
                             # This is not the  first invoice of the customer
                             if partner_id.classify_finance == 'retailer':
-                                remarks = remarks + "* Retail Customer"
+                                remarks.append("* Retail Customer")
                                 # This means customer is a retail customer
                                 # 10% total commission. 6% - Sales Manager, 4% - Sales rep
                                 am_com = 0.06 * diff
                                 sp_com = 0.04 * diff                            
                             elif partner_id.classify_finance in  ['wholesale','private_label']:
-                                remarks = remarks + "* Wholesale/Private Label"
+                                remarks.append("* Wholesale/Private Label")
                                 # This means customer is a wholesale/private label 
                                 # 5% total commission. 3% - Sales Manager, 2% - Sales rep
                                 am_com = 0.03 * diff
                                 sp_com = 0.02 * diff
-                                
+
                         if user_id.id == account_manager.id:
-                            commission = commission + am_com
+                            commission+= am_com
                         if user_id.id == salesman.id:
-                            commission = commission + sp_com
-        self.commission = commission  
-        self.remarks = remarks      
+                            commission +=  sp_com
+        self.commission = commission
+        self.write({'remarks':''.join(remarks)})  
     
     move_line_id = fields.Many2one('account.move.line','Journal Line')
     name = fields.Char(related = 'move_line_id.ref')
-    date = fields.Date(related = 'move_line_id.date',string = "Date")
     commission = fields.Float('Commmission',compute="_calculate_commission")
-    wizard_id = fields.Many2one('account.commissions')
     remarks = fields.Text('Remarks')
+    date = fields.Date(related = 'move_line_id.date',string = "Date")
     debit = fields.Float(related = "move_line_id.debit")
     credit = fields.Float(related = "move_line_id.credit")
     partner_id = fields.Many2one('res.partner',related = 'move_line_id.partner_id',string = "Customer")
-
-class account_commissions(models.TransientModel):
-    _name = "account.commissions"
-    _description = "Commissions Calculator"
-
-    @api.multi
-    def generate_archive(self):
-        archive = self.env['account.commissions.archive'].create({
-                'user':self.user.id,
-                'from_date':self.from_date,
-                'to_date':self.to_date,
-                'commission_line_ids': map(lambda l:(0,0,{'move_line_id':l.move_line_id.id}),self.commission_line_ids)
-            })
-        return {
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
-            'res_model': 'account.commissions.archive',
-            'target': 'current',
-            'res_id':archive.id,
-        }
-            
+    archive_id = fields.Many2one('account.commissions.archive',ondelete = 'cascade',required=True)
     
-    @api.one
-    @api.depends(
-        'user',
-        'from_date',
-        'to_date',
-    )    
-    def _compute_comission_lines(self):
-        payment_ids = []
-        if self.user and self.from_date and self.to_date:
-            self._cr.execute("""
-                select
-                    l.id
-                from
-                    account_move_line l
-                    left join account_account a on (l.account_id = a.id)
-                    left join account_journal as aj on (l.journal_id = aj.id)
-                    left join res_partner partner on (l.partner_id = partner.id)
-                    left join res_users as us on (us.id = partner.user_id)
-                where l.state != 'draft'
-                  and a.type = 'receivable'
-                  and l.date >= '%s'
-                  and l.date <='%s'
-                  and us.id = %s
-                  and aj.type in ('cash','bank')
-                  and l.reconcile_id is not null
-                  and (l.credit - l.debit) > 0
-            """%(self.from_date,self.to_date,self.user.id))
-            res = self._cr.fetchall()
-            if len(res) > 0:
-                commission_line_ids = map(lambda x:(0,0,{'move_line_id':x[0]}),res)
-                self.commission_line_ids = commission_line_ids
     
-    user= fields.Many2one('res.users',string = "Sales Person",required=True)
-    from_date = fields.Date('From',required=True)
-    to_date = fields.Date('To',required=True)
-    commission_line_ids = fields.One2many('account.commission.line', 'wizard_id', string='Payments',
-        compute='_compute_comission_lines') 
-

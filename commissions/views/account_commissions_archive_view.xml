@@ -17,18 +17,29 @@
 						</group>
 						<notebook>
 							<page string = "Details">
-								<field name = "payment_ids" nolabel = "1"  editable="bottom" >
-									<tree string = "Payment Lines">
+								<field name = "commission_line_ids" nolabel = "1" >
+									<tree string = "Commission Lines" decoration-danger="commission==0" >
+										<field name = "move_line_id" />
 										<field name = "name" />
-										<field name = "period_id" />
-										<field name = "date"/>
-										<field name = "ref" />
 										<field name = "partner_id" />
-										<field name = "type_account" />
-										<field name = "debit" sum="Total Debit" />
-										<field name = "credit" sum = "Total Credit" />
-										<field name = "commission" sum = "Total Commission" />
+										<field name = "date" />
+										<field name = "debit" sum = "Total Debit"/>
+										<field name = "credit" sum = "Total Credit"/>
+										<field name = "remarks" />
+										<field name = "commission" sum = "Total Commission"  />
 									</tree>
+									<form>
+										<group>
+											<field name = "move_line_id" />
+											<field name = "name" />
+											<field name = "partner_id" />
+											<field name = "date" />
+											<field name = "debit" />
+											<field name = "credit" />
+											<field name = "remarks" />
+											<field name = "commission"  />																			
+										</group>
+									</form>
 								</field>
 							</page>
 						</notebook>
@@ -57,6 +68,6 @@
 	            <field name="view_mode">tree,form</field>
 	        </record>
 			<menuitem id = "account_menu_commission_archive" action = "action_account_commission_view_archive" 
-			 groups = "base.group_hr_user,base.group_user" parent="hr.menu_hr_main"/> 			
+			 parent="hr.menu_hr_main"/> 			
 		</data>
 </openerp>

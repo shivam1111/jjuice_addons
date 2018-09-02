@@ -15,18 +15,29 @@
 						</group>
 						<notebook>
 							<page string = "Details">
-								<field name = "payment_ids" nolabel = "1" >
-									<tree string = "Payment Lines">
-										<field name = "name" />
-										<field name = "period_id" />
-										<field name = "date"/>
-										<field name = "ref" />
+								<field name = "commission_line_ids" nolabel = "1" readonly="1">
+									<tree string = "Commission Lines" decoration-danger="commission==0" >
+										<field name = "move_line_id" />
+										<field name = "name" invisible= "1"/>
 										<field name = "partner_id" />
-										<field name = "type_account" />
-										<field name = "debit" sum="Total Debit" />
-										<field name = "credit" sum = "Total Credit" />
+										<field name = "date" />
+										<field name = "debit" sum = "Total Debit" />
+										<field name = "credit" sum = "Total Credit"/>
+										<field name = "remarks" />
 										<field name = "commission" sum = "Total Commission" />
 									</tree>
+									<form string = "Payment Lines">
+										<group>
+											<field name = "move_line_id" />
+											<field name = "name" />
+											<field name = "partner_id" />
+											<field name = "date" />
+											<field name = "debit" />
+											<field name = "credit" />
+											<field name = "remarks" />
+											<field name = "commission"  />										
+										</group>
+									</form>
 								</field>
 							</page>
 						</notebook>
