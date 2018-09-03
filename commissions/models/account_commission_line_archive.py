@@ -6,6 +6,7 @@ class account_commission_line_archive(models.Model):
     _description = "Commissions Line Archive"
 
     @api.one
+    @api.depends('move_line_id')
     def _calculate_commission(self):
         commission = 0.00
         credit_move_line_id = self.move_line_id
@@ -38,44 +39,48 @@ class account_commission_line_archive(models.Model):
                     # continue only once we are sure that we have the fist invoice id of this partner
                     first_invoice = invoices.sorted(key = lambda r:r.id)[0]
                     if diff > 0:
-                        if invoice_id.id == first_invoice.id:
-                            remarks.append("* First Invoice of the customer")
-                            # This is the first invoice of the customer
-                            if partner_id.classify_finance == 'retailer':
-                                remarks.append("* Retail Customer")
-                                # This means customer is a retail customer
-                                # For the first time 20% total commission. 12% - Sales Manager, 8% - Sales rep
-                                am_com = 0.12 * diff
-                                sp_com = 0.8 * diff
-                            elif partner_id.classify_finance in  ['wholesale','private_label']:
-                                remarks.append("* Wholesale/Private Label")
-                                # This means customer is a wholesale/private label 
-                                # For the first time 10% total commission. 12% - Sales Manager, 8% - Sales rep
-                                am_com = 0.06 * diff
-                                sp_com = 0.04 * diff
-                        else:
-                            remarks.append("* Repeat Customer\n")
-                            # This is not the  first invoice of the customer
-                            if partner_id.classify_finance == 'retailer':
-                                remarks.append("* Retail Customer")
-                                # This means customer is a retail customer
-                                # 10% total commission. 6% - Sales Manager, 4% - Sales rep
-                                am_com = 0.06 * diff
-                                sp_com = 0.04 * diff                            
-                            elif partner_id.classify_finance in  ['wholesale','private_label']:
-                                remarks.append("* Wholesale/Private Label")
-                                # This means customer is a wholesale/private label 
-                                # 5% total commission. 3% - Sales Manager, 2% - Sales rep
-                                am_com = 0.03 * diff
-                                sp_com = 0.02 * diff
-
-                        if user_id.id == account_manager.id:
-                            commission+= am_com
-                        if user_id.id == salesman.id:
-                            commission +=  sp_com
-        self.commission = commission
-        self.write({'remarks':''.join(remarks)})  
+                        if partner_id.classify_finance:
+                            if invoice_id.id == first_invoice.id:
+                                remarks.append("* First Invoice of the customer")
+                                # This is the first invoice of the customer
+                                if partner_id.classify_finance == 'retailer':
+                                    remarks.append("* Retail Customer")
+                                    # This means customer is a retail customer
+                                    # For the first time 20% total commission. 12% - Sales Manager, 8% - Sales rep
+                                    am_com = 0.12 * diff
+                                    sp_com = 0.8 * diff
+                                elif partner_id.classify_finance in  ['wholesale','private_label']:
+                                    remarks.append("* Wholesale/Private Label")
+                                    # This means customer is a wholesale/private label 
+                                    # For the first time 10% total commission. 12% - Sales Manager, 8% - Sales rep
+                                    am_com = 0.06 * diff
+                                    sp_com = 0.04 * diff
+                            else:
+                                remarks.append("* Repeat Customer\n")
+                                # This is not the  first invoice of the customer
+                                if partner_id.classify_finance == 'retailer':
+                                    remarks.append("* Retail Customer")
+                                    # This means customer is a retail customer
+                                    # 10% total commission. 6% - Sales Manager, 4% - Sales rep
+                                    am_com = 0.06 * diff
+                                    sp_com = 0.04 * diff                            
+                                elif partner_id.classify_finance in  ['wholesale','private_label']:
+                                    remarks.append("* Wholesale/Private Label")
+                                    # This means customer is a wholesale/private label 
+                                    # 5% total commission. 3% - Sales Manager, 2% - Sales rep
+                                    am_com = 0.03 * diff
+                                    sp_com = 0.02 * diff
     
+                            if user_id.id == account_manager.id:
+                                commission+= am_com
+                            if user_id.id == salesman.id:
+                                commission +=  sp_com
+                        else:
+                            remarks.append("* Customer classification not set")
+                            
+        self.write({'remarks':''.join(remarks)})
+        self.commission = commission
+        
     move_line_id = fields.Many2one('account.move.line','Journal Line')
     name = fields.Char(related = 'move_line_id.ref')
     commission = fields.Float('Commmission',compute="_calculate_commission")

@@ -17,8 +17,8 @@
 						</group>
 						<notebook>
 							<page string = "Details">
-								<field name = "commission_line_ids" nolabel = "1" >
-									<tree string = "Commission Lines" decoration-danger="commission==0" >
+								<field name = "commission_line_ids" nolabel = "1"  >
+									<tree string = "Commission Lines" colors="red:commission==0" >
 										<field name = "move_line_id" />
 										<field name = "name" />
 										<field name = "partner_id" />

@@ -13,7 +13,7 @@ class account_commission_line(models.TransientModel):
         commission = 0.00
         credit_move_line_id = self.move_line_id
         user_id = self.wizard_id.user
-        remarks = ""
+        remarks = []
         """ 
             The account_move_line will be credited to reduce the debtor balance and this same line will reconciled with the 
             move line that was created to debit the partner balance in the sale journal. We have to find that account.move that
@@ -40,43 +40,46 @@ class account_commission_line(models.TransientModel):
                     # continue only once we are sure that we have the fist invoice id of this partner
                     first_invoice = invoices.sorted(key = lambda r:r.id)[0]
                     if diff > 0:
-                        if invoice_id.id == first_invoice.id:
-                            remarks = remarks + "* First Invoice of the customer\n"
-                            # This is the first invoice of the customer
-                            if partner_id.classify_finance == 'retailer':
-                                remarks = remarks + "* Retail Customer"
-                                # This means customer is a retail customer
-                                # For the first time 20% total commission. 12% - Sales Manager, 8% - Sales rep
-                                am_com = 0.12 * diff
-                                sp_com = 0.8 * diff
-                            elif partner_id.classify_finance in  ['wholesale','private_label']:
-                                remarks = remarks + "* Wholesale/Private Label"
-                                # This means customer is a wholesale/private label 
-                                # For the first time 10% total commission. 12% - Sales Manager, 8% - Sales rep
-                                am_com = 0.06 * diff
-                                sp_com = 0.04 * diff
+                        if partner_id.classify_finance:
+                            if invoice_id.id == first_invoice.id:
+                                remarks.append("* First Invoice of the customer")
+                                # This is the first invoice of the customer
+                                if partner_id.classify_finance == 'retailer':
+                                    remarks.append("* Retail Customer")
+                                    # This means customer is a retail customer
+                                    # For the first time 20% total commission. 12% - Sales Manager, 8% - Sales rep
+                                    am_com = 0.12 * diff
+                                    sp_com = 0.8 * diff
+                                elif partner_id.classify_finance in  ['wholesale','private_label']:
+                                    remarks.append("* Wholesale/Private Label")
+                                    # This means customer is a wholesale/private label 
+                                    # For the first time 10% total commission. 12% - Sales Manager, 8% - Sales rep
+                                    am_com = 0.06 * diff
+                                    sp_com = 0.04 * diff
+                            else:
+                                remarks.append("* Repeat Customer\n")
+                                # This is not the  first invoice of the customer
+                                if partner_id.classify_finance == 'retailer':
+                                    remarks.append("* Retail Customer")
+                                    # This means customer is a retail customer
+                                    # 10% total commission. 6% - Sales Manager, 4% - Sales rep
+                                    am_com = 0.06 * diff
+                                    sp_com = 0.04 * diff                            
+                                elif partner_id.classify_finance in  ['wholesale','private_label']:
+                                    remarks.append("* Wholesale/Private Label")
+                                    # This means customer is a wholesale/private label 
+                                    # 5% total commission. 3% - Sales Manager, 2% - Sales rep
+                                    am_com = 0.03 * diff
+                                    sp_com = 0.02 * diff
+                                    
+                            if user_id.id == account_manager.id:
+                                commission = commission + am_com
+                            if user_id.id == salesman.id:
+                                commission = commission + sp_com
                         else:
-                            remarks = remarks + "* Repeat Customer\n"
-                            # This is not the  first invoice of the customer
-                            if partner_id.classify_finance == 'retailer':
-                                remarks = remarks + "* Retail Customer"
-                                # This means customer is a retail customer
-                                # 10% total commission. 6% - Sales Manager, 4% - Sales rep
-                                am_com = 0.06 * diff
-                                sp_com = 0.04 * diff                            
-                            elif partner_id.classify_finance in  ['wholesale','private_label']:
-                                remarks = remarks + "* Wholesale/Private Label"
-                                # This means customer is a wholesale/private label 
-                                # 5% total commission. 3% - Sales Manager, 2% - Sales rep
-                                am_com = 0.03 * diff
-                                sp_com = 0.02 * diff
-                                
-                        if user_id.id == account_manager.id:
-                            commission = commission + am_com
-                        if user_id.id == salesman.id:
-                            commission = commission + sp_com
+                            remarks.append("* Customer classification not set")
+        self.remarks = ''.join(remarks)
         self.commission = commission  
-        self.remarks = remarks      
     
     move_line_id = fields.Many2one('account.move.line','Journal Line')
     name = fields.Char(related = 'move_line_id.ref')
