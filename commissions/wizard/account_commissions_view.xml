@@ -16,9 +16,10 @@
 						<notebook>
 							<page string = "Details">
 								<field name = "commission_line_ids" nolabel = "1" readonly="1">
-									<tree string = "Commission Lines" colors="red:commission==0" >
+									<tree string = "Commission Lines" colors="red:commission==0;green:first_invoice==True" >
 										<field name = "move_line_id" />
 										<field name = "name" invisible= "1"/>
+										<field name = "first_invoice" invisible="1" />
 										<field name = "partner_id" />
 										<field name = "date" />
 										<field name = "debit" sum = "Total Debit" />
