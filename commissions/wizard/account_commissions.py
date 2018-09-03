@@ -49,7 +49,7 @@ class account_commission_line(models.TransientModel):
                                     # This means customer is a retail customer
                                     # For the first time 20% total commission. 12% - Sales Manager, 8% - Sales rep
                                     am_com = 0.12 * diff
-                                    sp_com = 0.8 * diff
+                                    sp_com = 0.08 * diff
                                 elif partner_id.classify_finance in  ['wholesale','private_label']:
                                     remarks.append("* Wholesale/Private Label")
                                     # This means customer is a wholesale/private label 
