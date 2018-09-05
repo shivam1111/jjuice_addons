@@ -31,27 +31,39 @@
 		               </thead>
 		               <tbody class="sale_body">
 		               		<t t-set="commission_total" t-value="0.00"/>
-		               		<tr t-foreach="o.commission_line_ids" t-as="l">
-		                        <td>
-		                           <span t-field="l.date"/>
-		                        </td>		               			
-		                        <td>
-		                           <span t-field="l.partner_id.name"/>
-		                        </td>		               			
-		                        <td>
-		                        		<span t-field="l.remarks" />
-		                        </td>
-		                        <td>
-		                        	<span t-field="l.debit" />
-		                        </td>
-		                        <td>
-		                        	<span t-field="l.credit" />
-		                        </td>
-		                        <td>
-		                        	<span t-field="l.commission" />
-		                        </td>		    
-		                        <t t-set="commission_total" t-value="commission_total+l.commission"/>           
-		               		</tr>
+		               		<t t-foreach="o.commission_line_ids" t-as="l" >
+		               			<t t-if = "l.first_invoice">
+		               				<t t-set="style" t-value="'color:green'" />
+		               			</t>
+		               			<t t-if = "l.commission==0 and not l.first_invoice">
+		               				<t t-set="style" t-value="'color:red'" />
+		               			</t>
+		               			
+		               			<t t-if = "l.commission!=0 and not l.first_invoice">
+		               				<t t-set="style" t-value="'color:black'" />
+		               			</t>		               			
+		                        <tr t-att-style="style">
+			                        <td>
+			                           <span t-field="l.date"/>
+			                        </td>		               			
+			                        <td>
+			                           <span t-field="l.partner_id.name"/>
+			                        </td>		               			
+			                        <td>
+			                        		<span t-field="l.remarks" />
+			                        </td>
+			                        <td>
+			                        	<span t-field="l.debit" />
+			                        </td>
+			                        <td>
+			                        	<span t-field="l.credit" />
+			                        </td>
+			                        <td>
+			                        	<span t-field="l.commission" />
+			                        </td>		    
+			                        <t t-set="commission_total" t-value="commission_total+l.commission"/>
+		                        </tr>           
+		               		</t>
 		               </tbody>
 	               </table>
 		            <div class="row">
