@@ -1,0 +1,5 @@
+<openerp>
+	<data>
+		<menuitem id = "child_shipstation_menu" sequence="4" parent = "integrations.integrations_menu" name = "Shipstation" />
+	</data>
+</openerp>

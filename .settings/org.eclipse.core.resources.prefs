@@ -16,4 +16,5 @@ encoding//jjuice_purchase/__openerp__.py=utf-8
 encoding//jjuice_stock/__openerp__.py=utf-8
 encoding//payment_nmi/__openerp__.py=utf-8
 encoding//payment_nmi/res_config.py=utf-8
+encoding//shipstation/__openerp__.py=utf-8
 encoding/conf.py=utf-8

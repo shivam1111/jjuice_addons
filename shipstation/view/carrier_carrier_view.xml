@@ -1,0 +1,54 @@
+<openerp>
+	<data>
+		<record id="carrier_carrier_form" model="ir.ui.view">
+		     <field name="name">Carriers</field>
+		     <field name="model">carrier.carrier</field>
+		     <field name="arch" type="xml">
+				<form string = "Carrier Form">
+					<sheet>
+						<group>
+							<field name = "name" />
+						</group>
+						<group>
+							<group>
+								<field name = "code" />
+								<field name = "shipping_provider_id" />
+								<field name = "primary" />
+							</group>
+							<group>
+								<field name = "account_no" />
+								<field name = "balance" />
+								<field name = "requires_funded_account" />
+							</group>
+						</group>					
+					</sheet>
+				</form>
+			</field>
+	   	</record>
+	   	
+		<record id="carrier_carrier_tree" model="ir.ui.view">
+		     <field name="name">Carriers</field>
+		     <field name="model">carrier.carrier</field>
+		     <field name="arch" type="xml">
+				<tree string = "Carriers" create="false">
+					<field name = "name" />
+					<field name = "code" />
+					<field name = "shipping_provider_id" />
+					<field name = "account_no" />
+					<field name = "balance" />					
+					<field name = "primary" />
+					<field name = "requires_funded_account" />
+				</tree>
+			</field>
+	   	</record>	   	
+      <record id="action_shipstation_carrier_carrier" model="ir.actions.act_window">
+            <field name="name">Carriers</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">carrier.carrier</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+      </record>
+      <menuitem id = "child_child_shipstation_carrier" sequence="100" parent = "child_shipstation_menu" action = "action_shipstation_carrier_carrier" />
+	   			
+	</data>
+</openerp>
