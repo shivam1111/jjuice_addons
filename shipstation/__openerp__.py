@@ -32,6 +32,7 @@
     'data': [
              'view/shipstation.xml',
              'view/carrier_carrier_view.xml',
+            'view/res_config.xml',
              ],
 
     'qweb' : [

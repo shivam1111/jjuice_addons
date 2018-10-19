@@ -19,13 +19,13 @@ class account_treasury_report(osv.osv):
                 'volume':fields.char("Volume",readonly=True),
                 'source':fields.selection(_SOURCE,string="Basic Acquisition Source",readonly=True),
                 'source_name':fields.char("Acquisition Source",readonly=True),
-                
-                }
+                'state_id':fields.many2one('res.country.state',string = "State")
+            }
     
     def _select(self):
         
         select_str = """
-            SELECT sub.id, sub.date, sub.product_id, sub.partner_id, sub.country_id,
+            SELECT sub.id, sub.date, sub.product_id, sub.partner_id, sub.country_id,sub.state_id,
                 sub.payment_term, sub.period_id, sub.uom_name, sub.currency_id, sub.journal_id,
                 sub.fiscal_position, sub.user_id, sub.company_id, sub.nbr, sub.type, sub.state,
                 sub.account_type,sub.classify_finance,sub.volume,sub.source_name,sub.source,
@@ -80,7 +80,8 @@ class account_treasury_report(osv.osv):
                     END / (SELECT count(*) FROM account_invoice_line l where invoice_id = ai.id) *
                     count(*) AS residual,
                     ai.commercial_partner_id as commercial_partner_id,
-                    partner.country_id
+                    partner.country_id,
+                    partner.state_id
         """
         return select_str
     
@@ -106,7 +107,7 @@ class account_treasury_report(osv.osv):
                     ai.fiscal_position, ai.user_id, ai.company_id, ai.type, ai.state, pt.categ_id,
                     ai.date_due, ai.account_id, ail.account_id, ai.partner_bank_id, ai.residual,
                     ai.amount_total, ai.commercial_partner_id, partner.country_id,partner.acccount_type,
-                    partner.classify_finance,
+                    partner.classify_finance,partner.state_id,
                     pav.name,
                     aq.name,
                     aq.source

@@ -1,0 +1,56 @@
+<openerp>
+	<data>
+        <record id="view_shipstation_config_settings" model="ir.ui.view">
+            <field name="name">Shipstation settings</field>
+            <field name="model">integrations.config.settings</field>
+            <field name="arch" type="xml">
+                <form string="Configure Shipstation" class="oe_form_configuration">
+                    <header>
+                        <button string="Apply" type="object" name="execute" class="oe_highlight"/>
+                        <button string="Cancel" type="object" name="cancel" class="oe_link"/>
+                        <button string="Import Carriers" type="object" name="import_carriers" />
+                    </header>
+                    <separator string="Shipstaiton Settings"/>
+                    <group>
+                    	 <label for="id" string="Credentials"/>
+                   	 	<div name = "credentials">
+                   	 		<div>
+                                <label for="api_key"/>
+                                <field name="api_key" class="oe_inline"/>                   	 			
+                   	 		</div>
+                   	 		<div>
+                                <label for="api_secret"/>
+                                <field name="api_secret" class="oe_inline" password="1"/>                   	 			
+                   	 		</div>                   	 		
+                   	 		<div>
+                                <label for="url"/>
+                                <field name="url" class="oe_inline"/>                   	 			
+                   	 		</div>                   	 		                   	 		
+                   	 		<div>
+                                <label for="debug_mode"/>
+                                <field name="debug_mode" class="oe_inline"/>                   	 			
+                   	 		</div>                   	 		                   	 		                   	 		
+                   	 		<div>
+                                <label for="test_url"/>
+                                <field name="test_url" class="oe_inline"/>                   	 			
+                   	 		</div>                   	 		                   	 		                   	 		                   	 		
+                   	 	</div>
+                    </group>		
+                </form>
+            </field>
+       </record>
+
+        <record id="action_shipstation_config" model="ir.actions.act_window">
+            <field name="name">Shipstation</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">integrations.config.settings</field>
+            <field name="view_mode">form</field>
+            <field name="target">inline</field>
+            <field name="view_id" ref  = "view_shipstation_config_settings" />
+        </record>
+
+        <menuitem id="menu_shipstation_config"  parent="integrations.integration_setting_main_menu" 
+            sequence="1" action="action_shipstation_config"/>    		
+
+	</data>
+</openerp>

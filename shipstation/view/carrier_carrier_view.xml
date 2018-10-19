@@ -5,6 +5,11 @@
 		     <field name="model">carrier.carrier</field>
 		     <field name="arch" type="xml">
 				<form string = "Carrier Form">
+					<header>
+						<button string = "Update Info" type = "object" name = "update_info" />
+						<button string = "Update Services" type = "object" name = "update_services" />
+						<button string = "Update Packages" type = "object" name = "update_packages" />
+					</header>
 					<sheet>
 						<group>
 							<field name = "name" />
@@ -14,13 +19,36 @@
 								<field name = "code" />
 								<field name = "shipping_provider_id" />
 								<field name = "primary" />
+								<field name = "active" />
 							</group>
 							<group>
 								<field name = "account_no" />
 								<field name = "balance" />
 								<field name = "requires_funded_account" />
 							</group>
-						</group>					
+						</group>		
+						<notebook>
+							<page string = "Services">
+								<field name = "service_ids" readonly = "1" nolabel = "1">
+									<tree string="Services ">
+										<field name = "name" />
+										<field name = "code" />
+										<field name = "domestic" />
+										<field name = "international" />
+									</tree>
+								</field>
+							</page>
+							<page string = "Packages">
+								<field name = "package_ids" readonly = "1" nolabel = "1">
+									<tree string="Packages ">
+										<field name = "name" />
+										<field name = "code" />
+										<field name = "domestic" />
+										<field name = "international" />
+									</tree>
+								</field>
+							</page>							
+						</notebook>			
 					</sheet>
 				</form>
 			</field>
