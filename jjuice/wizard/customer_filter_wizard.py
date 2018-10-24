@@ -130,6 +130,7 @@ FINANCE_CLASSIFY  = [
                  ('wholesale','Wholesaler / Distributer'),
                  ('private_label','Private Label'),
                  ('website','Vapejjuice.com'),
+                 ('master_distributor','Master Distributor')
                  ]
 
 _SOURCE = [

@@ -18,6 +18,7 @@ FINANCE_CLASSIFY  = [
                  ('wholesale','Wholesaler / Distributer'),
                  ('private_label','Private Label'),
                  ('website','Vapejjuice.com'),
+                 ('master_distributor','Master Distributor')
                  ]
 
 ACCOUNT_TYPE  = [('smoke_shop',"Smoke Shop"),('vape_shop','Vape Shop'),('convenient_gas_store','Convenient Store/ Gas Station'),

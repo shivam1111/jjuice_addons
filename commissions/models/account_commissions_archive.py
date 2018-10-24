@@ -31,5 +31,6 @@ class account_commissions_archive(models.Model):
     user= fields.Many2one('res.users',string = "Sales Person",required=True)
     from_date = fields.Date('From',required=True)
     to_date = fields.Date('To',required=True)
+    date = fields.Date('Date',help = "Date of creation",default = fields.Date.today)
     commission_line_ids = fields.One2many('account.commission.line.archive','archive_id','Commission Lines')
     

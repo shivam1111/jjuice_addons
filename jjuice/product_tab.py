@@ -216,7 +216,8 @@ class product_tab(models.Model):
                                                                 'partner_id':partner_id,
                                                                 'note':result.get("order_notes",""),
                                                                 'order_line':result.get("lines",[]),
-                                                                'payment_plan_ids':result.get("payment_plan",[])
+                                                                'payment_plan_ids':result.get("payment_plan",[]),
+                                                                'user_id':uid,
                                                                 },context)
                         
         if result.get("paid",False) and result.get('paid',False) > 0:

@@ -55,9 +55,15 @@ class account_commission_line(models.TransientModel):
                                 elif partner_id.classify_finance in  ['wholesale','private_label']:
                                     remarks.append(" - Wholesale/Private Label")
                                     # This means customer is a wholesale/private label 
-                                    # For the first time 10% total commission. 12% - Sales Manager, 8% - Sales rep
+                                    # For the first time 10% total commission. 6% - Sales Manager, 4% - Sales rep
                                     am_com = 0.06 * diff
                                     sp_com = 0.04 * diff
+                                elif partner_id.classify_finance == 'master_distributor':
+                                    remarks.append (" - Master Distributor")
+                                    # This means customer is a Master Distributor 
+                                    # For the first time 3% total commission. 1.5% - Sales Manager, 1.5% - Sales rep
+                                    am_com = 0.015 * diff
+                                    sp_com = 0.015 * diff                                   
                             else:
                                 remarks.append(" - Repeat Customer")
                                 # This is not the  first invoice of the customer
@@ -73,6 +79,12 @@ class account_commission_line(models.TransientModel):
                                     # 5% total commission. 3% - Sales Manager, 2% - Sales rep
                                     am_com = 0.03 * diff
                                     sp_com = 0.02 * diff
+                                elif partner_id.classify_finance == 'master_distributor':
+                                    remarks.append (" - Master Distributor")
+                                    # This means customer is a Master Distributor 
+                                    # For the first time 1.5% total commission. 1% - Sales Manager, 0.5% - Sales rep
+                                    am_com = 0.010 * diff
+                                    sp_com = 0.005 * diff                                                                       
                                     
                             if user_id.id == account_manager.id:
                                 commission = commission + am_com
