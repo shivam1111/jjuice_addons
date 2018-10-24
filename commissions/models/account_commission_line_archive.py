@@ -34,7 +34,7 @@ class account_commission_line_archive(models.Model):
                 account_manager = partner_id.user_id
                 salesman = invoice_id.user_id
                 remarks.append("%s input order"%(salesman.name))
-                if invoices:
+                if invoices and (user_id.id in [account_manager.id,salesman.id]):
                     am_com = 0.00
                     sp_com = 0.00
                     # continue only once we are sure that we have the fist invoice id of this partner
