@@ -168,7 +168,7 @@ class account_commissions(models.TransientModel):
                   and aj.type in ('cash','bank')
                   and l.reconcile_id is not null
                   and (l.credit - l.debit) > 0
-            """%(self.from_date,self.to_date,self.user.id))
+            """%(self.from_date,self.to_date))
             res = self._cr.fetchall()
             if len(res) > 0:
                 commission_line_ids = map(lambda x:(0,0,{'move_line_id':x[0]}),res)
