@@ -99,7 +99,7 @@ class account_commission_line_archive(models.Model):
     name = fields.Char(related = 'move_line_id.ref')
     commission = fields.Float('Commmission',compute="_calculate_commission")
     remarks = fields.Text('Remarks')
-    date = fields.Date(related = 'move_line_id.date',string = "Date")
+    date = fields.Date(related = 'move_line_id.date',string = "Date of Creation")
     debit = fields.Float(related = "move_line_id.debit")
     credit = fields.Float(related = "move_line_id.credit")
     partner_id = fields.Many2one('res.partner',related = 'move_line_id.partner_id',string = "Customer")

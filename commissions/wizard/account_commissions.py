@@ -134,6 +134,22 @@ class account_commissions(models.TransientModel):
         'from_date',
         'to_date',
     )    
+#                 select
+#                     l.id
+#                 from
+#                     account_move_line l
+#                     left join account_account a on (l.account_id = a.id)
+#                     left join account_journal as aj on (l.journal_id = aj.id)
+#                     left join res_partner partner on (l.partner_id = partner.id)
+#                     left join res_users as us on (us.id = partner.user_id)
+#                 where l.state != 'draft'
+#                   and a.type = 'receivable'
+#                   and l.date >= '%s'
+#                   and l.date <='%s'
+#                   and us.id = %s
+#                   and aj.type in ('cash','bank')
+#                   and l.reconcile_id is not null
+#                   and (l.credit - l.debit) > 0    
     def _compute_comission_lines(self):
         payment_ids = []
         if self.user and self.from_date and self.to_date:
@@ -145,12 +161,10 @@ class account_commissions(models.TransientModel):
                     left join account_account a on (l.account_id = a.id)
                     left join account_journal as aj on (l.journal_id = aj.id)
                     left join res_partner partner on (l.partner_id = partner.id)
-                    left join res_users as us on (us.id = partner.user_id)
                 where l.state != 'draft'
                   and a.type = 'receivable'
                   and l.date >= '%s'
                   and l.date <='%s'
-                  and us.id = %s
                   and aj.type in ('cash','bank')
                   and l.reconcile_id is not null
                   and (l.credit - l.debit) > 0
