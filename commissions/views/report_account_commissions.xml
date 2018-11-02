@@ -93,7 +93,7 @@
         <report 
             id="report_account_commission"
             string="Commission Receipt"
-            model="account.commissions.archive" 
+            model="account.commissions" 
             report_type="qweb-pdf"
             file="commissions.report_account_commissions" 
             name="commissions.report_account_commissions" 

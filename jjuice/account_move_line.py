@@ -15,18 +15,4 @@ class account_move_line(osv.osv):
             return super(account_move_line,self).name_get(cr,uid,ids,context)
 
     
-    def _get_move_lines(self, cr, uid, ids, context=None):
-        result = []
-        for move in self.pool.get('account.move').browse(cr, uid, ids, context=context):
-            for line in move.line_id:
-                result.append(line.id)
-        return result
-    
-    _columns = {
-                'date': fields.related('move_id','date', string='Deposit date', type='date', required=True, select=True,
-                                store = {
-                                    'account.move': (_get_move_lines, ['date'], 20)
-                                }),                
-                }
-
     

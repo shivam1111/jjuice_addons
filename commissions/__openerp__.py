@@ -32,9 +32,8 @@
     'data': [
             'security/commission_security.xml',
             'security/ir.model.access.csv',
-             'wizard/account_commissions_view.xml',
-            'views/account_commissions_archive_view.xml',
             'views/report_account_commissions.xml',
+            'views/account_commissions_view.xml',
              ],
     'demo': [],
     'test': [],
