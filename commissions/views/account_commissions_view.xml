@@ -4,10 +4,11 @@
 		  <record id="account_commission_view_form" model="ir.ui.view">
 	            <field name="name">Sales Person Commission View</field>
 	            <field name="model">account.commissions</field>
-	            <field name="arch" type="xml">
-			     	<form string = "form view">
-			     		<group>
-			     			<field name="user"/>
+	            <field name="arch" type="xml" >
+			     	<form string = "form view" create='false'>
+			     		<group col="4">
+			     			<field name="user" col="2"/>
+			     			<field name = "create_date" col="2" readonly="1" />
 			     		</group>
 			     		<group col="4">
 							<field name = "from_date" col = "2"/>
@@ -42,7 +43,7 @@
 							</page>
 						</notebook>
 						<footer>
-							<button name = "generate_archive" type="object" string = "Generate Commission Receipt" class = "oe_highlight"/>
+							<button invisible = "not context.get('calculator',False)" name = "generate_archive" type="object" string = "Generate Commission Receipt" class = "oe_highlight"/>
 						</footer>
 					</form>
 				</field>
@@ -53,6 +54,7 @@
 	            <field name="res_model">account.commissions</field>
 	            <field name="view_type">form</field>
 	            <field name="view_mode">form</field>
+	            <field name = "context">{'calculator':True}</field>
 	            <field name = "target">new</field>
 	        </record>
 			<menuitem id = "account_menu_commission" groups = "commission_calculator" action = "action_account_commission_view" parent = "hr.menu_hr_main" /> 			
@@ -62,8 +64,8 @@
 		  <record id="account_commission_view_form_archive_tree" model="ir.ui.view">
 	            <field name="name">Commissions</field>
 	            <field name="model">account.commissions</field>
-	            <field name="arch" type="xml">
-			     	<tree string = "Commissions">
+	            <field name="arch" type="xml" >
+			     	<tree string = "Commissions" create='false'>
 			     		<field name = "user" />
 			     		<field name = "from_date" />
 			     		<field name = "to_date" />
