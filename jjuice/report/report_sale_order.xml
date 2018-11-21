@@ -171,8 +171,7 @@
 						  		<td><span><t t-esc="data['comment']" /></span></td>
 						  	</tr>
 						  </table>
-						  <!-- Invoice part on the delivery order just needs to be commented out. We are not using this functionality -->
-<!-- 			               <t t-if = "data['invoice_line']['invoice']">
+ 			              <t t-if = "data['invoice_line']['invoice']">
 								<t t-if = "data['paid_stamp']">
 							        <div class="pull-right watermark" style="position:absolute;opacity:0.4;font-size:3em;width:100%;text-align:center;z-index:1000;">
 										<p>
@@ -204,7 +203,7 @@
 					                    </tr>
 		              			   </tbody>
 		                       </table>
-			                </t> -->
+			                </t> 
 						</div>				
 					</t>
 				</t>
